@@ -1,0 +1,78 @@
+---
+interface Props {
+  titulo: string;
+  valor: string | number;
+  icono: 'cabezas' | 'alerta' | 'peso' | 'crecimiento' | 'rendimiento' | 'leche';
+  tendencia?: { valor: number; positiva: boolean };
+  color?: 'emerald' | 'amber' | 'blue' | 'red' | 'purple' | 'cyan';
+}
+
+const { titulo, valor, icono, tendencia, color = 'emerald' } = Astro.props;
+
+const colores = {
+  emerald: 'from-emerald-500 to-emerald-600',
+  amber: 'from-amber-500 to-amber-600',
+  blue: 'from-blue-500 to-blue-600',
+  red: 'from-red-500 to-red-600',
+  purple: 'from-purple-500 to-purple-600',
+  cyan: 'from-cyan-500 to-cyan-600',
+};
+
+const fondos = {
+  emerald: 'bg-emerald-50',
+  amber: 'bg-amber-50',
+  blue: 'bg-blue-50',
+  red: 'bg-red-50',
+  purple: 'bg-purple-50',
+  cyan: 'bg-cyan-50',
+};
+---
+
+<div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow">
+  <div class="flex items-start justify-between">
+    <div class="flex-1">
+      <p class="text-sm font-medium text-slate-500">{titulo}</p>
+      <p class="text-2xl font-bold text-slate-900 mt-1">{valor}</p>
+      {tendencia && (
+        <div class="flex items-center gap-1 mt-2">
+          <span class={`inline-flex items-center text-sm font-medium ${tendencia.positiva ? 'text-emerald-600' : 'text-red-600'}`}>
+            {tendencia.positiva ? '↑' : '↓'} {tendencia.valor}%
+          </span>
+          <span class="text-xs text-slate-400">vs mes anterior</span>
+        </div>
+      )}
+    </div>
+    <div class={`w-12 h-12 rounded-xl ${fondos[color]} flex items-center justify-center bg-gradient-to-br ${colores[color]} text-white shadow-sm`}>
+      {icono === 'cabezas' && (
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/>
+        </svg>
+      )}
+      {icono === 'alerta' && (
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+        </svg>
+      )}
+      {icono === 'peso' && (
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/>
+        </svg>
+      )}
+      {icono === 'crecimiento' && (
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+        </svg>
+      )}
+      {icono === 'rendimiento' && (
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+        </svg>
+      )}
+      {icono === 'leche' && (
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+        </svg>
+      )}
+    </div>
+  </div>
+</div>

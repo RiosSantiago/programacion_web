@@ -1,0 +1,32 @@
+---
+interface Props {
+  vendedor: string;
+  rating: number;
+  ventas?: number;
+  badge?: 'top' | 'verificado' | 'nuevo' | null;
+}
+
+const { vendedor, rating, ventas = 0, badge = null } = Astro.props;
+
+const badgeInfo = {
+  top: { label: 'Top Vendedor', class: 'bg-gradient-to-r from-amber-400 to-amber-500 text-white', icon: '★' },
+  verificado: { label: 'Verificado', class: 'bg-campo-100 text-campo-700', icon: '✓' },
+  nuevo: { label: 'Nuevo', class: 'bg-blue-100 text-blue-700', icon: '★' },
+};
+
+const ratingClass = rating >= 4.8 ? 'text-amber-500' : rating >= 4.5 ? 'text-campo-500' : 'text-slate-500';
+---
+
+<div class="flex items-center gap-2">
+  <div class="flex items-center gap-1">
+    <span class={`text-sm font-bold ${ratingClass}`}>★</span>
+    <span class="text-sm font-semibold text-slate-700">{rating.toFixed(1)}</span>
+    <span class="text-xs text-slate-400">({ventas} ventas)</span>
+  </div>
+  {badge && badgeInfo[badge] && (
+    <span class={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeInfo[badge].class}`}>
+      <span>{badgeInfo[badge].icon}</span>
+      <span>{badgeInfo[badge].label}</span>
+    </span>
+  )}
+</div>

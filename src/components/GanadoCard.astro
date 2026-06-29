@@ -1,0 +1,118 @@
+---
+interface Props {
+  ganado: {
+    id: number;
+    nombre: string;
+    raza: string;
+    peso: number;
+    ubicacion: string;
+    precio: number;
+    cabezas: number;
+    imagen: string;
+    estado: string;
+    rendimiento: number;
+  };
+}
+
+const { ganado } = Astro.props;
+
+const formatearPrecio = (precio: number): string => {
+  return new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    minimumFractionDigits: 0,
+  }).format(precio);
+};
+
+const estadoEstilos: Record<string, string> = {
+  engorde: 'bg-blue-100 text-blue-700',
+  cria: 'bg-amber-100 text-amber-700',
+  produccion: 'bg-emerald-100 text-emerald-700',
+};
+
+const estadoEtiqueta: Record<string, string> = {
+  engorde: 'Engorde',
+  cria: 'Cria',
+  produccion: 'Produccion',
+};
+---
+
+<div class="group bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300">
+  <!-- Imagen -->
+  <div class="relative overflow-hidden aspect-video">
+    <img
+      src={ganado.imagen}
+      alt={ganado.nombre}
+      class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
+      loading="lazy"
+    />
+    <div class="absolute top-3 left-3">
+      <span class={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${estadoEstilos[ganado.estado]}`}>
+        {estadoEtiqueta[ganado.estado]}
+      </span>
+    </div>
+    <div class="absolute top-3 right-3">
+      <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-white/90 backdrop-blur-sm text-slate-700">
+        {ganado.cabezas} cabezas
+      </span>
+    </div>
+  </div>
+
+  <!-- Contenido -->
+  <div class="p-5">
+    <h3 class="text-lg font-semibold text-slate-900">{ganado.nombre}</h3>
+    <p class="text-sm text-slate-500 mt-0.5 flex items-center gap-1">
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+      {ganado.ubicacion}
+    </p>
+
+    <!-- Ficha tecnica -->
+    <div class="grid grid-cols-3 gap-3 mt-4 py-4 border-y border-slate-100">
+      <div class="text-center">
+        <p class="text-xs text-slate-400 uppercase tracking-wider">Raza</p>
+        <p class="text-sm font-semibold text-slate-700 mt-0.5">{ganado.raza}</p>
+      </div>
+      <div class="text-center border-x border-slate-100">
+        <p class="text-xs text-slate-400 uppercase tracking-wider">Peso</p>
+        <p class="text-sm font-semibold text-slate-700 mt-0.5">{ganado.peso} kg</p>
+      </div>
+      <div class="text-center">
+        <p class="text-xs text-slate-400 uppercase tracking-wider">Rendim.</p>
+        <p class="text-sm font-semibold text-emerald-600 mt-0.5">{ganado.rendimiento}%</p>
+      </div>
+    </div>
+
+    <!-- Precio y acciones -->
+    <div class="flex items-center justify-between mt-4">
+      <div>
+        <p class="text-xs text-slate-400">Precio por lote</p>
+        <p class="text-xl font-bold text-slate-900">{formatearPrecio(ganado.precio)}</p>
+      </div>
+    </div>
+
+    <div class="flex gap-2 mt-4">
+      <a
+        href={`/dashboard?lote=${ganado.id}`}
+        class="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-slate-100 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-200 transition-colors"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+        Ver Detalles
+      </a>
+      <a
+        href="/inversion"
+        class="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white text-sm font-semibold rounded-lg shadow-sm hover:shadow-md hover:from-emerald-700 hover:to-emerald-800 transition-all"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Invertir
+      </a>
+    </div>
+  </div>
+</div>

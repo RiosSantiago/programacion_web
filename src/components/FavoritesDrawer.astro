@@ -1,0 +1,228 @@
+---
+---
+
+<div id="favoritos-overlay" class="fixed inset-0 bg-black/40 z-40 hidden backdrop-blur-sm" onclick="cerrarFavoritos()"></div>
+
+<div id="favoritos-drawer" class="fixed top-0 right-0 h-full w-full sm:w-[28rem] bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
+  <div class="flex items-center justify-between p-5 border-b border-[#E8E0D8] bg-gradient-to-r from-campo-600 to-campo-700">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 bg-coral-500 rounded-xl flex items-center justify-center">
+        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+      </div>
+      <div>
+        <h3 class="text-lg font-display font-bold text-white">Mis Favoritos</h3>
+        <span id="favoritos-count" class="text-sm text-coral-300 font-medium">0 productos guardados</span>
+      </div>
+    </div>
+    <button onclick="cerrarFavoritos()" class="w-10 h-10 flex items-center justify-center rounded-xl text-coral-300 hover:bg-campo-500 hover:text-white transition-colors">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <div id="favoritos-items" class="flex-1 overflow-y-auto p-5 space-y-4">
+    <div id="favoritos-empty" class="flex flex-col items-center justify-center h-full text-center py-12">
+      <div class="w-24 h-24 bg-[#FFFDF7] rounded-2xl flex items-center justify-center mb-6 border border-[#E8E0D8]">
+        <svg class="w-12 h-12 text-[#C4B09C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+      </div>
+      <h4 class="text-lg font-display font-bold text-[#2D2D2D] mb-2">No tienes favoritos</h4>
+      <p class="text-sm text-[#6B6B6B] mb-6">Guarda productos que te interesen para compararlos después</p>
+      <a href="/marketplace" onclick="cerrarFavoritos()" class="btn-primary">
+        Explorar Productos
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  interface Favorito {
+    id: number;
+    nombre: string;
+    precio: number;
+    imagen: string;
+    vendedor: string;
+    ubicacion: string;
+    categoria: string;
+    fechaAgregado: string;
+  }
+
+  let favoritos: Favorito[] = [];
+
+  function formatearCOP(valor: number): string {
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(valor);
+  }
+
+  function abrirFavoritos() {
+    document.getElementById('favoritos-overlay')?.classList.remove('hidden');
+    document.getElementById('favoritos-drawer')?.classList.remove('translate-x-full');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function cerrarFavoritos() {
+    document.getElementById('favoritos-overlay')?.classList.add('hidden');
+    document.getElementById('favoritos-drawer')?.classList.add('translate-x-full');
+    document.body.style.overflow = '';
+  }
+
+  function agregarFavorito(item: Favorito) {
+    const existe = favoritos.find(f => f.id === item.id);
+    if (!existe) {
+      favoritos.unshift({ ...item, fechaAgregado: new Date().toISOString() });
+      actualizarFavoritos();
+      guardarFavoritos();
+    }
+  }
+
+  function eliminarFavorito(id: number) {
+    favoritos = favoritos.filter(f => f.id !== id);
+    actualizarFavoritos();
+    guardarFavoritos();
+    actualizarBotonesFavoritos();
+  }
+
+  function guardarFavoritos() {
+    try {
+      localStorage.setItem('agrotech-favoritos', JSON.stringify(favoritos));
+    } catch (e) {}
+  }
+
+  function cargarFavoritos() {
+    try {
+      const saved = localStorage.getItem('agrotech-favoritos');
+      if (saved) {
+        favoritos = JSON.parse(saved);
+        actualizarFavoritos();
+        actualizarBotonesFavoritos();
+      }
+    } catch (e) {}
+  }
+
+  function actualizarFavoritos() {
+    const container = document.getElementById('favoritos-items');
+    const emptyState = document.getElementById('favoritos-empty');
+    const countEl = document.getElementById('favoritos-count');
+    const navBadge = document.getElementById('nav-favoritos-count');
+
+    if (countEl) countEl.textContent = `${favoritos.length} producto${favoritos.length !== 1 ? 's' : ''} guardado${favoritos.length !== 1 ? 's' : ''}`;
+    if (navBadge) {
+      navBadge.textContent = String(favoritos.length);
+      navBadge.classList.toggle('hidden', favoritos.length === 0);
+    }
+
+    if (favoritos.length === 0) {
+      if (container) {
+        container.innerHTML = '';
+        container.appendChild(createEmptyState());
+      }
+      return;
+    }
+
+    if (emptyState) emptyState.style.display = 'none';
+
+    if (container) {
+      container.innerHTML = '';
+      favoritos.forEach(item => {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'flex gap-4 p-4 bg-white rounded-2xl border border-[#E8E0D8] shadow-sm hover:shadow-md transition-shadow';
+        itemEl.innerHTML = `
+          <a href="/marketplace/${item.id}" class="shrink-0">
+            <img src="${item.imagen}" alt="${item.nombre}" class="w-20 h-20 rounded-xl object-cover" />
+          </a>
+          <div class="flex-1 min-w-0">
+            <a href="/marketplace/${item.id}" class="text-sm font-bold text-[#2D2D2D] line-clamp-2 hover:text-gold-700 transition-colors">${item.nombre}</a>
+            <p class="text-xs text-[#6B6B6B] mt-1">${item.vendedor}</p>
+            <p class="text-lg font-extrabold text-[#2D2D2D] mt-1">${formatearCOP(item.precio)}</p>
+            <div class="flex items-center justify-between mt-3">
+              <span class="text-xs text-[#6B6B6B] capitalize">${item.categoria}</span>
+              <button onclick="eliminarFavorito(${item.id})" class="text-xs text-coral-500 hover:text-coral-700 font-medium transition-colors flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Quitar
+              </button>
+            </div>
+          </div>
+        `;
+        container.appendChild(itemEl);
+      });
+    }
+  }
+
+  function createEmptyState(): HTMLElement {
+    const div = document.createElement('div');
+    div.id = 'favoritos-empty';
+    div.className = 'flex flex-col items-center justify-center h-full text-center py-12';
+    div.innerHTML = `
+      <div class="w-24 h-24 bg-[#FFFDF7] rounded-2xl flex items-center justify-center mb-6 border border-[#E8E0D8]">
+        <svg class="w-12 h-12 text-[#C4B09C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+      </div>
+      <h4 class="text-lg font-display font-bold text-[#2D2D2D] mb-2">No tienes favoritos</h4>
+      <p class="text-sm text-[#6B6B6B] mb-6">Guarda productos que te interesen para compararlos después</p>
+      <a href="/marketplace" onclick="cerrarFavoritos()" class="btn-primary">
+        Explorar Productos
+      </a>
+    `;
+    return div;
+  }
+
+  function actualizarBotonesFavoritos() {
+    document.querySelectorAll('.btn-favorito').forEach(btn => {
+      const id = parseInt(btn.getAttribute('data-id') || '0');
+      const esFavorito = favoritos.some(f => f.id === id);
+      btn.classList.toggle('activo', esFavorito);
+    });
+  }
+
+  function toggleFavorito(id: number, nombre: string, precio: number, imagen: string, vendedor: string, ubicacion: string, categoria: string) {
+    const existe = favoritos.find(f => f.id === id);
+    if (existe) {
+      eliminarFavorito(id);
+    } else {
+      agregarFavorito({ id, nombre, precio, imagen, vendedor, ubicacion, categoria, fechaAgregado: '' });
+    }
+  }
+
+  // Expose globally
+  (window as any).abrirFavoritos = abrirFavoritos;
+  (window as any).cerrarFavoritos = cerrarFavoritos;
+  (window as any).toggleFavorito = toggleFavorito;
+  (window as any).eliminarFavorito = eliminarFavorito;
+
+  // Load on page load
+  cargarFavoritos();
+
+  // Listen for favorite buttons
+  document.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('.btn-favorito');
+    if (btn) {
+      const id = parseInt(btn.getAttribute('data-id') || '0');
+      const nombre = btn.getAttribute('data-nombre') || '';
+      const precio = parseFloat(btn.getAttribute('data-precio') || '0');
+      const imagen = btn.getAttribute('data-imagen') || '';
+      const vendedor = btn.getAttribute('data-vendedor') || '';
+      const ubicacion = btn.getAttribute('data-ubicacion') || '';
+      const categoria = btn.getAttribute('data-categoria') || '';
+      toggleFavorito(id, nombre, precio, imagen, vendedor, ubicacion, categoria);
+    }
+  });
+
+  // Open favoritos drawer
+  document.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('[data-open-favoritos]');
+    if (btn) {
+      abrirFavoritos();
+    }
+  });
+</script>

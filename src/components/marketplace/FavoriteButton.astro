@@ -1,0 +1,39 @@
+---
+interface Props {
+  producto: {
+    id: number;
+    nombre: string;
+    imagen?: string;
+    imagenes?: string[];
+    precio: number;
+    vendedor?: string;
+    ubicacion?: string;
+    categoria?: string;
+  };
+}
+
+const { producto } = Astro.props;
+---
+
+<button
+  class="btn-favorito w-10 h-10 flex items-center justify-center rounded-xl bg-white/90 backdrop-blur-sm shadow-md hover:shadow-lg hover:scale-110 transition-all duration-200"
+  data-id={producto.id}
+  data-nombre={producto.nombre}
+  data-precio={producto.precio}
+  data-imagen={producto.imagen || (producto.imagenes && producto.imagenes[0]) || '/images/ganado.svg'}
+  data-vendedor={producto.vendedor || ''}
+  data-ubicacion={producto.ubicacion || ''}
+  data-categoria={producto.categoria || ''}
+  aria-label="Guardar en favoritos"
+>
+  <svg class="w-5 h-5 corazon-icon text-slate-400 hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+  </svg>
+</button>
+
+<style>
+  .btn-favorito.activo .corazon-icon {
+    fill: #EF4444;
+    color: #EF4444;
+  }
+</style>

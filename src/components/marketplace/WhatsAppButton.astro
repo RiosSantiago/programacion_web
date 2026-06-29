@@ -1,0 +1,27 @@
+---
+interface Props {
+  producto: {
+    nombre: string;
+    precio: number;
+    id: number;
+    vendedor?: string;
+  };
+}
+
+const { producto } = Astro.props;
+const phone = '573001234567';
+const message = encodeURIComponent(
+  `Hola! Estoy interesado en ${producto.nombre} (${new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(producto.precio)}). Puedo ver la publicacion aqui: ${Astro.url.origin}/marketplace/${producto.id}`
+);
+const whatsappUrl = `https://wa.me/${phone}?text=${message}`;
+---
+
+<a
+  href={whatsappUrl}
+  target="_blank"
+  rel="noopener noreferrer"
+  class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-campo-600 text-white font-semibold rounded-lg hover:bg-campo-700 transition-colors shadow-sm"
+>
+  <span class="text-lg">💬</span>
+  Negociar por WhatsApp
+</a>

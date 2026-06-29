@@ -1,0 +1,101 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PerfilForm from '../components/auth/PerfilForm';
+---
+
+<BaseLayout title="Mi Perfil - AgroTech">
+  <div class="min-h-screen bg-[#FFFDF7]">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div id="perfil-content" class="hidden">
+        <div class="bg-white rounded-2xl border border-[#E8E0D8] shadow-sm overflow-hidden">
+          <div class="px-6 py-4 bg-gradient-to-r from-campo-50 to-white border-b border-[#E8E0D8]">
+            <h1 class="text-xl font-bold text-[#1A0E08]">Mi Perfil</h1>
+            <p class="text-sm text-[#6B6B6B] mt-1">Gestiona tu información personal</p>
+          </div>
+
+          <div class="p-6">
+            <div class="flex items-center gap-6 mb-8">
+              <div class="w-20 h-20 bg-gradient-to-br from-gold-500 to-gold-700 rounded-2xl flex items-center justify-center text-white text-2xl font-bold" id="user-avatar-initial">
+                ?
+              </div>
+              <div>
+                <h2 class="text-xl font-bold text-[#1A0E08]" id="user-name-display"></h2>
+                <p class="text-[#6B6B6B]" id="user-email-display"></p>
+                <span id="user-role-badge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold mt-2"></span>
+              </div>
+            </div>
+
+            <PerfilForm client:load />
+          </div>
+        </div>
+
+      <div id="admin-section" class="mt-6 hidden">
+        <div class="bg-white rounded-2xl border border-[#E8E0D8] shadow-sm overflow-hidden">
+          <div class="px-6 py-4 bg-gradient-to-r from-gold-50 to-white border-b border-[#E8E0D8]">
+            <h2 class="text-lg font-bold text-[#1A0E08]">Panel de Administración</h2>
+            <p class="text-sm text-[#6B6B6B] mt-1">Gestiona el marketplace</p>
+          </div>
+          <div class="p-6">
+            <a href="/admin" class="inline-flex items-center gap-2 px-5 py-2.5 bg-campo-600 text-white text-sm font-bold rounded-xl hover:bg-campo-700 transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              Ir a Administración
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 flex justify-between">
+        <a href="/terminos" class="text-sm text-[#6B6B6B] hover:text-gold-700">Términos y Condiciones</a>
+        <a href="/privacidad" class="text-sm text-[#6B6B6B] hover:text-gold-700">Política de Privacidad</a>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const raw = localStorage.getItem('agrotech_user');
+    if (!raw) {
+      window.location.href = '/auth/login';
+      return;
+    }
+    try {
+      const user = JSON.parse(raw);
+
+      document.getElementById('perfil-content')?.classList.remove('hidden');
+
+      const avatarEl = document.getElementById('user-avatar-initial');
+      if (avatarEl && user.nombre) {
+        avatarEl.textContent = user.nombre.charAt(0).toUpperCase();
+      }
+
+      const nameEl = document.getElementById('user-name-display');
+      if (nameEl) nameEl.textContent = user.nombre;
+
+      const emailEl = document.getElementById('user-email-display');
+      if (emailEl) emailEl.textContent = user.email;
+
+      const badge = document.getElementById('user-role-badge');
+      if (badge) {
+        if (user.rol === 'root') {
+          badge.textContent = 'Root';
+          badge.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold mt-2 bg-gold-100 text-gold-800';
+        } else if (user.rol === 'admin') {
+          badge.textContent = 'Admin';
+          badge.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold mt-2 bg-purple-100 text-purple-700';
+        } else {
+          badge.textContent = 'Usuario';
+          badge.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold mt-2 bg-campo-100 text-campo-800';
+        }
+      }
+
+      if (user.rol === 'root' || user.rol === 'admin') {
+        const section = document.getElementById('admin-section');
+        if (section) section.classList.remove('hidden');
+      }
+    } catch {}
+  });
+</script>

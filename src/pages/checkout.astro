@@ -1,0 +1,249 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Finalizar Compra - AgroTech">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-2xl md:text-3xl font-display font-bold text-[#2D2D2D] mb-6">Finalizar Compra</h1>
+
+    <div class="grid lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-2 space-y-6">
+        <div class="bg-white rounded-2xl border border-[#E8E0D8] shadow-sm p-6">
+          <h2 class="text-lg font-display font-bold text-[#2D2D2D] mb-4 flex items-center gap-2">
+            <svg class="w-5 h-5 text-gold-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            </svg>
+            Información de entrega
+          </h2>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-[#2D2D2D] mb-1.5">Nombre completo</label>
+              <input type="text" id="nombre" placeholder="Tu nombre" class="w-full px-4 py-2.5 border border-[#E8E0D8] rounded-xl text-sm focus:ring-2 focus:ring-gold-500 focus:border-gold-500" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-[#2D2D2D] mb-1.5">Teléfono</label>
+              <input type="tel" id="telefono" placeholder="3001234567" class="w-full px-4 py-2.5 border border-[#E8E0D8] rounded-xl text-sm focus:ring-2 focus:ring-gold-500 focus:border-gold-500" />
+            </div>
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-[#2D2D2D] mb-1.5">Dirección de entrega</label>
+              <input type="text" id="direccion" placeholder="Dirección completa en Manizales" class="w-full px-4 py-2.5 border border-[#E8E0D8] rounded-xl text-sm focus:ring-2 focus:ring-gold-500 focus:border-gold-500" />
+            </div>
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-[#2D2D2D] mb-1.5">Notas adicionales (opcional)</label>
+              <textarea id="notas" rows="2" placeholder="Indicaciones especiales para la entrega" class="w-full px-4 py-2.5 border border-[#E8E0D8] rounded-xl text-sm focus:ring-2 focus:ring-gold-500 focus:border-gold-500"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-[#E8E0D8] shadow-sm p-6">
+          <h2 class="text-lg font-display font-bold text-[#2D2D2D] mb-4 flex items-center gap-2">
+            <svg class="w-5 h-5 text-gold-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+            </svg>
+            Método de pago
+          </h2>
+          <div id="error-pago" class="hidden bg-red-50 border border-red-200 text-red-600 rounded-lg p-3 mb-4 text-sm"></div>
+          <div class="grid md:grid-cols-2 gap-3" id="metodos-pago"></div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-2xl border border-[#E8E0D8] shadow-sm p-6 sticky top-24">
+          <h2 class="text-lg font-display font-bold text-[#2D2D2D] mb-4">Resumen del pedido</h2>
+          <div id="resumen-items" class="space-y-3 mb-4"></div>
+          <div class="border-t border-[#E8E0D8] pt-4 space-y-2">
+            <div class="flex justify-between text-sm">
+              <span class="text-[#6B6B6B]">Subtotal</span>
+              <span id="subtotal" class="font-medium text-[#2D2D2D]"></span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-[#6B6B6B]">Envío</span>
+              <span class="font-medium text-gold-700">Gratis</span>
+            </div>
+            <div class="flex justify-between text-lg font-bold pt-2 border-t border-[#E8E0D8]">
+              <span>Total</span>
+              <span id="total" class="text-gold-700"></span>
+            </div>
+          </div>
+          <button id="btn-pagar" class="w-full mt-6 py-3 bg-campo-600 text-white font-bold rounded-xl hover:bg-campo-700 transition-all duration-200 active:scale-[0.98] shadow-lg">
+            Confirmar Pedido
+          </button>
+          <p class="text-xs text-[#6B6B6B] text-center mt-3">
+            Al confirmar, aceptas nuestros <a href="/terminos" class="text-gold-700 hover:underline">términos</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  import { $cart, clearCart } from '../stores/cart';
+  import { $user, $isAuthenticated } from '../stores/auth';
+
+  const metodosPago = [
+    { id: 'pse', nombre: 'PSE', descripcion: 'Pago desde tu banco' },
+    { id: 'nequi', nombre: 'Nequi', descripcion: 'Billetera digital' },
+    { id: 'daviplata', nombre: 'Daviplata', descripcion: 'Billetera digital' },
+    { id: 'tarjeta', nombre: 'Tarjeta Débito/Crédito', descripcion: 'Visa, Mastercard, Amex' },
+    { id: 'efectivo', nombre: 'Efectivo', descripcion: 'Contra entrega o presencial' },
+    { id: 'whatsapp', nombre: 'WhatsApp', descripcion: 'Coordina tu pago' },
+  ];
+
+  function getMetodoIcon(m: typeof metodosPago[0]) {
+    if (m.id === 'whatsapp') {
+      return '<svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>';
+    }
+    return '<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>';
+  }
+
+  function formatCOP(value: number): string {
+    return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(value);
+  }
+
+  function renderMetodosPago() {
+    const container = document.getElementById('metodos-pago');
+    if (!container) return;
+
+    container.innerHTML = metodosPago.map(m => `
+      <label class="metodo-pago-label relative flex items-center gap-3 p-4 border-2 rounded-xl cursor-pointer transition-all hover:border-gold-400 ${m.id === 'pse' ? 'border-gold-700 bg-gold-50' : 'border-[#E8E0D8]'}">
+        <input type="radio" name="metodo_pago" value="${m.id}" class="mt-1 w-4 h-4 text-gold-700" ${m.id === 'pse' ? 'checked' : ''} />
+        <div class="w-12 h-12 bg-gold-100 rounded-xl flex items-center justify-center flex-shrink-0">
+          ${getMetodoIcon(m)}
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-bold text-[#2D2D2D] text-sm">${m.nombre}</p>
+          <p class="text-xs text-[#6B6B6B]">${m.descripcion}</p>
+        </div>
+      </label>
+    `).join('');
+
+    document.querySelectorAll('.metodo-pago-label').forEach(label => {
+      label.addEventListener('click', () => {
+        document.querySelectorAll('.metodo-pago-label').forEach(l => {
+          l.classList.remove('border-gold-700', 'bg-gold-50');
+          l.classList.add('border-[#E8E0D8]');
+        });
+        label.classList.remove('border-[#E8E0D8]');
+        label.classList.add('border-gold-700', 'bg-gold-50');
+      });
+    });
+  }
+
+  function renderResumen() {
+    const items = $cart.get();
+    const resumenItems = document.getElementById('resumen-items');
+    const subtotalEl = document.getElementById('subtotal');
+    const totalEl = document.getElementById('total');
+
+    if (!resumenItems || !subtotalEl || !totalEl) return;
+
+    if (items.length === 0) {
+      window.location.href = '/marketplace';
+      return;
+    }
+
+    resumenItems.innerHTML = items.map(item => `
+      <div class="flex gap-3 p-3 bg-[#FFFDF7] rounded-xl border border-[#E8E0D8]">
+        <img src="${item.imagen}" alt="${item.nombre}" class="w-16 h-16 object-cover rounded-lg" />
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-bold text-[#2D2D2D] truncate">${item.nombre}</p>
+          <p class="text-xs text-[#6B6B6B]">Cantidad: ${item.cantidad}</p>
+          <p class="text-sm font-bold text-gold-700">${formatCOP(item.precio * item.cantidad)}</p>
+        </div>
+      </div>
+    `).join('');
+
+    const total = items.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
+    subtotalEl.textContent = formatCOP(total);
+    totalEl.textContent = formatCOP(total);
+  }
+
+  document.getElementById('btn-pagar')?.addEventListener('click', async () => {
+    const nombre = (document.getElementById('nombre') as HTMLInputElement)?.value;
+    const telefono = (document.getElementById('telefono') as HTMLInputElement)?.value;
+    const direccion = (document.getElementById('direccion') as HTMLInputElement)?.value;
+    const notas = (document.getElementById('notas') as HTMLTextAreaElement)?.value;
+    const metodoPago = (document.querySelector('input[name="metodo_pago"]:checked') as HTMLInputElement)?.value;
+
+    const errorEl = document.getElementById('error-pago');
+    if (!nombre || !telefono || !direccion) {
+      if (errorEl) {
+        errorEl.textContent = 'Por favor completa todos los campos de entrega';
+        errorEl.classList.remove('hidden');
+      }
+      return;
+    }
+
+    const items = $cart.get();
+    const total = items.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
+
+    if (metodoPago === 'whatsapp') {
+      const productos = items.map(i => `${i.cantidad}x ${i.nombre}`).join(', ');
+      const texto = `Hola! Quiero comprar en AgroTech:%0A%0A*Productos:* ${productos}%0A*Total:* ${formatCOP(total)}%0A%0A*Datos de entrega:*%0ANombre: ${nombre}%0ATeléfono: ${telefono}%0ADirección: ${direccion}${notas ? '%0ANotas: ' + notas : ''}`;
+      window.open(`https://wa.me/573001234567?text=${texto}`, '_blank');
+      clearCart();
+      window.location.href = '/pedido-exito?metodo=whatsapp';
+      return;
+    }
+
+    try {
+      const endpoint = metodoPago === 'efectivo' ? '/api/pedidos/crear' : '/api/wompi/crear';
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items, total, metodoPago, nombre, telefono, direccion, notas }),
+      });
+      const data = await res.json();
+
+      if (data.urlPago) {
+        clearCart();
+        window.location.href = data.urlPago;
+      } else {
+        clearCart();
+        window.location.href = `/pedido-exito?orden=${data.ordenId}&metodo=${metodoPago}`;
+      }
+    } catch (err) {
+      if (errorEl) {
+        errorEl.textContent = 'Error al procesar el pago. Intenta de nuevo.';
+        errorEl.classList.remove('hidden');
+      }
+    }
+  });
+
+  // Migrate old localStorage key if present
+  if (typeof localStorage !== 'undefined') {
+    const oldCart = localStorage.getItem('agrotech-cart');
+    if (oldCart) {
+      const currentCart = localStorage.getItem('agrotech_cart');
+      if (!currentCart || JSON.parse(currentCart).length === 0) {
+        localStorage.setItem('agrotech_cart', oldCart);
+      }
+      localStorage.removeItem('agrotech-cart');
+    }
+  }
+
+  function checkAuth() {
+    const isAuth = $isAuthenticated.get();
+    const user = $user.get();
+
+    if (!isAuth || !user) {
+      const returnUrl = encodeURIComponent('/checkout');
+      window.location.href = `/auth/login?redirect=${returnUrl}`;
+      return;
+    }
+
+    const nombreEl = document.getElementById('nombre') as HTMLInputElement;
+    const telefonoEl = document.getElementById('telefono') as HTMLInputElement;
+    const direccionEl = document.getElementById('direccion') as HTMLInputElement;
+
+    if (nombreEl && user.nombre) nombreEl.value = user.nombre;
+    if (telefonoEl && user.celular) telefonoEl.value = user.celular;
+    if (direccionEl && user.direccion) direccionEl.value = user.direccion;
+  }
+
+  checkAuth();
+  $cart.subscribe(renderResumen);
+  renderMetodosPago();
+  renderResumen();
+</script>

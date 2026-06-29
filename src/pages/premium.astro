@@ -1,0 +1,10 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PremiumNavbar from '../components/premium/PremiumNavbar.tsx';
+import PremiumHero from '../components/premium/PremiumHero.tsx';
+---
+
+<BaseLayout hideNav>
+  <PremiumNavbar client:load />
+  <PremiumHero client:load />
+</BaseLayout>

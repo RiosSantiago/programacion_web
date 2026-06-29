@@ -1,0 +1,286 @@
+---
+interface Props {
+  producto: {
+    id: number;
+    nombre: string;
+    raza: string;
+    peso: number;
+    precio: number;
+    precioAnterior?: number;
+    categoria?: string;
+    imagen?: string;
+    imagenes?: string[];
+    estado?: string;
+    vendedor?: string;
+    vendedorRating?: number;
+    vendedorVentas?: number;
+    vendedorBadge?: 'top' | 'verificado' | 'nuevo' | null;
+    destacado?: boolean;
+    oferta?: boolean;
+    stock?: number;
+    trazabilidad?: boolean;
+    sexo?: string;
+  };
+}
+
+const { producto } = Astro.props;
+
+const todasLasImagenes = producto.imagenes && producto.imagenes.length > 0
+  ? producto.imagenes
+  : producto.imagen
+    ? [producto.imagen]
+    : ['/images/ganado.svg'];
+const imagen = todasLasImagenes[0];
+const multipleImages = todasLasImagenes.length > 1;
+
+const formatearPrecio = (precio: number): string => {
+  return new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    minimumFractionDigits: 0,
+  }).format(precio);
+};
+
+const tieneDescuento = producto.precioAnterior && producto.precioAnterior > producto.precio;
+const descuento = tieneDescuento ? Math.round((1 - producto.precio / producto.precioAnterior!) * 100) : 0;
+
+const categoriaIconos: Record<string, string> = {
+  bovino: '/images/ganado.svg',
+  equino: '/images/caballo.svg',
+  porcino: '/images/cerdo.svg',
+  avicola: '/images/gallina.svg',
+  agricultura: '/images/cultivos.svg',
+  insumos: '/images/default.svg',
+};
+const iconoCategoria = categoriaIconos[producto.categoria?.toLowerCase() || 'bovino'] || '/images/ganado.svg';
+
+const badgeInfo: Record<string, { label: string; class: string; icon: string }> = {
+  top: { label: 'Top', class: 'bg-amber-600 text-white', icon: '★' },
+  verificado: { label: 'Verif.', class: 'bg-campo-600 text-white', icon: '✓' },
+  nuevo: { label: 'Nuevo', class: 'bg-coral-500 text-white', icon: '◆' },
+};
+
+const vendedorBadge = producto.vendedorBadge || null;
+const vendedorInicial = producto.vendedor?.[0] || 'H';
+
+const atributos = [
+  producto.raza && { label: 'Raza', value: producto.raza },
+  producto.sexo && { label: 'Sexo', value: producto.sexo },
+  producto.peso != null && { label: 'Peso', value: `${producto.peso} kg` },
+].filter(Boolean);
+---
+
+<article
+  class="group bg-white rounded-xl border border-[#E8E0D8] overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] hover:border-campo-400/50 active:scale-[0.98]"
+  data-href={`/marketplace/${producto.id}`}
+  data-imagenes={JSON.stringify(todasLasImagenes)}
+  data-img-index="0"
+>
+  <div class="relative aspect-[4/3] bg-[#FAF8F3] overflow-hidden">
+    <img
+      src={imagen}
+      alt={producto.nombre}
+      class="card-img w-full h-full object-contain p-3 group-hover:scale-105 transition-transform duration-500"
+      loading="lazy"
+    />
+
+    <div class="absolute inset-0 bg-gradient-to-t from-black/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+    {multipleImages && (
+      <>
+        <button
+          class="card-nav-prev absolute left-1 top-1/2 -translate-y-1/2 w-6 h-6 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-white z-10 text-[#2D2D2D]"
+          onclick="event.stopPropagation();window.cardNav(this,-1)"
+          aria-label="Imagen anterior"
+        >
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <button
+          class="card-nav-next absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-white z-10 text-[#2D2D2D]"
+          onclick="event.stopPropagation();window.cardNav(this,1)"
+          aria-label="Imagen siguiente"
+        >
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+        <div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10">
+          {todasLasImagenes.map((_, i) => (
+            <span
+              class={`card-dot block w-1.5 h-1.5 rounded-full transition-all duration-200 ${i === 0 ? 'bg-white shadow-sm w-3' : 'bg-white/50'}`}
+            />
+          ))}
+        </div>
+      </>
+    )}
+
+    <div class="absolute top-2 left-2 flex flex-col gap-1">
+      <span class={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold leading-tight shadow-sm ${
+        producto.estado === 'reservado' ? 'bg-coral-500 text-white' :
+        producto.estado === 'vendido' ? 'bg-campo-600 text-white' :
+        'bg-campo-600 text-white'
+      }`}>
+        <span class="w-1 h-1 rounded-full bg-white" />
+        {producto.estado === 'reservado' ? 'Reservado' : producto.estado === 'vendido' ? 'Vendido' : 'Disponible'}
+      </span>
+      {producto.oferta && tieneDescuento && (
+        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-coral-500 text-white shadow-sm">
+          -{descuento}%
+        </span>
+      )}
+    </div>
+
+    <div class="absolute top-2 right-2 flex items-center gap-1.5">
+      <button
+        onclick="event.stopPropagation()"
+        class="btn-favorito w-7 h-7 bg-white/80 backdrop-blur-sm rounded-md flex items-center justify-center shadow-sm hover:shadow-md hover:scale-110 transition-all duration-200"
+        data-id={producto.id}
+        data-nombre={producto.nombre}
+        data-precio={producto.precio}
+        data-imagen={imagen}
+        data-vendedor={producto.vendedor || ''}
+        data-categoria={producto.categoria || ''}
+        aria-label="Guardar en favoritos"
+      >
+        <svg class="w-3.5 h-3.5 text-stone-400 hover:text-coral-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+      </button>
+      <div class="bg-white/80 backdrop-blur-sm rounded-md px-2 py-1 shadow-sm flex items-center gap-1">
+        <img src={iconoCategoria} alt="" class="w-3 h-3" />
+        <span class="text-[10px] font-semibold text-[#2D2D2D] capitalize">{producto.categoria || 'Bovino'}</span>
+      </div>
+    </div>
+
+    {producto.trazabilidad && (
+      <div class="absolute bottom-2 left-2">
+        <span class="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-campo-700/80 backdrop-blur-sm text-white shadow-sm">
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 00-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+          Trazabilidad
+        </span>
+      </div>
+    )}
+
+    <div class="absolute bottom-2 right-2">
+      <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-white/80 backdrop-blur-sm text-[#6B6B6B] shadow-sm">
+        {producto.stock || 1} {producto.stock === 1 ? 'ud.' : 'uds.'}
+      </span>
+    </div>
+  </div>
+
+  <div class="p-3 space-y-2">
+    <div class="min-w-0">
+      <h3 class="text-sm font-display font-bold text-[#2D2D2D] leading-tight line-clamp-1 group-hover:text-campo-700 transition-colors">
+        {producto.nombre}
+      </h3>
+    </div>
+
+    {atributos.length > 0 && (
+      <div class="flex flex-wrap gap-1">
+        {atributos.map((attr) => (
+          <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-[#F5F0E8] text-[11px] font-medium text-[#6B6B6B]">
+            {attr!.value}
+          </span>
+        ))}
+      </div>
+    )}
+
+    {producto.vendedor && (
+      <div class="flex items-center gap-2 pt-0.5">
+        <div class="w-6 h-6 bg-gradient-to-br from-campo-500 to-campo-700 rounded-full flex items-center justify-center shadow-sm shrink-0">
+          <span class="text-white font-bold text-[10px]">{vendedorInicial}</span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-[11px] font-semibold text-[#2D2D2D] leading-tight truncate">{producto.vendedor}</p>
+          <div class="flex items-center gap-1.5">
+            <div class="flex items-center gap-0.5">
+              <span class="text-[10px] font-bold text-amber-600">★</span>
+              <span class="text-[10px] font-semibold text-[#6B6B6B]">{producto.vendedorRating?.toFixed(1) || '4.5'}</span>
+            </div>
+            {vendedorBadge && badgeInfo[vendedorBadge] && (
+              <span class={`inline-flex items-center gap-0.5 px-1.5 py-0 rounded text-[9px] font-bold ${badgeInfo[vendedorBadge].class}`}>
+                {badgeInfo[vendedorBadge].icon}
+                {badgeInfo[vendedorBadge].label}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+    )}
+
+    <div class="pt-0.5">
+      {tieneDescuento && (
+        <span class="text-[11px] text-[#A09080] line-through">
+          {formatearPrecio(producto.precioAnterior!)}
+        </span>
+      )}
+      <p class="text-base font-extrabold text-[#2D2D2D] leading-tight">
+        {formatearPrecio(producto.precio)}
+      </p>
+    </div>
+
+    <div class="flex gap-1.5 pt-1">
+      <a
+        href={`/marketplace/${producto.id}`}
+        class="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-[#FFFDF7] text-[#2D2D2D] font-semibold rounded-lg border border-[#E8E0D8] hover:border-campo-400 hover:bg-campo-50 active:scale-[0.98] transition-all duration-200 text-[11px]"
+      >
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+        Ver
+      </a>
+      <button
+        class="agregar-carrito-btn flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-campo-600 text-white font-bold rounded-lg shadow-sm hover:bg-campo-700 active:scale-[0.98] transition-all duration-200 text-[11px]"
+        data-id={producto.id}
+        data-nombre={producto.nombre}
+        data-precio={producto.precio}
+        data-imagen={producto.imagen || (producto.imagenes && producto.imagenes[0]) || '/images/ganado.svg'}
+        data-vendedor={producto.vendedor || 'Vendedor'}
+      >
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+        Agregar
+      </button>
+    </div>
+  </div>
+</article>
+
+<script>
+  window.cardNav = window.cardNav || function(btn, dir) {
+    const card = (btn as HTMLElement).closest('[data-imagenes]') as HTMLElement;
+    if (!card) return;
+    const imagenes = JSON.parse(card.getAttribute('data-imagenes') || '[]');
+    if (imagenes.length <= 1) return;
+    let idx = parseInt(card.getAttribute('data-img-index') || '0');
+    idx = (idx + dir + imagenes.length) % imagenes.length;
+    card.setAttribute('data-img-index', String(idx));
+    const img = card.querySelector('.card-img') as HTMLImageElement;
+    if (img) img.src = imagenes[idx];
+    const dots = card.querySelectorAll('.card-dot');
+    dots.forEach((dot, i) => {
+      if (i === idx) {
+        (dot as HTMLElement).classList.add('bg-white', 'shadow-sm', 'w-3');
+        (dot as HTMLElement).classList.remove('bg-white/50', 'w-1.5');
+      } else {
+        (dot as HTMLElement).classList.remove('bg-white', 'shadow-sm', 'w-3');
+        (dot as HTMLElement).classList.add('bg-white/50', 'w-1.5');
+      }
+    });
+  };
+
+  if (!document.documentElement.hasAttribute('data-card-nav')) {
+    document.documentElement.setAttribute('data-card-nav', '');
+    document.addEventListener('click', (e) => {
+      const card = (e.target as HTMLElement).closest('[data-href]');
+      if (card && !(e.target as HTMLElement).closest('button, a, .agregar-carrito-btn, .btn-favorito, .card-nav-prev, .card-nav-next')) {
+        window.location.href = card.getAttribute('data-href') || '';
+      }
+    });
+  }
+</script>
