@@ -18,6 +18,7 @@ const categorias = [
   { value: 'bovino', label: 'Bovinos' },
   { value: 'equino', label: 'Equinos' },
   { value: 'porcino', label: 'Porcinos' },
+  { value: 'ovino', label: 'Ovinos' },
   { value: 'avicola', label: 'Avícolas' },
   { value: 'agricultura', label: 'Agricultura' },
   { value: 'insumos', label: 'Insumos' },

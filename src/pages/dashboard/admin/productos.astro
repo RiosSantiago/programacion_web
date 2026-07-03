@@ -17,7 +17,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
         <p class="text-sm text-slate-500 mt-1">Administra todos los productos publicados en el marketplace</p>
       </div>
       <div class="flex items-center gap-3">
-        <span id="role-badge" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-100 text-red-700 rounded-full text-xs font-bold">
+        <span id="role-badge" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-500 text-red-700 rounded-full text-xs font-bold">
           <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
           Root
         </span>
@@ -84,7 +84,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
               <th class="text-right px-4 py-3 font-semibold text-slate-600">Acciones</th>
             </tr>
           </thead>
-          <tbody id="productos-tbody" class="divide-y divide-slate-100"></tbody>
+          <tbody id="productos-tbody" class="divide-y divide-slate-500"></tbody>
         </table>
       </div>
       <div id="empty-state" class="hidden text-center py-12">
@@ -99,7 +99,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-white rounded-2xl p-6 max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-lg font-bold text-slate-900">Detalles del Producto</h3>
-        <button onclick="cerrarViewModal()" class="p-1 hover:bg-slate-100 rounded">
+        <button onclick="cerrarViewModal()" class="p-1 hover:bg-slate-500 rounded">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -115,7 +115,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-xl p-6">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-bold text-slate-900">Editar Producto</h2>
-        <button onclick="cerrarEditModal()" class="p-1 hover:bg-slate-100 rounded">
+        <button onclick="cerrarEditModal()" class="p-1 hover:bg-slate-500 rounded">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -146,14 +146,14 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
   }
 
   const estadoClass = {
-    disponible: 'bg-emerald-100 text-emerald-700',
-    vendido: 'bg-red-100 text-red-700',
-    reservado: 'bg-amber-100 text-amber-700',
-    engorde: 'bg-blue-100 text-blue-700',
-    produccion: 'bg-emerald-100 text-emerald-700',
-    levante: 'bg-purple-100 text-purple-700',
-    cria: 'bg-amber-100 text-amber-700',
-    reproduccion: 'bg-pink-100 text-pink-700',
+    disponible: 'bg-emerald-500 text-emerald-700',
+    vendido: 'bg-red-500 text-red-700',
+    reservado: 'bg-amber-500 text-amber-700',
+    engorde: 'bg-blue-500 text-blue-700',
+    produccion: 'bg-emerald-500 text-emerald-700',
+    levante: 'bg-purple-500 text-purple-700',
+    cria: 'bg-amber-500 text-amber-700',
+    reproduccion: 'bg-pink-500 text-pink-700',
   };
 
   async function checkAccess() {
@@ -165,10 +165,10 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
         const badge = document.getElementById('role-badge');
         if (badge) {
           if (currentUserRole === 'root') {
-            badge.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-100 text-red-700 rounded-full text-xs font-bold';
+            badge.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-500 text-red-700 rounded-full text-xs font-bold';
             badge.innerHTML = '<span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> Root';
           } else {
-            badge.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-100 text-purple-700 rounded-full text-xs font-bold';
+            badge.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-500 text-purple-700 rounded-full text-xs font-bold';
             badge.innerHTML = '<span class="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></span> Admin';
           }
         }
@@ -223,7 +223,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
         tr.innerHTML = `
           <td class="px-4 py-3">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 bg-slate-100 rounded-lg shrink-0 overflow-hidden">
+              <div class="w-10 h-10 bg-slate-500 rounded-lg shrink-0 overflow-hidden">
 <img src="${img}" alt="" class="w-full h-full object-contain" />
               </div>
               <div class="min-w-0">
@@ -237,7 +237,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
           <td class="px-4 py-3 text-right font-semibold text-slate-900">$${(p.precio || 0).toLocaleString('es-CO')}</td>
           <td class="px-4 py-3 text-center text-slate-600">${p.stock || 1}</td>
           <td class="px-4 py-3 text-center">
-            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold capitalize ${estadoClass[estado] || 'bg-slate-100 text-slate-700'}">${estado}</span>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold capitalize ${estadoClass[estado] || 'bg-slate-500 text-slate-700'}">${estado}</span>
           </td>
           <td class="px-4 py-3 text-right">
             <div class="flex items-center justify-end gap-1">
@@ -300,7 +300,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     const img = p.imagenes?.[0] || p.imagen || '/images/ganado.svg';
     document.getElementById('view-content').innerHTML = `
       <div class="flex gap-4">
-        <div class="w-24 h-24 bg-slate-100 rounded-xl shrink-0 overflow-hidden">
+        <div class="w-24 h-24 bg-slate-500 rounded-xl shrink-0 overflow-hidden">
           <img src="${img}" alt="" class="w-full h-full object-contain" />
         </div>
         <div class="flex-1">
@@ -374,6 +374,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
               <option value="bovino" ${p.categoria === 'bovino' ? 'selected' : ''}>Bovinos</option>
               <option value="equino" ${p.categoria === 'equino' ? 'selected' : ''}>Equinos</option>
               <option value="porcino" ${p.categoria === 'porcino' ? 'selected' : ''}>Porcinos</option>
+              <option value="ovino" ${p.categoria === 'ovino' ? 'selected' : ''}>Ovinos</option>
               <option value="avicola" ${p.categoria === 'avicola' ? 'selected' : ''}>Avicolas</option>
               <option value="cultivos" ${p.categoria === 'cultivos' ? 'selected' : ''}>Cultivos</option>
               <option value="servicios" ${p.categoria === 'servicios' ? 'selected' : ''}>Servicios</option>
@@ -391,6 +392,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
               <option value="">Seleccionar</option>
               <option value="macho" ${(p.sexo || '') === 'macho' ? 'selected' : ''}>Macho</option>
               <option value="hembra" ${p.sexo === 'hembra' ? 'selected' : ''}>Hembra</option>
+              <option value="mixto" ${p.sexo === 'mixto' ? 'selected' : ''}>Mixto</option>
             </select>
           </div>
           <div>
@@ -435,9 +437,9 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
           </select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">Descripción <span class="text-slate-400 font-normal">(máx. 100 caracteres)</span></label>
-          <textarea id="e-descripcion" maxlength="100" rows="3" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 resize-none">${escapeHtml(p.descripcion || '')}</textarea>
-          <p class="text-xs text-slate-400 text-right mt-1" id="e-desc-count">${(p.descripcion || '').length}/100</p>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Descripción <span class="text-slate-400 font-normal">(máx. 500 caracteres)</span></label>
+          <textarea id="e-descripcion" maxlength="500" rows="3" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 resize-none">${escapeHtml(p.descripcion || '')}</textarea>
+          <p class="text-xs text-slate-400 text-right mt-1" id="e-desc-count">${(p.descripcion || '').length}/500</p>
         </div>
         <div>
           <label class="block text-sm font-medium text-slate-700 mb-1">Fotos <span class="text-slate-400 font-normal">(opcional, máximo 5)</span></label>
@@ -473,7 +475,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     if (desc) {
       desc.addEventListener('input', () => {
         const count = document.getElementById('e-desc-count');
-        if (count) count.textContent = `${desc.value.length}/100`;
+        if (count) count.textContent = `${desc.value.length}/500`;
       });
     }
 
@@ -618,7 +620,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       peso: (document.getElementById('e-peso') as HTMLInputElement).value ? parseFloat((document.getElementById('e-peso') as HTMLInputElement).value) : null,
       salud: (document.getElementById('e-salud') as HTMLSelectElement).value,
       estado: (document.getElementById('e-estado') as HTMLSelectElement).value,
-      descripcion: ((document.getElementById('e-descripcion') as HTMLTextAreaElement)?.value || '').slice(0, 100),
+      descripcion: ((document.getElementById('e-descripcion') as HTMLTextAreaElement)?.value || '').slice(0, 500),
       imagenes: finalImagenes,
       video: finalVideo,
     };

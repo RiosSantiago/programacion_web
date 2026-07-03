@@ -3,13 +3,14 @@ const todasLasCategorias = [
   { id: 1, nombre: 'Bovinos', icono: '🐄', color: 'bg-gold-100 text-gold-700', cantidad: 284 },
   { id: 2, nombre: 'Equinos', icono: '🐴', color: 'bg-blue-100 text-blue-700', cantidad: 42 },
   { id: 3, nombre: 'Porcinos', icono: '🐷', color: 'bg-coral-100 text-coral-700', cantidad: 156 },
-  { id: 4, nombre: 'Avicolas', icono: '🐔', color: 'bg-orange-100 text-orange-700', cantidad: 89 },
-  { id: 5, nombre: 'Agricultura', icono: '🌱', color: 'bg-campo-100 text-campo-700', cantidad: 0 },
-  { id: 6, nombre: 'Insumos', icono: '🧰', color: 'bg-stone-100 text-stone-700', cantidad: 0 },
+  { id: 4, nombre: 'Ovinos', icono: '🐑', color: 'bg-purple-100 text-purple-700', cantidad: 0 },
+  { id: 5, nombre: 'Avicolas', icono: '🐔', color: 'bg-orange-100 text-orange-700', cantidad: 89 },
+  { id: 6, nombre: 'Agricultura', icono: '🌱', color: 'bg-campo-100 text-campo-700', cantidad: 0 },
+  { id: 7, nombre: 'Insumos', icono: '🧰', color: 'bg-stone-100 text-stone-700', cantidad: 0 },
 ];
 
 const slugMap: Record<string, string> = {
-  Bovinos: 'bovino', Equinos: 'equino', Porcinos: 'porcino', Avicolas: 'avicola',
+  Bovinos: 'bovino', Equinos: 'equino', Porcinos: 'porcino', Ovinos: 'ovino', Avicolas: 'avicola',
   Agricultura: 'agricultura', Insumos: 'insumos', Servicios: 'servicio', Cultivos: 'cultivo',
 };
 const current = Astro.url.searchParams.get('categoria') || null;
@@ -17,6 +18,7 @@ const categoriaSVGs: Record<string, string> = {
   'Bovinos': `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 4c-1.5 0-3 1-3.5 2.5-.3 1-.1 2 .3 2.5.5.5.7 1.2.7 2s-.2 1.5-.7 2c-.4.5-.6 1.3-.3 2.5.5 1.5 2 2.5 3.5 2.5s3-1 3.5-2.5c.3-1.2.1-2-.3-2.5-.5-.5-.7-1.2-.7-2s.2-1.5.7-2c.4-.5.6-1.5.3-2.5C15 5 13.5 4 12 4z" stroke-linecap="round"/><circle cx="10" cy="9" r="1" fill="currentColor"/><circle cx="14" cy="9" r="1" fill="currentColor"/><path d="M8 13c.5-.5 1-.5 1.5-.3" stroke-linecap="round"/><path d="M16 13c-.5-.5-1-.5-1.5-.3" stroke-linecap="round"/><path d="M6 4.5c0-1.5 1.5-2 3-1.5" stroke-linecap="round"/><path d="M18 4.5c0-1.5-1.5-2-3-1.5" stroke-linecap="round"/></svg>`,
   'Equinos': `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19c0-4 2-7 4-8l1-1-1-2c0-2 2-4 5-4 1 0 2 .5 3 1.5 1-1 2-1.5 3-1.5 3 0 5 2 5 4v3" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 19l-3-6" stroke-linecap="round"/><path d="M16 10c1-1 2-1.5 3-2" stroke-linecap="round"/><path d="M4 19h3" stroke-linecap="round"/><circle cx="16" cy="6" r="1" fill="currentColor"/></svg>`,
   'Porcinos': `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="13" rx="7" ry="5"/><path d="M12 8c2 0 3.5-1 3.5-2" stroke-linecap="round"/><circle cx="16" cy="5" r="2"/><path d="M18 5c1-1 2-1 2-2" stroke-linecap="round"/><circle cx="9.5" cy="12" r="1" fill="currentColor"/><circle cx="12" cy="13" r="1" fill="currentColor"/><circle cx="14.5" cy="12" r="1" fill="currentColor"/></svg>`,
+  'Ovinos': `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="10" r="4"/><path d="M8 14c0 2 1 4 4 4s4-2 4-4" stroke-linecap="round"/><path d="M16 7c1.5-.5 3-1 4-2" stroke-linecap="round"/><path d="M8 7c-1.5-.5-3-1-4-2" stroke-linecap="round"/><path d="M10 10c-1.5-.5-2.5-1.5-3-3" stroke-linecap="round"/><path d="M14 10c1.5-.5 2.5-1.5 3-3" stroke-linecap="round"/><circle cx="10" cy="9" r="0.8" fill="currentColor"/><circle cx="14" cy="9" r="0.8" fill="currentColor"/></svg>`,
   'Avicolas': `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="14" rx="6" ry="4"/><circle cx="14" cy="10" r="4"/><path d="M18 9c1 0 2-1 2-2" stroke-linecap="round"/><path d="M14 6l2-3" stroke-linecap="round"/><path d="M10 14l-2 2" stroke-linecap="round"/><path d="M14 14l2 2" stroke-linecap="round"/><circle cx="15" cy="9" r="0.5" fill="currentColor"/></svg>`,
   'Cultivos': `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22V12" stroke-linecap="round"/><path d="M12 12c-3-3-6-4-6-8 0-2 1-4 4-4 2 0 3 1 4 4 0-3 1-4 4-4 3 0 4 2 4 4 0 4-3 5-6 8" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 22h8" stroke-linecap="round"/></svg>`,
   'Servicios': `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" stroke-linecap="round" stroke-linejoin="round"/></svg>`,

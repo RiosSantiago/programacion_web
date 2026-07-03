@@ -6,7 +6,7 @@ import '../lib/db';
 import { getProductosDestacados } from '../lib/models/productos.js';
 
 const productos = getProductosDestacados(6).filter(p => 
-  ['bovino', 'equino', 'porcino', 'avicola'].includes(p.categoria)
+  ['bovino', 'equino', 'porcino', 'ovino', 'avicola'].includes(p.categoria)
 );
 
 const getReputacion = (vendedor: string) => {

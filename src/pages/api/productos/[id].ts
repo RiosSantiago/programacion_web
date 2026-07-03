@@ -115,7 +115,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
     for (const field of allowedFields) {
       if (data[field] !== undefined) {
         fields.push(`${field} = ?`);
-        paramsArr.push(field === 'descripcion' ? String(data[field]).slice(0, 100) : data[field]);
+        paramsArr.push(field === 'descripcion' ? String(data[field]).slice(0, 500) : data[field]);
       }
     }
 

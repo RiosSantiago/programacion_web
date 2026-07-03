@@ -66,7 +66,7 @@ export const POST: APIRoute = async ({ request }) => {
       0,
       0,
       data.tipoPrecio || 'fijo',
-      (data.descripcion || '').slice(0, 100),
+      (data.descripcion || '').slice(0, 500),
       data.video || '',
       data.sexo || ''
     );

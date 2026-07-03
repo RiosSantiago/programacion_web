@@ -33,6 +33,7 @@ function getPlaceholderImagen(categoria: string): string {
     bovino: '/images/ganado.svg',
     equino: '/images/caballo.svg',
     porcino: '/images/cerdo.svg',
+    ovino: '/images/ganado.svg',
     avicola: '/images/gallina.svg',
     cultivos: '/images/cultivos.svg',
     servicios: '/images/default.svg',

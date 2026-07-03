@@ -4,6 +4,7 @@ const categoriasDemo = [
   { value: 'bovino', label: 'Bovinos' },
   { value: 'equino', label: 'Equinos' },
   { value: 'porcino', label: 'Porcinos' },
+  { value: 'ovino', label: 'Ovinos' },
   { value: 'avicola', label: 'Avicolas' },
 ];
 
@@ -12,6 +13,7 @@ function getPlaceholderImagen(categoria: string): string {
     bovino: '/images/ganado.svg',
     equino: '/images/caballo.svg',
     porcino: '/images/cerdo.svg',
+    ovino: '/images/ganado.svg',
     avicola: '/images/gallina.svg',
   };
   return imagenes[categoria] || '/images/ganado.svg';
@@ -30,6 +32,8 @@ export default function PublicationForm() {
     stock: '1',
     salud: 'Bueno',
     sexo: '',
+    ubicacion: '',
+    departamento: 'Caldas',
     descripcion: '',
   });
 
@@ -113,6 +117,8 @@ export default function PublicationForm() {
       stock: formData.stock,
       salud: formData.salud,
       sexo: formData.sexo,
+      ubicacion: formData.ubicacion,
+      departamento: formData.departamento,
       descripcion: formData.descripcion,
       imagenes: uploadedPhotoUrls.length > 0 ? uploadedPhotoUrls : [getPlaceholderImagen(formData.categoria)],
       video: uploadedVideoUrl,
@@ -172,30 +178,6 @@ export default function PublicationForm() {
       }
 
       setSuccess(true);
-      setFormData({
-        nombre: '',
-        categoria: 'bovino',
-        raza: '',
-        peso: '',
-        precio: '',
-        tipoPrecio: 'fijo',
-        stock: '1',
-        salud: 'Bueno',
-        sexo: '',
-        descripcion: '',
-      });
-      setPhotos([]);
-      setPhotoPreviews([]);
-      setVideo(null);
-      setVideoPreview('');
-
-      setTimeout(() => {
-        if (window.location.pathname === '/publicar') {
-          window.location.href = '/dashboard/publicaciones';
-        } else {
-          window.location.reload();
-        }
-      }, 1500);
     } catch (err) {
       setError('Error al publicar. Intenta de nuevo.');
     } finally {
@@ -203,22 +185,56 @@ export default function PublicationForm() {
     }
   };
 
+  function resetForm() {
+    setFormData({
+      nombre: '',
+      categoria: 'bovino',
+      raza: '',
+      peso: '',
+      precio: '',
+      tipoPrecio: 'fijo',
+      stock: '1',
+      salud: 'Bueno',
+      sexo: '',
+      ubicacion: '',
+      departamento: 'Caldas',
+      descripcion: '',
+    });
+    setPhotos([]);
+    setPhotoPreviews([]);
+    setVideo(null);
+    setVideoPreview('');
+    setSuccess(false);
+  }
+
+  if (success) {
+    return (
+      <div className="bg-emerald-50 border-2 border-emerald-300 rounded-2xl p-8 text-center space-y-4">
+        <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto">
+          <svg className="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <div>
+          <p className="text-xl font-bold text-emerald-800">Publicación creada exitosamente</p>
+          <p className="text-emerald-600 mt-1">Tu animal ya está disponible en el marketplace.</p>
+        </div>
+        <button
+          type="button"
+          onClick={resetForm}
+          className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 transition-colors"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Seguir Publicando
+        </button>
+      </div>
+    );
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {success && (
-        <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
-          <p className="text-emerald-700 font-medium">Publicación creada exitosamente!</p>
-          <p className="text-emerald-600 text-sm mt-1">Tu animal ya está disponible en el marketplace.</p>
-          <button
-            type="button"
-            onClick={() => setSuccess(false)}
-            className="text-emerald-600 text-sm underline mt-2"
-          >
-            Publicar otro
-          </button>
-        </div>
-      )}
-
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <p className="text-red-700">{error}</p>
@@ -285,6 +301,7 @@ export default function PublicationForm() {
             <option value="">Seleccionar</option>
             <option value="macho">Macho</option>
             <option value="hembra">Hembra</option>
+            <option value="mixto">Mixto</option>
           </select>
         </div>
         <div>
@@ -297,6 +314,61 @@ export default function PublicationForm() {
             placeholder="1"
             className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500"
           />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Municipio</label>
+          <input
+            type="text"
+            required
+            value={formData.ubicacion}
+            onChange={(e) => setFormData({ ...formData, ubicacion: e.target.value })}
+            placeholder="Manizales, Caldas"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Departamento</label>
+          <select
+            value={formData.departamento}
+            onChange={(e) => setFormData({ ...formData, departamento: e.target.value })}
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-emerald-500"
+          >
+            <option value="Amazonas">Amazonas</option>
+            <option value="Antioquia">Antioquia</option>
+            <option value="Arauca">Arauca</option>
+            <option value="Atlantico">Atlantico</option>
+            <option value="Bolivar">Bolivar</option>
+            <option value="Boyaca">Boyaca</option>
+            <option value="Caldas">Caldas</option>
+            <option value="Caqueta">Caqueta</option>
+            <option value="Casanare">Casanare</option>
+            <option value="Cauca">Cauca</option>
+            <option value="Cesar">Cesar</option>
+            <option value="Choco">Choco</option>
+            <option value="Cordoba">Cordoba</option>
+            <option value="Cundinamarca">Cundinamarca</option>
+            <option value="Guainia">Guainia</option>
+            <option value="Guaviare">Guaviare</option>
+            <option value="Huila">Huila</option>
+            <option value="La Guajira">La Guajira</option>
+            <option value="Magdalena">Magdalena</option>
+            <option value="Meta">Meta</option>
+            <option value="Narino">Narino</option>
+            <option value="Norte de Santander">Norte de Santander</option>
+            <option value="Putumayo">Putumayo</option>
+            <option value="Quindio">Quindio</option>
+            <option value="Risaralda">Risaralda</option>
+            <option value="San Andres">San Andres</option>
+            <option value="Santander">Santander</option>
+            <option value="Sucre">Sucre</option>
+            <option value="Tolima">Tolima</option>
+            <option value="Valle del Cauca">Valle del Cauca</option>
+            <option value="Vaupes">Vaupes</option>
+            <option value="Vichada">Vichada</option>
+          </select>
         </div>
       </div>
 
@@ -373,17 +445,17 @@ export default function PublicationForm() {
 
       <div>
         <label className="block text-sm font-medium text-slate-700 mb-1">
-          Descripción <span className="text-slate-400 font-normal">(máx. 100 caracteres)</span>
+          Descripción <span className="text-slate-400 font-normal">(máx. 500 caracteres)</span>
         </label>
         <textarea
           value={formData.descripcion}
-          onChange={(e) => setFormData({ ...formData, descripcion: e.target.value.slice(0, 100) })}
+          onChange={(e) => setFormData({ ...formData, descripcion: e.target.value.slice(0, 500) })}
           placeholder="Describe brevemente el animal o lote..."
-          maxLength={100}
+          maxLength={500}
           rows={3}
           className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 resize-none"
         />
-        <p className="text-xs text-slate-400 text-right mt-1">{formData.descripcion.length}/100</p>
+        <p className="text-xs text-slate-400 text-right mt-1">{formData.descripcion.length}/500</p>
       </div>
 
       {/* Photos */}

@@ -136,6 +136,7 @@ export function inicializarDatos() {
       ['Bovinos', '🐄', 'bg-emerald-100 text-emerald-700', 284],
       ['Equinos', '🐴', 'bg-blue-100 text-blue-700', 42],
       ['Porcinos', '🐷', 'bg-amber-100 text-amber-700', 156],
+      ['Ovinos', '🐑', 'bg-purple-100 text-purple-700', 0],
       ['Avicolas', '🐔', 'bg-orange-100 text-orange-700', 89],
       ['Agricultura', '🌱', 'bg-green-100 text-green-700', 0],
       ['Insumos', '🧰', 'bg-slate-100 text-slate-700', 0],
@@ -150,32 +151,8 @@ export function inicializarDatos() {
   const insertIfMissing = db.prepare('INSERT OR IGNORE INTO categorias (nombre, icono, color, cantidad) VALUES (?, ?, ?, ?)');
   insertIfMissing.run('Agricultura', '🌱', 'bg-green-100 text-green-700', 0);
   insertIfMissing.run('Insumos', '🧰', 'bg-slate-100 text-slate-700', 0);
+  insertIfMissing.run('Ovinos', '🐑', 'bg-purple-100 text-purple-700', 0);
 
-  const productosCount = db.prepare('SELECT COUNT(*) as count FROM productos').get() as { count: number };
-  
-  if (productosCount.count === 0) {
-    const insertProducto = db.prepare(`
-      INSERT INTO productos (nombre, categoria, raza, peso, peso_unitario, ubicacion, departamento, precio, precio_anterior, stock, vendedor, vendedor_rating, imagenes, estado, salud, envio, destacado, oferta, trazabilidad)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-    
-const productos = [
-      ['Lote de 15 Novillos Angus Negro', 'bovino', 'Angus Negro', 420, 280000, 'Manizales, Caldas', 'Caldas', 4200000, 4800000, 15, 'Finca La Pradera', 4.8, '["https://images.pexels.com/photos/151731/pexels-photo-151731.jpeg?w=600&h=400&fit=crop"]', 'engorde', 'Dia completo al dia', 1, 1, 1, 1],
-      ['20 Cerdos en Engorde - Linea Pietrain', 'porcino', 'Pietrain', 95, 140000, 'Dosquebradas, Risaralda', 'Risaralda', 2800000, null, 20, 'Granja El Progreso', 4.5, '["https://images.pexels.com/photos/324408/pexels-photo-324408.jpeg?w=600&h=400&fit=crop"]', 'engorde', 'Vacunados', 1, 0, 0, 1],
-      ['Lote 12 Vacas Holstein Lecheras', 'bovino', 'Holstein', 510, 350000, 'Chinchina, Caldas', 'Caldas', 4200000, 4500000, 12, 'Finca San Miguel', 4.9, '["https://images.pexels.com/photos/155685/dairy-cow-cattle-livestock-155685.jpeg?w=600&h=400&fit=crop"]', 'produccion', 'Control sanitario completo', 1, 1, 1, 1],
-      ['Caballo Pura Sangre - Garañon', 'equino', 'Pura Sangre', 450, 8500000, 'Santa Rosa de Cabal, Risaralda', 'Risaralda', 8500000, null, 1, 'Haras La Colina', 5.0, '["https://images.pexels.com/photos/1118665/pexels-photo-1118665.jpeg?w=600&h=400&fit=crop"]', 'reproduccion', 'Excelente estado', 0, 1, 0, 1],
-      ['100 Gallinas Ponedoras Hy-Line', 'avicola', 'Hy-Line Brown', 2.1, 35000, 'Pereira, Risaralda', 'Risaralda', 3500000, 3800000, 100, 'Avicola Los Andes', 4.6, '["https://images.pexels.com/photos/155685/dairy-cow-cattle-livestock-155685.jpeg?w=600&h=400&fit=crop"]', 'produccion', 'Sanas y productivas', 1, 0, 1, 1],
-      ['Lote 18 Toros Hereford para Ceba', 'bovino', 'Hereford', 445, 211000, 'Aguadas, Caldas', 'Caldas', 3800000, null, 18, 'Hacienda El Rosario', 4.7, '["https://images.pexels.com/photos/47168/farm-cattle-ranch-herd-47168.jpeg?w=600&h=400&fit=crop"]', 'engorde', 'Dia completo', 1, 0, 0, 1],
-      ['5 Yeguas Criollas con Cria', 'equino', 'Criollo Colombiano', 380, 3200000, 'Salamina, Caldas', 'Caldas', 16000000, 18000000, 5, 'Finca El Recuerdo', 4.4, '["https://images.pexels.com/photos/1337380/pexels-photo-1337380.jpeg?w=600&h=400&fit=crop"]', 'cria', 'Buen estado general', 0, 0, 1, 1],
-      ['Lote 25 Terneros Brahman Rojo', 'bovino', 'Brahman Rojo', 180, 160000, 'Filadelfia, Caldas', 'Caldas', 4000000, null, 25, 'Finca La Esperanza', 4.3, '["https://images.pexels.com/photos/1183474/pexels-photo-1183474.jpeg?w=600&h=400&fit=crop"]', 'levante', 'Vacunados y desparasitados', 1, 0, 0, 1],
-      ['50 Cuyes Reproductores - Linea Peruana', 'porcino', 'Andina', 1.2, 45000, 'Armenia, Quindio', 'Quindio', 2250000, 2500000, 50, 'Cuyicola del Quindio', 4.2, '["https://images.pexels.com/photos/324408/pexels-photo-324408.jpeg?w=600&h=400&fit=crop"]', 'reproduccion', 'Sanos', 1, 0, 1, 0],
-      ['Lote 10 Charolais de Ceba Premium', 'bovino', 'Charolais', 470, 450000, 'Neira, Caldas', 'Caldas', 4500000, 5000000, 10, 'Hacienda Buenos Aires', 4.9, '["https://images.pexels.com/photos/259356/pexels-photo-259356.jpeg?w=600&h=400&fit=crop"]', 'engorde', 'Premium - Control veterinario mensual', 1, 1, 1, 1],
-    ];
-    
-    for (const prod of productos) {
-      insertProducto.run(...prod);
-    }
-  }
 
   const inventarioCount = db.prepare('SELECT COUNT(*) as count FROM inventario').get() as { count: number };
   

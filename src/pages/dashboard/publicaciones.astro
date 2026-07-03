@@ -75,7 +75,7 @@ import PublicationForm from '../../components/dashboard/PublicationForm.tsx';
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-xl p-6">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-bold text-slate-900">Nueva Publicación</h2>
-        <button onclick="document.getElementById('publish-modal').classList.add('hidden')" class="p-1 hover:bg-slate-100 rounded">
+        <button onclick="document.getElementById('publish-modal').classList.add('hidden')" class="p-1 hover:bg-slate-500 rounded">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -91,7 +91,7 @@ import PublicationForm from '../../components/dashboard/PublicationForm.tsx';
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-xl p-6">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-bold text-slate-900">Editar Publicación</h2>
-        <button onclick="cerrarEditModal()" class="p-1 hover:bg-slate-100 rounded">
+        <button onclick="cerrarEditModal()" class="p-1 hover:bg-slate-500 rounded">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -106,7 +106,7 @@ import PublicationForm from '../../components/dashboard/PublicationForm.tsx';
     <div class="absolute inset-0 bg-black/50" onclick="cerrarEliminarModal()"></div>
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm bg-white rounded-xl p-6">
       <div class="text-center">
-        <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <div class="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
           <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
           </svg>
@@ -177,14 +177,14 @@ import PublicationForm from '../../components/dashboard/PublicationForm.tsx';
         const imgSrc = p.imagenes?.[0] || p.imagen || '/images/ganado.svg';
 
         const estadoClases = {
-          'disponible': 'bg-gold-100 text-gold-800',
-          'engorde': 'bg-blue-100 text-blue-700',
-          'produccion': 'bg-gold-100 text-gold-800',
-          'levante': 'bg-purple-100 text-purple-700',
-          'cria': 'bg-amber-100 text-amber-700',
-          'reproduccion': 'bg-pink-100 text-pink-700',
-          'reservado': 'bg-amber-100 text-amber-700',
-          'vendido': 'bg-slate-100 text-slate-700',
+          'disponible': 'bg-gold-500 text-gold-800',
+          'engorde': 'bg-blue-500 text-blue-700',
+          'produccion': 'bg-gold-500 text-gold-800',
+          'levante': 'bg-purple-500 text-purple-700',
+          'cria': 'bg-amber-500 text-amber-700',
+          'reproduccion': 'bg-pink-500 text-pink-700',
+          'reservado': 'bg-amber-500 text-amber-700',
+          'vendido': 'bg-slate-500 text-slate-700',
         };
 
         div.innerHTML = `
@@ -197,7 +197,7 @@ import PublicationForm from '../../components/dashboard/PublicationForm.tsx';
             <p class="text-lg font-bold text-slate-900 mt-2">$${(p.precio || 0).toLocaleString('es-CO')}</p>
           </div>
           <div class="flex sm:flex-col gap-2">
-            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold w-fit capitalize ${estadoClases[p.estado] || 'bg-slate-100 text-slate-700'}">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold w-fit capitalize ${estadoClases[p.estado] || 'bg-slate-500 text-slate-700'}">
               ${p.estado || 'disponible'}
             </span>
             <div class="flex gap-2">
@@ -277,6 +277,7 @@ import PublicationForm from '../../components/dashboard/PublicationForm.tsx';
                 <option value="bovino" ${producto.categoria === 'bovino' ? 'selected' : ''}>Bovinos</option>
                 <option value="equino" ${producto.categoria === 'equino' ? 'selected' : ''}>Equinos</option>
                 <option value="porcino" ${producto.categoria === 'porcino' ? 'selected' : ''}>Porcinos</option>
+                <option value="ovino" ${producto.categoria === 'ovino' ? 'selected' : ''}>Ovinos</option>
                 <option value="avicola" ${producto.categoria === 'avicola' ? 'selected' : ''}>Avicolas</option>
                 <option value="cultivos" ${producto.categoria === 'cultivos' ? 'selected' : ''}>Cultivos</option>
                 <option value="servicios" ${producto.categoria === 'servicios' ? 'selected' : ''}>Servicios</option>
@@ -295,6 +296,7 @@ import PublicationForm from '../../components/dashboard/PublicationForm.tsx';
                 <option value="">Seleccionar</option>
                 <option value="macho" ${producto.sexo === 'macho' ? 'selected' : ''}>Macho</option>
                 <option value="hembra" ${producto.sexo === 'hembra' ? 'selected' : ''}>Hembra</option>
+                <option value="mixto" ${producto.sexo === 'mixto' ? 'selected' : ''}>Mixto</option>
               </select>
             </div>
             <div>
@@ -344,10 +346,10 @@ import PublicationForm from '../../components/dashboard/PublicationForm.tsx';
 
           <div>
             <label class="block text-sm font-medium text-slate-700 mb-1">
-              Descripción <span class="text-slate-400 font-normal">(máx. 100 caracteres)</span>
+              Descripción <span class="text-slate-400 font-normal">(máx. 500 caracteres)</span>
             </label>
-            <textarea id="edit-descripcion" maxlength="100" rows="3" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-gold-500 resize-none">${escapeHtml(producto.descripcion || '')}</textarea>
-            <p class="text-xs text-slate-400 text-right mt-1" id="edit-descripcion-count">${(producto.descripcion || '').length}/100</p>
+            <textarea id="edit-descripcion" maxlength="500" rows="3" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-gold-500 resize-none">${escapeHtml(producto.descripcion || '')}</textarea>
+            <p class="text-xs text-slate-400 text-right mt-1" id="edit-descripcion-count">${(producto.descripcion || '').length}/500</p>
           </div>
 
           <div>
@@ -384,7 +386,7 @@ import PublicationForm from '../../components/dashboard/PublicationForm.tsx';
       if (editDesc) {
         editDesc.addEventListener('input', () => {
           const count = document.getElementById('edit-descripcion-count');
-          if (count) count.textContent = `${editDesc.value.length}/100`;
+          if (count) count.textContent = `${editDesc.value.length}/500`;
         });
       }
 
@@ -525,7 +527,7 @@ import PublicationForm from '../../components/dashboard/PublicationForm.tsx';
       precio: parseFloat(document.getElementById('edit-precio').value),
       salud: document.getElementById('edit-salud').value,
       estado: document.getElementById('edit-estado').value,
-      descripcion: (document.getElementById('edit-descripcion') as HTMLTextAreaElement)?.value.slice(0, 100) || '',
+      descripcion: (document.getElementById('edit-descripcion') as HTMLTextAreaElement)?.value.slice(0, 500) || '',
       imagenes: finalImagenes,
       video: finalVideo,
     };
