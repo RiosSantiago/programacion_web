@@ -127,7 +127,7 @@ export default function PublicationForm() {
     try {
       let apiSuccess = false;
       try {
-        const token = localStorage.getItem('agrotech_token');
+        const token = localStorage.getItem('agroup_token');
         const headers: Record<string, string> = { 'Content-Type': 'application/json' };
         if (token) headers['Authorization'] = `Bearer ${token}`;
 
@@ -149,7 +149,7 @@ export default function PublicationForm() {
       }
 
       if (!apiSuccess) {
-        const productos = JSON.parse(localStorage.getItem('agrotech_productos') || '[]');
+        const productos = JSON.parse(localStorage.getItem('agroup_productos') || '[]');
         const nuevoProducto = {
           ...payload,
           id: Date.now().toString(),
@@ -163,7 +163,7 @@ export default function PublicationForm() {
           trazabilidad: 0,
         };
 
-        const historialPrecios = JSON.parse(localStorage.getItem('agrotech_precios_historial') || '[]');
+        const historialPrecios = JSON.parse(localStorage.getItem('agroup_precios_historial') || '[]');
         historialPrecios.push({
           productoId: nuevoProducto.id,
           precio: parseFloat(formData.precio),
@@ -171,10 +171,10 @@ export default function PublicationForm() {
           fecha: new Date().toISOString(),
           motivo: 'Publicacion inicial',
         });
-        localStorage.setItem('agrotech_precios_historial', JSON.stringify(historialPrecios));
+        localStorage.setItem('agroup_precios_historial', JSON.stringify(historialPrecios));
 
         productos.push(nuevoProducto);
-        localStorage.setItem('agrotech_productos', JSON.stringify(productos));
+        localStorage.setItem('agroup_productos', JSON.stringify(productos));
       }
 
       setSuccess(true);

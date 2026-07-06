@@ -34,10 +34,10 @@ export default function LoginForm({ onToggle }: { onToggle?: () => void }) {
       }
 
       if (data.token) {
-        localStorage.setItem('agrotech_token', data.token);
+        localStorage.setItem('agroup_token', data.token);
       }
       if (data.user) {
-        localStorage.setItem('agrotech_user', JSON.stringify(data.user));
+        localStorage.setItem('agroup_user', JSON.stringify(data.user));
       }
 
       window.location.href = getRedirectUrl();

@@ -329,7 +329,7 @@ const indicadoresCrecimiento = getIndicadoresCrecimiento();
 
   async function confirmarEliminar() {
     if (!productoAEliminar) return;
-    const token = localStorage.getItem('agrotech_token');
+    const token = localStorage.getItem('agroup_token');
     
     try {
       await fetch(`/api/productos/${productoAEliminar.id}`, {
@@ -360,7 +360,7 @@ const indicadoresCrecimiento = getIndicadoresCrecimiento();
     const grid = document.getElementById('mi-publicaciones-grid');
     const countEl = document.getElementById('mi-publicaciones-count');
     const sinPublicaciones = document.getElementById('sin-publicaciones');
-    const token = localStorage.getItem('agrotech_token');
+    const token = localStorage.getItem('agroup_token');
     
     let productos = [];
     try {
@@ -373,7 +373,7 @@ const indicadoresCrecimiento = getIndicadoresCrecimiento();
       }
     } catch (err) {
       console.error('Error al cargar publicaciones:', err);
-      productos = JSON.parse(localStorage.getItem('agrotech_productos') || '[]');
+      productos = JSON.parse(localStorage.getItem('agroup_productos') || '[]');
     }
     
     countEl.textContent = `${productos.length} publicados`;
@@ -436,8 +436,8 @@ const indicadoresCrecimiento = getIndicadoresCrecimiento();
   cargarMisPublicaciones();
   
   async function actualizarStatsVendedor() {
-    const token = localStorage.getItem('agrotech_token');
-    const favoritos = JSON.parse(localStorage.getItem('agrotech-favoritos') || '[]');
+    const token = localStorage.getItem('agroup_token');
+    const favoritos = JSON.parse(localStorage.getItem('agroup-favoritos') || '[]');
     
     let publicaciones = [];
     try {
@@ -449,7 +449,7 @@ const indicadoresCrecimiento = getIndicadoresCrecimiento();
         publicaciones = data.productos || [];
       }
     } catch {
-      publicaciones = JSON.parse(localStorage.getItem('agrotech_productos') || '[]');
+      publicaciones = JSON.parse(localStorage.getItem('agroup_productos') || '[]');
     }
     
     const statPublicaciones = document.getElementById('stat-publicaciones');

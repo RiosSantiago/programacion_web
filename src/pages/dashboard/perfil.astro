@@ -316,7 +316,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       miembroDesde: 'marzo 2026',
       especies: Array.from(document.querySelectorAll('.especie-check:checked')).map((cb: any) => cb.nextElementSibling?.textContent?.trim() || ''),
     };
-    localStorage.setItem('agrotech_hacienda_perfil', JSON.stringify(data));
+    localStorage.setItem('agroup_hacienda_perfil', JSON.stringify(data));
 
     const btn = e.currentTarget?.querySelector('button[type="submit"]');
     if (btn) {
@@ -328,12 +328,12 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
   // Reset
   document.getElementById('btn-reset')?.addEventListener('click', () => {
-    localStorage.removeItem('agrotech_hacienda_perfil');
+    localStorage.removeItem('agroup_hacienda_perfil');
     location.reload();
   });
 
   // Load saved data
-  const saved = JSON.parse(localStorage.getItem('agrotech_hacienda_perfil') || '{}');
+  const saved = JSON.parse(localStorage.getItem('agroup_hacienda_perfil') || '{}');
   if (saved.nombre) {
     (document.getElementById('nombre-hacienda') as HTMLInputElement).value = saved.nombre;
     (document.getElementById('departamento') as HTMLSelectElement).value = saved.departamento || 'Caldas';

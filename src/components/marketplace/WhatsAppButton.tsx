@@ -22,7 +22,7 @@ export default function WhatsAppButton({
   };
 
   const message = encodeURIComponent(
-    `Hola! Estoy interesado en ${nombreProducto} que vi en AgroTech por ${formatPrice(precio)}. ¿Sigue disponible?`
+    `Hola! Estoy interesado en ${nombreProducto} que vi en Agroup por ${formatPrice(precio)}. ¿Sigue disponible?`
   );
   
   const whatsappUrl = `https://wa.me/${telefonoVendedor}?text=${message}`;

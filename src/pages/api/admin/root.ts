@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import { db, inicializar } from '../../../lib/db';
 import crypto from 'crypto';
 
-const ADMIN_SECRET = 'agrotech-root-2026';
+const ADMIN_SECRET = 'agroup-root-2026';
 
 function hashPassword(password: string): string {
   return crypto.createHash('sha256').update(password).digest('hex');

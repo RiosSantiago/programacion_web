@@ -184,10 +184,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 </BaseLayout>
 
 <script>
-  const token = localStorage.getItem('agrotech_token');
+  const token = localStorage.getItem('agroup_token');
 
   function getHeaders() {
-    const t = localStorage.getItem('agrotech_token');
+    const t = localStorage.getItem('agroup_token');
     return t ? { 'Authorization': `Bearer ${t}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
   }
 

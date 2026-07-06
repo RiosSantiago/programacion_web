@@ -218,14 +218,14 @@
 
   function saveCart() {
     try {
-      localStorage.setItem('agrotech_cart', JSON.stringify(carrito));
+      localStorage.setItem('agroup_cart', JSON.stringify(carrito));
       document.dispatchEvent(new CustomEvent('cart-updated'));
     } catch (e) {}
   }
 
   function loadCart() {
     try {
-      const saved = localStorage.getItem('agrotech_cart');
+      const saved = localStorage.getItem('agroup_cart');
       if (saved) {
         carrito = JSON.parse(saved);
         actualizarCarrito();

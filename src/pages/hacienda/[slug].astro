@@ -6,7 +6,7 @@ const { slug } = Astro.params;
 const slugNombre = (slug || '').replace(/-/g, ' ');
 
 const productosLS = typeof localStorage !== 'undefined'
-  ? JSON.parse(localStorage.getItem('agrotech_productos') || '[]')
+  ? JSON.parse(localStorage.getItem('agroup_productos') || '[]')
   : [];
 
 const haciendaProductos = productosLS.filter((p: any) => {
@@ -15,7 +15,7 @@ const haciendaProductos = productosLS.filter((p: any) => {
 });
 
 const haciendaRaw = typeof localStorage !== 'undefined'
-  ? JSON.parse(localStorage.getItem('agrotech_hacienda_perfil') || '{}')
+  ? JSON.parse(localStorage.getItem('agroup_hacienda_perfil') || '{}')
   : {};
 
 const hacienda = {
@@ -37,7 +37,7 @@ const hacienda = {
 };
 
 const ventasData = typeof localStorage !== 'undefined'
-  ? JSON.parse(localStorage.getItem('agrotech_ventas_verificadas') || '[]')
+  ? JSON.parse(localStorage.getItem('agroup_ventas_verificadas') || '[]')
   : [];
 
 const ventasHacienda = ventasData.filter((v: any) =>

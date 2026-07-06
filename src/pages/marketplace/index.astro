@@ -244,7 +244,7 @@ const productosConReputacion = filtrados.map(p => {
   // Cargar productos de localStorage y agregarlos al grid
   (async function() {
     try {
-      const localProductos = JSON.parse(localStorage.getItem('agrotech_productos') || '[]');
+      const localProductos = JSON.parse(localStorage.getItem('agroup_productos') || '[]');
       (window as any).__localProductos = localProductos;
       if (localProductos.length === 0) return;
 

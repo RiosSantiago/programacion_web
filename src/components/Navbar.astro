@@ -11,8 +11,8 @@ const { variant = 'dark' } = Astro.props;
 
 <script is:inline>
   if (typeof localStorage !== 'undefined') {
-    var _token = localStorage.getItem('agrotech_token');
-    var _user = localStorage.getItem('agrotech_user');
+    var _token = localStorage.getItem('agroup_token');
+    var _user = localStorage.getItem('agroup_user');
     if (_token && _user) {
       document.documentElement.classList.add('user-logged-in');
     }
@@ -36,7 +36,7 @@ const { variant = 'dark' } = Astro.props;
           </svg>
         </div>
         <div>
-          <span class="text-2xl font-display font-bold text-white">AgroTech</span>
+          <span class="text-2xl font-display font-bold text-white">Agroup</span>
           <span class="hidden sm:block text-[10px] text-white/50 font-medium -mt-1">Mercado Ganadero</span>
         </div>
       </a>
@@ -335,7 +335,7 @@ const { variant = 'dark' } = Astro.props;
   let cachedRole = null;
 
   async function checkAdminStatus() {
-    const token = localStorage.getItem('agrotech_token');
+    const token = localStorage.getItem('agroup_token');
     if (!token) return;
     try {
       const res = await fetch('/api/admin/check', {
@@ -417,7 +417,7 @@ const { variant = 'dark' } = Astro.props;
     const badge = document.getElementById('nav-cart-count');
     if (!badge) return;
     try {
-      const cart = JSON.parse(localStorage.getItem('agrotech_cart') || '[]');
+      const cart = JSON.parse(localStorage.getItem('agroup_cart') || '[]');
       const count = cart.reduce((sum: number, item: any) => sum + (item.cantidad || 0), 0);
       badge.textContent = String(count);
       badge.classList.toggle('hidden', count === 0);

@@ -61,7 +61,7 @@ export default function PerfilForm() {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('agrotech_token');
+      const token = localStorage.getItem('agroup_token');
       if (!token) {
         window.location.href = '/auth/login';
         return;

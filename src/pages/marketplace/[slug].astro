@@ -435,7 +435,7 @@ const badgeInfo: Record<string, { label: string; class: string; icon: string }> 
       if (!fbContainer) return;
       const slug = fbContainer.getAttribute('data-slug');
       if (!slug) return;
-      const localProductos = JSON.parse(localStorage.getItem('agrotech_productos') || '[]');
+      const localProductos = JSON.parse(localStorage.getItem('agroup_productos') || '[]');
       const p = localProductos.find(item => String(item.id) === slug);
       if (p) {
         const fbLoading = document.getElementById('fallback-loading');
@@ -495,9 +495,9 @@ const badgeInfo: Record<string, { label: string; class: string; icon: string }> 
       setTimeout(() => {
         ratingSection.classList.add('hidden');
         ratingThanks.classList.remove('hidden');
-        const calif = JSON.parse(localStorage.getItem('agrotech_calificaciones') || '[]');
+        const calif = JSON.parse(localStorage.getItem('agroup_calificaciones') || '[]');
         calif.push({ producto: curProductoId, rating: valor, fecha: new Date().toISOString() });
-        localStorage.setItem('agrotech_calificaciones', JSON.stringify(calif));
+        localStorage.setItem('agroup_calificaciones', JSON.stringify(calif));
       }, 800);
     });
   });
@@ -517,14 +517,14 @@ const badgeInfo: Record<string, { label: string; class: string; icon: string }> 
     if (!motivo) return;
     reportarForm.classList.add('hidden');
     reportarGracias.classList.remove('hidden');
-    const reportes = JSON.parse(localStorage.getItem('agrotech_reportes') || '[]');
+    const reportes = JSON.parse(localStorage.getItem('agroup_reportes') || '[]');
     reportes.push({
       productoId: curProductoId,
       productoNombre: curProductoNombre,
       motivo,
       fecha: new Date().toISOString(),
     });
-    localStorage.setItem('agrotech_reportes', JSON.stringify(reportes));
+    localStorage.setItem('agroup_reportes', JSON.stringify(reportes));
     setTimeout(() => {
       reportarModal.classList.add('hidden');
       reportarForm.classList.remove('hidden');

@@ -134,7 +134,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
   let editMediaState = null;
 
   function getHeaders() {
-    const t = localStorage.getItem('agrotech_token');
+    const t = localStorage.getItem('agroup_token');
     return t ? { 'Authorization': `Bearer ${t}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
   }
 

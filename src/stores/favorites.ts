@@ -36,7 +36,7 @@ export function isFavorite(id: number): boolean {
 
 export function checkPriceChanges() {
   const favorites = $favorites.get();
-  const productos = JSON.parse(localStorage.getItem('agrotech_productos') || '[]');
+  const productos = JSON.parse(localStorage.getItem('agroup_productos') || '[]');
 
   Object.values(favorites).forEach((fav) => {
     const current = productos.find((p: any) => p.id === fav.id || p.id === Number(fav.id));
@@ -54,30 +54,30 @@ export function checkPriceChanges() {
 
 // Load from localStorage
 if (typeof localStorage !== 'undefined') {
-  const saved = localStorage.getItem('agrotech_favorites');
+  const saved = localStorage.getItem('agroup_favorites');
   if (saved) {
     try {
       $favorites.set(JSON.parse(saved));
     } catch (e) {
-      localStorage.removeItem('agrotech_favorites');
+      localStorage.removeItem('agroup_favorites');
     }
   }
 
-  const savedAlerts = localStorage.getItem('agrotech_precio_alerts');
+  const savedAlerts = localStorage.getItem('agroup_precio_alerts');
   if (savedAlerts) {
     try {
       $precioAlerts.set(JSON.parse(savedAlerts));
     } catch (e) {
-      localStorage.removeItem('agrotech_precio_alerts');
+      localStorage.removeItem('agroup_precio_alerts');
     }
   }
 
   // Save on change
   $favorites.subscribe((value) => {
-    localStorage.setItem('agrotech_favorites', JSON.stringify(value));
+    localStorage.setItem('agroup_favorites', JSON.stringify(value));
   });
 
   $precioAlerts.subscribe((value) => {
-    localStorage.setItem('agrotech_precio_alerts', JSON.stringify(value));
+    localStorage.setItem('agroup_precio_alerts', JSON.stringify(value));
   });
 }

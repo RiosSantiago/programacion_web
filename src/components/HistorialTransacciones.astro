@@ -211,14 +211,14 @@ function formatMoneda(val: number): string {
     e.preventDefault();
     const codigo = (document.getElementById('ica-codigo') as HTMLInputElement)?.value;
     if (!codigo) return;
-    const guias = JSON.parse(localStorage.getItem('agrotech_guias_ica') || '[]');
+    const guias = JSON.parse(localStorage.getItem('agroup_guias_ica') || '[]');
     guias.push({
       txn: (document.getElementById('ica-txn') as HTMLInputElement)?.value,
       codigo,
       fecha: new Date().toISOString(),
       archivo: 'guia_movilizacion.pdf',
     });
-    localStorage.setItem('agrotech_guias_ica', JSON.stringify(guias));
+    localStorage.setItem('agroup_guias_ica', JSON.stringify(guias));
     document.getElementById('ica-form')!.classList.add('hidden');
     document.getElementById('ica-gracias')!.classList.remove('hidden');
     setTimeout(() => {

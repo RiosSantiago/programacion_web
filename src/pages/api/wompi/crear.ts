@@ -52,7 +52,7 @@ export const POST: APIRoute = async ({ request }) => {
       case 'pse':
         paymentMethod = {
           type: 'PSE',
-          payment_description: 'Pago PSE - AgroTech',
+          payment_description: 'Pago PSE - Agroup',
           user_type: 0,
           user_legal_id: '123456789',
         };
@@ -93,7 +93,7 @@ export const POST: APIRoute = async ({ request }) => {
         },
         body: JSON.stringify({
           name: `Pedido ${ordenId}`,
-          description: `Compra en AgroTech - ${items.length} producto(s)`,
+          description: `Compra en Agroup - ${items.length} producto(s)`,
           single_use: true,
           amount_in_cents: amountCents,
           currency,

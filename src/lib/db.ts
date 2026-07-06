@@ -8,7 +8,7 @@ if (!fs.existsSync(dbDir)) {
   fs.mkdirSync(dbDir, { recursive: true });
 }
 
-const dbPath = path.join(dbDir, 'agrotech.db');
+const dbPath = path.join(dbDir, 'agroup.db');
 
 export const db = new Database(dbPath);
 

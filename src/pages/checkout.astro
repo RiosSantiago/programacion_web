@@ -2,7 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="Finalizar Compra - AgroTech">
+<BaseLayout title="Finalizar Compra - Agroup">
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <h1 class="text-2xl md:text-3xl font-display font-bold text-[#2D2D2D] mb-6">Finalizar Compra</h1>
 
@@ -180,7 +180,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
     if (metodoPago === 'whatsapp') {
       const productos = items.map(i => `${i.cantidad}x ${i.nombre}`).join(', ');
-      const texto = `Hola! Quiero comprar en AgroTech:%0A%0A*Productos:* ${productos}%0A*Total:* ${formatCOP(total)}%0A%0A*Datos de entrega:*%0ANombre: ${nombre}%0ATeléfono: ${telefono}%0ADirección: ${direccion}${notas ? '%0ANotas: ' + notas : ''}`;
+      const texto = `Hola! Quiero comprar en Agroup:%0A%0A*Productos:* ${productos}%0A*Total:* ${formatCOP(total)}%0A%0A*Datos de entrega:*%0ANombre: ${nombre}%0ATeléfono: ${telefono}%0ADirección: ${direccion}${notas ? '%0ANotas: ' + notas : ''}`;
       window.open(`https://wa.me/573001234567?text=${texto}`, '_blank');
       clearCart();
       window.location.href = '/pedido-exito?metodo=whatsapp';
@@ -213,13 +213,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   // Migrate old localStorage key if present
   if (typeof localStorage !== 'undefined') {
-    const oldCart = localStorage.getItem('agrotech-cart');
+    const oldCart = localStorage.getItem('agroup-cart');
     if (oldCart) {
-      const currentCart = localStorage.getItem('agrotech_cart');
+      const currentCart = localStorage.getItem('agroup_cart');
       if (!currentCart || JSON.parse(currentCart).length === 0) {
-        localStorage.setItem('agrotech_cart', oldCart);
+        localStorage.setItem('agroup_cart', oldCart);
       }
-      localStorage.removeItem('agrotech-cart');
+      localStorage.removeItem('agroup-cart');
     }
   }
 

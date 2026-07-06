@@ -28,14 +28,14 @@ export function addToCart(item: CartItem) {
   }
   
   if (typeof localStorage !== 'undefined') {
-    localStorage.setItem('agrotech_cart', JSON.stringify($cart.get()));
+    localStorage.setItem('agroup_cart', JSON.stringify($cart.get()));
   }
 }
 
 export function removeFromCart(id: number) {
   $cart.set($cart.get().filter((i) => i.id !== id));
   if (typeof localStorage !== 'undefined') {
-    localStorage.setItem('agrotech_cart', JSON.stringify($cart.get()));
+    localStorage.setItem('agroup_cart', JSON.stringify($cart.get()));
   }
 }
 
@@ -48,14 +48,14 @@ export function updateQuantity(id: number, cantidad: number) {
     $cart.get().map((i) => (i.id === id ? { ...i, cantidad } : i))
   );
   if (typeof localStorage !== 'undefined') {
-    localStorage.setItem('agrotech_cart', JSON.stringify($cart.get()));
+    localStorage.setItem('agroup_cart', JSON.stringify($cart.get()));
   }
 }
 
 export function clearCart() {
   $cart.set([]);
   if (typeof localStorage !== 'undefined') {
-    localStorage.removeItem('agrotech_cart');
+    localStorage.removeItem('agroup_cart');
   }
 }
 
@@ -81,21 +81,21 @@ export function closeCart() {
 
 if (typeof localStorage !== 'undefined') {
   // Migrate from old key if present
-  const oldCart = localStorage.getItem('agrotech-cart');
+  const oldCart = localStorage.getItem('agroup-cart');
   if (oldCart) {
-    const currentCart = localStorage.getItem('agrotech_cart');
+    const currentCart = localStorage.getItem('agroup_cart');
     if (!currentCart || JSON.parse(currentCart).length === 0) {
-      localStorage.setItem('agrotech_cart', oldCart);
+      localStorage.setItem('agroup_cart', oldCart);
     }
-    localStorage.removeItem('agrotech-cart');
+    localStorage.removeItem('agroup-cart');
   }
 
-  const saved = localStorage.getItem('agrotech_cart');
+  const saved = localStorage.getItem('agroup_cart');
   if (saved) {
     try {
       $cart.set(JSON.parse(saved));
     } catch (e) {
-      localStorage.removeItem('agrotech_cart');
+      localStorage.removeItem('agroup_cart');
     }
   }
 }

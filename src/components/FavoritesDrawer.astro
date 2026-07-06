@@ -92,13 +92,13 @@
 
   function guardarFavoritos() {
     try {
-      localStorage.setItem('agrotech-favoritos', JSON.stringify(favoritos));
+      localStorage.setItem('agroup-favoritos', JSON.stringify(favoritos));
     } catch (e) {}
   }
 
   function cargarFavoritos() {
     try {
-      const saved = localStorage.getItem('agrotech-favoritos');
+      const saved = localStorage.getItem('agroup-favoritos');
       if (saved) {
         favoritos = JSON.parse(saved);
         actualizarFavoritos();
