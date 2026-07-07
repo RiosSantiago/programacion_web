@@ -1,0 +1,465 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import StatsCard from '../components/StatsCard.astro';
+import InventarioTable from '../components/InventarioTable.astro';
+import IndicadorCrecimiento from '../components/IndicadorCrecimiento.astro';
+import CalendarioSanitario from '../components/CalendarioSanitario.astro';
+import EstadisticasProduccion from '../components/EstadisticasProduccion.astro';
+import ReportesExportables from '../components/ReportesExportables.astro';
+import HistorialTransacciones from '../components/HistorialTransacciones.astro';
+import CartDrawer from '../components/CartDrawer.astro';
+import '../lib/db';
+import { getEstadisticas, getInventario, getIndicadoresCrecimiento } from '../lib/models/inventario.js';
+
+const estadisticas = getEstadisticas();
+const inventario = getInventario();
+const indicadoresCrecimiento = getIndicadoresCrecimiento();
+---
+
+<BaseLayout navVariant="market">
+  <div>
+    <section class="bg-[#0B5D3B]">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2 text-sm text-white/70">
+              <a href="/" class="hover:text-white transition-colors">Marketplace</a>
+              <span>/</span>
+              <span class="text-white font-medium">Mi Hacienda</span>
+            </div>
+            <h1 class="text-2xl md:text-3xl font-bold text-white mt-2">Mi Hacienda</h1>
+            <p class="text-white/70 mt-1">Gestiona tu inventario, ventas y rendimiento desde aqui</p>
+          </div>
+          <div class="flex items-center gap-3">
+              <a
+               href="/publicar"
+               class="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-black text-sm font-semibold rounded-lg hover:bg-gray-100 transition-colors shadow-sm"
+             >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Publicar Lote
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <section>
+        <div class="flex items-center gap-2 mb-4">
+          <h2 class="text-lg font-semibold text-[#1A0E08]">Resumen General</h2>
+          <span class="text-xs text-[#6B6B6B] bg-[#F5F0E8] px-2 py-0.5 rounded-full">Hoy</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatsCard
+          titulo="Total de Cabezas"
+          valor={estadisticas.totalCabezas.toLocaleString()}
+          icono="cabezas"
+          tendencia={{ valor: estadisticas.crecimientoMensual, positiva: true }}
+          color="emerald"
+        />
+        <StatsCard
+          titulo="Alertas de Salud"
+          valor={estadisticas.alertasSalud}
+          icono="alerta"
+          color="amber"
+        />
+        <StatsCard
+          titulo="Promedio Peso (kg)"
+          valor={estadisticas.promedioPeso}
+          icono="peso"
+          tendencia={{ valor: 3.2, positiva: true }}
+          color="blue"
+        />
+        <StatsCard
+          titulo="Produccion Leche (L)"
+          valor={estadisticas.produccionLeche.toLocaleString()}
+          icono="leche"
+          tendencia={{ valor: 2.1, positiva: true }}
+          color="cyan"
+        />
+      </div>
+      </section>
+
+      <div class="bg-[#0B5D3B] rounded-2xl p-6 text-white" id="seller-stats">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold">Mi Perfil como Vendedor</h3>
+              <p class="text-white/70 text-sm">Resumen de tu actividad</p>
+            </div>
+          </div>
+          <a href="/publicar" class="inline-flex items-center gap-2 px-4 py-2 bg-white text-black text-sm font-bold rounded-xl hover:bg-gray-100 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Nueva Publicación
+          </a>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4" id="seller-stats-grid">
+          <div class="bg-white/10 rounded-xl p-4 text-center">
+            <p class="text-3xl font-extrabold" id="stat-publicaciones">0</p>
+            <p class="text-white/70 text-sm">Publicaciones</p>
+          </div>
+          <div class="bg-white/10 rounded-xl p-4 text-center">
+            <p class="text-3xl font-extrabold" id="stat-favoritos">0</p>
+            <p class="text-white/70 text-sm">Favoritos</p>
+          </div>
+          <div class="bg-white/10 rounded-xl p-4 text-center">
+            <p class="text-3xl font-extrabold" id="stat-vistas">0</p>
+            <p class="text-white/70 text-sm">Vistas</p>
+          </div>
+          <div class="bg-white/10 rounded-xl p-4 text-center">
+            <p class="text-3xl font-extrabold flex items-center justify-center gap-1">
+              <span id="stat-rating">4.5</span>
+              <svg class="w-5 h-5 text-white/70" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+            </p>
+            <p class="text-white/70 text-sm">Rating</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        <div class="xl:col-span-2">
+          <IndicadorCrecimiento datos={indicadoresCrecimiento} />
+        </div>
+
+        <div class="bg-white rounded-xl border border-[#E8E0D8] shadow-sm p-6">
+          <h3 class="text-lg font-semibold text-[#1A0E08] mb-6">Rendimiento por Categoria</h3>
+          <div class="space-y-5">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-[#2D2D2D]">Engorde</span>
+                <span class="text-sm font-bold text-gold-700">14.2%</span>
+              </div>
+              <div class="h-2.5 bg-[#F5F0E8] rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-gold-400 to-gold-600 rounded-full" style="width: 71%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-[#2D2D2D]">Cria</span>
+                <span class="text-sm font-bold text-blue-600">8.5%</span>
+              </div>
+              <div class="h-2.5 bg-[#F5F0E8] rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full" style="width: 42%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-[#2D2D2D]">Produccion</span>
+                <span class="text-sm font-bold text-purple-600">15.8%</span>
+              </div>
+              <div class="h-2.5 bg-[#F5F0E8] rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-purple-400 to-purple-600 rounded-full" style="width: 79%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-[#2D2D2D]">Reproduccion</span>
+                <span class="text-sm font-bold text-gold-600">11.3%</span>
+              </div>
+              <div class="h-2.5 bg-[#F5F0E8] rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-gold-400 to-gold-600 rounded-full" style="width: 56%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-8 pt-6 border-t border-[#E8E0D8]">
+            <h4 class="text-sm font-semibold text-[#2D2D2D] mb-3">Resumen rapido</h4>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="p-3 bg-gold-100 rounded-lg">
+                <p class="text-2xl font-bold text-gold-800">+4.2%</p>
+                <p class="text-xs text-gold-700 mt-0.5">Crecimiento mensual</p>
+              </div>
+              <div class="p-3 bg-blue-50 rounded-lg">
+                <p class="text-2xl font-bold text-blue-700">98.5%</p>
+                <p class="text-xs text-blue-600 mt-0.5">Tasa de retencion</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        <div class="xl:col-span-2">
+          <CalendarioSanitario />
+        </div>
+        <div>
+          <EstadisticasProduccion />
+        </div>
+      </div>
+
+      <InventarioTable animales={inventario} />
+
+      <ReportesExportables />
+
+      <HistorialTransacciones />
+
+      <section id="mis-publicaciones-section">
+        <div class="bg-white rounded-xl border border-[#E8E0D8] shadow-sm">
+          <div class="px-6 py-4 border-b border-[#E8E0D8] flex items-center justify-between">
+            <div>
+              <h2 class="text-lg font-semibold text-[#1A0E08]">Mis Publicaciones</h2>
+              <p class="text-sm text-[#6B6B6B]">Productos que has publicado en el marketplace</p>
+            </div>
+            <span id="mi-publicaciones-count" class="text-sm font-medium text-gold-700 bg-gold-100 px-3 py-1 rounded-full">0 publicados</span>
+          </div>
+          
+          <div id="mi-publicaciones-grid" class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          </div>
+          
+          <div id="sin-publicaciones" class="p-8 text-center" style="display: none;">
+            <svg class="w-12 h-12 text-[#C0B0A0] mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+            <p class="text-[#6B6B6B] mt-2">No tienes publicaciones aún</p>
+            <a href="/publicar" class="text-gold-700 hover:underline text-sm">Publicar tu primer producto</a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div id="detalles-modal" class="fixed inset-0 bg-black/50 z-50 hidden">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-[#1A0E08]" id="detalles-titulo">Detalles del Producto</h3>
+            <button id="btn-cerrar-detalles" class="text-[#6B6B6B] hover:text-[#2D2D2D]">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div id="detalles-contenido" class="space-y-4">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="eliminar-modal" class="fixed inset-0 bg-black/50 z-50 hidden">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-xl max-w-sm w-full p-6" onclick="event.stopPropagation()">
+        <div class="text-center">
+          <div class="w-12 h-12 bg-coral-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-6 h-6 text-coral-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-[#1A0E08] mb-2">¿Eliminar publicación?</h3>
+          <p class="text-[#6B6B6B] text-sm mb-6">Esta acción no se puede deshacer. El producto ya no aparecerá en el marketplace.</p>
+          <div class="flex gap-3">
+            <button id="btn-cancelar-eliminar" class="flex-1 px-4 py-2 border border-[#E8E0D8] text-[#2D2D2D] rounded-lg hover:bg-[#F5F0E8]">Cancelar</button>
+            <button id="btn-confirmar-eliminar" class="flex-1 px-4 py-2 bg-coral-600 text-white rounded-lg hover:bg-coral-700">Eliminar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <CartDrawer />
+</BaseLayout>
+
+<script>
+  let productoAEliminar = null;
+
+  function cerrarModal() {
+    document.getElementById('detalles-modal').classList.add('hidden');
+  }
+
+  function cerrarEliminar() {
+    document.getElementById('eliminar-modal').classList.add('hidden');
+    productoAEliminar = null;
+  }
+
+  function getPlaceholderImagen(categoria) {
+    const imagenes = {
+      bovino: '/images/ganado.svg',
+      equino: '/images/caballo.svg',
+      porcino: '/images/cerdo.svg',
+      ovino: '/images/ganado.svg',
+      avicola: '/images/gallina.svg',
+      cultivos: '/images/cultivos.svg',
+      servicios: '/images/default.svg',
+    };
+    return imagenes[categoria] || '/images/default.svg';
+  }
+
+  function mostrarDetalles(producto) {
+    const contenido = document.getElementById('detalles-contenido');
+    const imgSrc = producto.imagenes?.[0] || getPlaceholderImagen(producto.categoria);
+    
+    contenido.innerHTML = `
+      <div class="aspect-video bg-[#F5F0E8] rounded-lg flex items-center justify-center">
+        <img src="${imgSrc}" alt="${producto.nombre}" class="w-32 h-32 object-contain" />
+      </div>
+      <div>
+        <h4 class="font-semibold text-[#1A0E08]">${producto.nombre}</h4>
+        <p class="text-sm text-[#6B6B6B] capitalize">${producto.categoria} ${producto.raza ? '- ' + producto.raza : ''}</p>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div><p class="text-xs text-[#6B6B6B]">Precio</p><p class="font-semibold">$${parseInt(producto.precio || 0).toLocaleString('es-CO')}</p></div>
+        <div><p class="text-xs text-[#6B6B6B]">Stock</p><p class="font-semibold">${producto.stock}</p></div>
+        <div><p class="text-xs text-[#6B6B6B]">Ubicación</p><p class="font-semibold">${producto.ubicacion}</p></div>
+        <div><p class="text-xs text-[#6B6B6B]">Departamento</p><p class="font-semibold">${producto.departamento}</p></div>
+        ${producto.peso ? `<div><p class="text-xs text-[#6B6B6B]">Peso</p><p class="font-semibold">${producto.peso} kg</p></div>` : ''}
+        ${producto.salud ? `<div><p class="text-xs text-[#6B6B6B]">Salud</p><p class="font-semibold">${producto.salud}</p></div>` : ''}
+      </div>
+      <a href="/marketplace" class="block w-full text-center py-2 bg-campo-600 text-white rounded-lg hover:bg-campo-700">Ver todos en Marketplace</a>
+    `;
+    document.getElementById('detalles-titulo').textContent = producto.nombre;
+    document.getElementById('detalles-modal').classList.remove('hidden');
+  }
+
+  function mostrarEliminar(producto) {
+    productoAEliminar = producto;
+    document.getElementById('eliminar-modal').classList.remove('hidden');
+  }
+
+  async function confirmarEliminar() {
+    if (!productoAEliminar) return;
+    const token = localStorage.getItem('agroup_token');
+    
+    try {
+      await fetch(`/api/productos/${productoAEliminar.id}`, {
+        method: 'DELETE',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+      });
+    } catch (err) {
+      console.error('Error al eliminar:', err);
+    }
+    
+    cerrarEliminar();
+    cargarMisPublicaciones();
+    actualizarStatsVendedor();
+  }
+
+  document.getElementById('btn-cerrar-detalles').addEventListener('click', cerrarModal);
+  document.getElementById('btn-confirmar-eliminar').addEventListener('click', confirmarEliminar);
+  document.getElementById('btn-cancelar-eliminar').addEventListener('click', cerrarEliminar);
+
+  document.getElementById('detalles-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'detalles-modal') cerrarModal();
+  });
+  document.getElementById('eliminar-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'eliminar-modal') cerrarEliminar();
+  });
+
+  async function cargarMisPublicaciones() {
+    const grid = document.getElementById('mi-publicaciones-grid');
+    const countEl = document.getElementById('mi-publicaciones-count');
+    const sinPublicaciones = document.getElementById('sin-publicaciones');
+    const token = localStorage.getItem('agroup_token');
+    
+    let productos = [];
+    try {
+      const res = await fetch('/api/productos/mios', {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+      });
+      if (res.ok) {
+        const data = await res.json();
+        productos = data.productos || [];
+      }
+    } catch (err) {
+      console.error('Error al cargar publicaciones:', err);
+      productos = JSON.parse(localStorage.getItem('agroup_productos') || '[]');
+    }
+    
+    countEl.textContent = `${productos.length} publicados`;
+    
+    if (productos.length === 0) {
+      grid.innerHTML = '';
+      sinPublicaciones.style.display = 'block';
+      return;
+    }
+    
+    sinPublicaciones.style.display = 'none';
+    grid.innerHTML = '';
+    
+    const productosMostrar = [...productos].reverse();
+    
+    productosMostrar.forEach((p, index) => {
+      const card = document.createElement('div');
+      card.className = 'border border-[#E8E0D8] rounded-lg p-4 hover:shadow-md transition-shadow';
+      
+      const imgSrc = p.imagenes?.[0] || getPlaceholderImagen(p.categoria);
+      
+      card.innerHTML = `
+        <div class="flex gap-3">
+          <div class="w-16 h-16 bg-[#F5F0E8] rounded-lg flex items-center justify-center shrink-0">
+            <img src="${imgSrc}" alt="${p.nombre}" class="w-12 h-12 object-contain" />
+          </div>
+          <div class="flex-1 min-w-0">
+            <h4 class="font-semibold text-[#1A0E08] truncate">${p.nombre}</h4>
+            <p class="text-xs text-[#6B6B6B] capitalize">${p.categoria}</p>
+            <p class="text-lg font-bold text-gold-700 mt-1">$${parseInt(p.precio || 0).toLocaleString('es-CO')}</p>
+          </div>
+        </div>
+        <div class="flex gap-2 mt-3">
+          <button class="btn-detalles flex-1 py-1.5 text-sm text-[#2D2D2D] border border-[#E8E0D8] rounded hover:bg-[#F5F0E8]" data-index="${index}">Detalles</button>
+          <a href="/dashboard/publicaciones" class="flex-1 py-1.5 text-sm text-gold-700 border border-gold-200 rounded hover:bg-gold-50 text-center block">Editar</a>
+          <button class="btn-eliminar flex-1 py-1.5 text-sm text-coral-600 border border-coral-200 rounded hover:bg-coral-50" data-index="${index}">Eliminar</button>
+        </div>
+      `;
+      
+      grid.appendChild(card);
+    });
+    
+    document.querySelectorAll('.btn-detalles').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.index);
+        const producto = productosMostrar[idx];
+        mostrarDetalles(producto);
+      });
+    });
+    
+    document.querySelectorAll('.btn-eliminar').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.index);
+        const producto = productosMostrar[idx];
+        mostrarEliminar(producto);
+      });
+    });
+  }
+
+  cargarMisPublicaciones();
+  
+  async function actualizarStatsVendedor() {
+    const token = localStorage.getItem('agroup_token');
+    const favoritos = JSON.parse(localStorage.getItem('agroup-favoritos') || '[]');
+    
+    let publicaciones = [];
+    try {
+      const res = await fetch('/api/productos/mios', {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+      });
+      if (res.ok) {
+        const data = await res.json();
+        publicaciones = data.productos || [];
+      }
+    } catch {
+      publicaciones = JSON.parse(localStorage.getItem('agroup_productos') || '[]');
+    }
+    
+    const statPublicaciones = document.getElementById('stat-publicaciones');
+    const statFavoritos = document.getElementById('stat-favoritos');
+    const statVistas = document.getElementById('stat-vistas');
+    
+    if (statPublicaciones) statPublicaciones.textContent = String(publicaciones.length);
+    if (statFavoritos) statFavoritos.textContent = String(favoritos.length);
+    if (statVistas) statVistas.textContent = String(publicaciones.length * 12 + Math.floor(Math.random() * 50));
+  }
+  
+  actualizarStatsVendedor();
+</script>

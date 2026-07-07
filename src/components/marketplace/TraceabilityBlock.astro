@@ -1,0 +1,80 @@
+---
+interface Props {
+  producto?: {
+    historialPeso?: { fecha: string; peso: number }[];
+    vacunas?: { fecha: string; nombre: string }[];
+    verificacion?: 'basico' | 'verificado' | 'ica';
+  };
+}
+
+const { producto } = Astro.props;
+
+const datosProducto = producto || {};
+const verificacion = datosProducto.verificacion || 'verificado';
+const historialPeso = datosProducto.historialPeso || [
+  { fecha: 'Ene', peso: 280 },
+  { fecha: 'Feb', peso: 310 },
+  { fecha: 'Mar', peso: 345 },
+  { fecha: 'Abr', peso: 380 },
+  { fecha: 'May', peso: 410 },
+];
+const vacunas = datosProducto.vacunas || [
+  { fecha: '2026-01-15', nombre: 'Aftosa' },
+  { fecha: '2026-02-20', nombre: 'Brucelosis' },
+  { fecha: '2026-04-10', nombre: 'Rabia' },
+];
+
+const badges = {
+  basico: null,
+  verificado: { label: 'Historial Verificado', class: 'bg-campo-100 text-campo-700' },
+  ica: { label: 'Certificado ICA', class: 'bg-blue-100 text-blue-700' },
+};
+const badge = badges[verificacion];
+---
+
+<div class="bg-white border border-slate-200 rounded-xl p-6 space-y-6">
+  {badge && (
+    <div class="flex items-center gap-2">
+      <span class={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${badge.class}`}>
+        {badge.label}
+      </span>
+    </div>
+  )}
+
+  <!-- Historial de peso -->
+  <div>
+    <h3 class="text-sm font-semibold text-slate-700 uppercase tracking-wider mb-3">Historial de Peso</h3>
+    <div class="bg-slate-50 rounded-lg p-4">
+      <div class="flex items-end gap-2 h-32">
+        {historialPeso.map((p) => (
+          <div class="flex-1 flex flex-col items-center gap-1">
+            <span class="text-xs text-slate-500">{p.peso}kg</span>
+            <div
+              class="w-full bg-campo-500 rounded-t"
+              style={`height: ${(p.peso / 500) * 100}%`}
+            ></div>
+            <span class="text-xs text-slate-400">{p.fecha}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <!-- Vacunas -->
+  <div>
+    <h3 class="text-sm font-semibold text-slate-700 uppercase tracking-wider mb-3">Historial Sanitario</h3>
+    <div class="space-y-2">
+      {vacunas.map((v) => (
+        <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+          <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-xs">
+            ✓
+          </div>
+          <div class="flex-1">
+            <p class="text-sm font-medium text-slate-900">{v.nombre}</p>
+            <p class="text-xs text-slate-500">{v.fecha}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>

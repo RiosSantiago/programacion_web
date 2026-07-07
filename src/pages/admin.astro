@@ -1,0 +1,697 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex items-center gap-2 text-sm text-[#6B6B6B] mb-6">
+      <a href="/dashboard" class="hover:text-gold-700">Mi Hacienda</a>
+      <span>/</span>
+      <span class="text-[#1A0E08] font-medium">Admin</span>
+    </div>
+
+    <div id="admin-root-container">
+      <div id="admin-loading" class="text-center py-12">
+        <svg class="animate-spin w-8 h-8 text-gold-700 mx-auto mb-3" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+        </svg>
+        <p class="text-[#6B6B6B]">Verificando acceso...</p>
+      </div>
+
+      <div id="admin-not-root" class="hidden">
+        <div class="max-w-lg mx-auto">
+          <div class="bg-white rounded-xl border border-[#E8E0D8] p-8 text-center">
+            <svg class="w-16 h-16 text-coral-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m0 0v2m0-2h2m-2 0H10m9.364-7.364A9 9 0 1112 3a9 9 0 017.364 4.636z" />
+            </svg>
+            <h2 class="text-2xl font-bold text-[#1A0E08] mb-2">Acceso restringido</h2>
+            <p class="text-[#6B6B6B] mb-6">Solo los administradores pueden acceder a esta sección.</p>
+            <a href="/dashboard" class="text-gold-700 hover:underline">Volver al dashboard</a>
+          </div>
+
+          <div class="bg-white rounded-xl border border-[#E8E0D8] p-8 mt-6">
+            <h3 class="text-lg font-semibold text-[#1A0E08] mb-4">Crear usuario administrador</h3>
+            <form id="create-root-form" class="space-y-4">
+              <div id="root-form-error" class="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-600 hidden"></div>
+              <div id="root-form-success" class="bg-gold-100 border border-gold-200 rounded-lg p-3 text-sm text-gold-800 hidden"></div>
+
+              <div>
+                <label class="block text-sm font-medium text-[#2D2D2D] mb-1">Nombre completo</label>
+                <input type="text" id="root-nombre" required class="w-full px-3 py-2 border border-[#E8E0D8] rounded-lg text-sm" placeholder="Admin" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-[#2D2D2D] mb-1">Email</label>
+                <input type="email" id="root-email" required class="w-full px-3 py-2 border border-[#E8E0D8] rounded-lg text-sm" placeholder="admin@agrotech.com" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-[#2D2D2D] mb-1">Contraseña</label>
+                <input type="password" id="root-password" required minlength="6" class="w-full px-3 py-2 border border-[#E8E0D8] rounded-lg text-sm" placeholder="••••••" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-[#2D2D2D] mb-1">Clave secreta</label>
+                <input type="password" id="root-secret" required class="w-full px-3 py-2 border border-[#E8E0D8] rounded-lg text-sm font-mono" placeholder="Clave de administración" />
+                <p class="text-xs text-[#6B6B6B] mt-1">Ingresa la clave secreta proporcionada por el desarrollador</p>
+              </div>
+              <button type="submit" class="w-full py-2.5 bg-campo-600 text-white font-semibold rounded-lg hover:bg-campo-700 transition-colors">
+                Crear Administrador
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div id="admin-panel" class="hidden">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h1 class="text-2xl font-bold text-[#1A0E08]">Panel de Administración</h1>
+            <p class="text-sm text-[#6B6B6B] mt-1">Gestiona todas las configuraciones del marketplace</p>
+          </div>
+          <span id="admin-badge" class="bg-gold-100 text-gold-800 px-3 py-1 rounded-full text-xs font-semibold">ROOT</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-8" id="admin-stats"></div>
+
+        <div class="border-b border-[#E8E0D8] mb-6">
+          <nav class="flex gap-6 overflow-x-auto">
+            <button id="tab-btn-usuarios" class="tab-btn active text-gold-700 border-b-2 border-gold-700 pb-3 text-sm font-semibold whitespace-nowrap" data-tab="usuarios">Usuarios</button>
+            <button id="tab-btn-categorias" class="tab-btn text-[#6B6B6B] hover:text-[#2D2D2D] pb-3 text-sm font-medium whitespace-nowrap" data-tab="categorias">Categorías</button>
+            <button id="tab-btn-productos" class="tab-btn text-[#6B6B6B] hover:text-[#2D2D2D] pb-3 text-sm font-medium whitespace-nowrap" data-tab="productos">Productos</button>
+          </nav>
+        </div>
+
+        <div id="tab-usuarios" class="tab-content">
+          <div class="bg-white rounded-xl border border-[#E8E0D8] overflow-hidden">
+            <div class="px-6 py-4 border-b border-[#E8E0D8] flex items-center justify-between">
+              <h3 class="font-semibold text-[#1A0E08]">Usuarios Registrados</h3>
+              <span id="usuarios-count" class="text-xs text-[#6B6B6B] bg-[#F5F0E8] px-2 py-1 rounded-full"></span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-[#F5F0E8]">
+                  <tr>
+                    <th class="text-left px-6 py-3 font-medium text-[#6B6B6B]">ID</th>
+                    <th class="text-left px-6 py-3 font-medium text-[#6B6B6B]">Nombre</th>
+                    <th class="text-left px-6 py-3 font-medium text-[#6B6B6B]">Email</th>
+                    <th class="text-left px-6 py-3 font-medium text-[#6B6B6B]">Celular</th>
+                    <th id="th-contrasena" class="text-left px-6 py-3 font-medium text-[#6B6B6B] hidden">Contraseña</th>
+                    <th class="text-left px-6 py-3 font-medium text-[#6B6B6B]">Rol</th>
+                    <th class="text-left px-6 py-3 font-medium text-[#6B6B6B]">Verificado</th>
+                    <th class="text-left px-6 py-3 font-medium text-[#6B6B6B]">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="usuarios-tbody" class="divide-y divide-[#E8E0D8]"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-categorias" class="tab-content hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2">
+              <div class="bg-white rounded-xl border border-[#E8E0D8] overflow-hidden">
+                <div class="px-6 py-4 border-b border-[#E8E0D8]">
+                  <h3 class="font-semibold text-[#1A0E08]">Categorías del Marketplace</h3>
+                </div>
+                <div class="divide-y divide-[#E8E0D8]" id="categorias-list"></div>
+              </div>
+            </div>
+            <div id="nueva-categoria-container">
+              <div class="bg-white rounded-xl border border-[#E8E0D8] p-6">
+                <h3 class="font-semibold text-[#1A0E08] mb-4">Nueva Categoría</h3>
+                <form id="create-categoria-form" class="space-y-3">
+                  <input type="text" id="cat-nombre" required placeholder="Nombre" class="w-full px-3 py-2 border border-[#E8E0D8] rounded-lg text-sm" />
+                  <input type="text" id="cat-icono" required placeholder="Icono (ej: 🐄)" class="w-full px-3 py-2 border border-[#E8E0D8] rounded-lg text-sm" />
+                  <input type="text" id="cat-color" required placeholder="Clases CSS color (ej: bg-campo-100 text-campo-700)" class="w-full px-3 py-2 border border-[#E8E0D8] rounded-lg text-sm" />
+                  <button type="submit" class="w-full py-2 bg-campo-600 text-white text-sm font-semibold rounded-lg hover:bg-campo-700">Agregar Categoría</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-productos" class="tab-content hidden">
+          <div class="bg-white rounded-xl border border-[#E8E0D8] overflow-hidden">
+            <div class="px-6 py-4 border-b border-[#E8E0D8] flex items-center justify-between">
+              <h3 class="font-semibold text-[#1A0E08]">Todos los Productos</h3>
+              <div class="flex items-center gap-3">
+                <a href="/dashboard/admin/productos" class="text-xs text-gold-700 hover:text-gold-800 font-semibold hover:underline flex items-center gap-1">
+                  Gestión completa
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </a>
+                <span id="productos-count" class="text-xs text-[#6B6B6B] bg-[#F5F0E8] px-2 py-1 rounded-full"></span>
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-[#F5F0E8]">
+                  <tr>
+                    <th class="text-left px-6 py-3 font-medium text-[#6B6B6B]">ID</th>
+                    <th class="text-left px-6 py-3 font-medium text-[#6B6B6B]">Nombre</th>
+                    <th class="text-left px-6 py-3 font-medium text-[#6B6B6B]">Vendedor</th>
+                    <th class="text-left px-6 py-3 font-medium text-[#6B6B6B]">Precio</th>
+                    <th class="text-left px-6 py-3 font-medium text-[#6B6B6B]">Estado</th>
+                    <th class="text-left px-6 py-3 font-medium text-[#6B6B6B]">Categoría</th>
+                    <th class="text-left px-6 py-3 font-medium text-[#6B6B6B]">Creado</th>
+                    <th class="text-left px-6 py-3 font-medium text-[#6B6B6B]" colspan="2">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="productos-tbody" class="divide-y divide-[#E8E0D8]"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="admin-edit-modal" class="hidden fixed inset-0 z-50">
+    <div class="absolute inset-0 bg-black/50" onclick="cerrarAdminEditModal()"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-xl p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-[#1A0E08]">Editar Producto</h2>
+        <button onclick="cerrarAdminEditModal()" class="p-1 hover:bg-[#F5F0E8] rounded">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div id="admin-edit-form-container"></div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  const token = localStorage.getItem('agroup_token');
+
+  function getHeaders() {
+    const t = localStorage.getItem('agroup_token');
+    return t ? { 'Authorization': `Bearer ${t}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
+  }
+
+  function getEl<T extends HTMLElement>(id: string): T {
+    return document.getElementById(id) as T;
+  }
+
+  let currentUserRole = null;
+
+  async function checkRoot() {
+    const loading = getEl('admin-loading');
+    const notRoot = getEl('admin-not-root');
+    const panel = getEl('admin-panel');
+
+    try {
+      const res = await fetch('/api/admin/check', { headers: getHeaders() });
+      const data = await res.json();
+
+      if (data.admin) {
+        currentUserRole = data.user?.rol || null;
+        const badge = getEl('admin-badge');
+        if (badge) badge.textContent = currentUserRole === 'root' ? 'ROOT' : 'ADMIN';
+
+        if (currentUserRole !== 'root') {
+          const btnUsuarios = getEl('tab-btn-usuarios');
+          const btnCategorias = getEl('tab-btn-categorias');
+          if (btnUsuarios) btnUsuarios.classList.add('hidden');
+          if (btnCategorias) btnCategorias.classList.add('hidden');
+        } else {
+          const thPw = getEl('th-contrasena');
+          if (thPw) thPw.classList.remove('hidden');
+        }
+        if (currentUserRole !== 'root') {
+          const tabUsuarios = getEl('tab-usuarios');
+          const tabCategorias = getEl('tab-categorias');
+          if (tabUsuarios) tabUsuarios.classList.add('hidden');
+          if (tabCategorias) tabCategorias.classList.add('hidden');
+          const tabProductos = getEl('tab-productos');
+          if (tabProductos) tabProductos.classList.remove('hidden');
+          document.querySelectorAll('.tab-btn').forEach(b => {
+            b.classList.remove('active', 'text-gold-700', 'border-b-2', 'border-gold-700');
+            b.classList.add('text-[#6B6B6B]');
+          });
+          const btnProductos = getEl('tab-btn-productos');
+          if (btnProductos) {
+            btnProductos.classList.add('active', 'text-gold-700', 'border-b-2', 'border-gold-700');
+            btnProductos.classList.remove('text-[#6B6B6B]');
+          }
+          const catContainer = getEl('nueva-categoria-container');
+          if (catContainer) catContainer.classList.add('hidden');
+        }
+        panel.classList.remove('hidden');
+        loading.classList.add('hidden');
+        cargarAdminPanel();
+      } else {
+        loading.classList.add('hidden');
+        notRoot.classList.remove('hidden');
+      }
+    } catch {
+      loading.classList.add('hidden');
+      notRoot.classList.remove('hidden');
+    }
+  }
+
+  async function cargarAdminPanel() {
+    if (currentUserRole === 'root') {
+      await Promise.all([cargarStats(), cargarUsuarios(), cargarCategorias(), cargarProductos()]);
+    } else {
+      await cargarProductos();
+    }
+  }
+
+  async function cargarStats() {
+    try {
+      const [users, cats, prods] = await Promise.all([
+        fetch('/api/admin/usuarios', { headers: getHeaders() }).then(r => r.json()),
+        fetch('/api/admin/categorias', { headers: getHeaders() }).then(r => r.json()),
+        fetch('/api/productos').then(r => r.json()),
+      ]);
+
+      const u = users.usuarios || [];
+      const c = cats.categorias || [];
+      const p = prods.productos || [];
+
+      document.getElementById('admin-stats').innerHTML = `
+        <div class="bg-white rounded-xl border border-[#E8E0D8] p-4">
+          <p class="text-xs text-[#6B6B6B]">Usuarios</p>
+          <p class="text-2xl font-bold text-[#1A0E08] mt-1">${u.length}</p>
+        </div>
+        <div class="bg-white rounded-xl border border-[#E8E0D8] p-4">
+          <p class="text-xs text-[#6B6B6B]">Categorías</p>
+          <p class="text-2xl font-bold text-[#1A0E08] mt-1">${c.length}</p>
+        </div>
+        <div class="bg-white rounded-xl border border-[#E8E0D8] p-4">
+          <p class="text-xs text-[#6B6B6B]">Productos</p>
+          <p class="text-2xl font-bold text-[#1A0E08] mt-1">${p.length}</p>
+        </div>
+        <div class="bg-white rounded-xl border border-[#E8E0D8] p-4">
+          <p class="text-xs text-[#6B6B6B]">Roots</p>
+            <p class="text-2xl font-bold text-gold-700 mt-1">${u.filter(x => x.rol === 'root' || x.rol === 'admin').length}</p>
+        </div>
+      `;
+    } catch {}
+  }
+
+  function togglePassword(el) {
+    const masked = el.querySelector('.pw-masked');
+    const visible = el.querySelector('.pw-visible');
+    if (!masked || !visible) return;
+    const isHidden = !masked.classList.contains('hidden');
+    masked.classList.toggle('hidden', !isHidden);
+    visible.classList.toggle('hidden', isHidden);
+  }
+  (window as any).togglePassword = togglePassword;
+
+  function escapeHtml(text) {
+    if (!text) return '';
+    const d = document.createElement('div');
+    d.textContent = text;
+    return d.innerHTML;
+  }
+
+  async function cargarUsuarios() {
+    try {
+      const res = await fetch('/api/admin/usuarios', { headers: getHeaders() });
+      const data = await res.json();
+      const usuarios = data.usuarios || [];
+
+      document.getElementById('usuarios-count').textContent = `${usuarios.length} usuarios`;
+      const tbody = document.getElementById('usuarios-tbody');
+      const isRootUser = currentUserRole === 'root';
+
+      tbody.innerHTML = usuarios.map(u => {
+        const roleLabel = u.rol === 'root' ? 'Root' : u.rol === 'admin' ? 'Admin' : 'Usuario';
+        return `
+        <tr>
+          <td class="px-6 py-3 text-[#6B6B6B]">${u.id}</td>
+          <td class="px-6 py-3 font-medium text-[#1A0E08]">${escapeHtml(u.nombre)}</td>
+          <td class="px-6 py-3 text-[#6B6B6B]">${escapeHtml(u.email)}</td>
+          <td class="px-6 py-3 text-[#6B6B6B]">${escapeHtml(u.celular)}</td>
+          <td class="px-6 py-3">
+            ${isRootUser && u.password_text
+              ? `<span class="password-cell text-xs font-mono" data-pw="${escapeHtml(u.password_text)}" onclick="togglePassword(this)">
+                  <span class="pw-masked">••••••••</span>
+                  <span class="pw-visible hidden">${escapeHtml(u.password_text)}</span>
+                  <svg class="w-3 h-3 inline ml-1 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                </span>`
+              : '<span class="text-xs text-[#C0B0A0]">—</span>'}
+          </td>
+          <td class="px-6 py-3">
+            ${isRootUser
+              ? `<select class="rol-select text-xs border border-[#E8E0D8] rounded px-2 py-1" data-id="${u.id}" ${u.rol === 'root' ? 'disabled' : ''}>
+                  <option value="" ${u.rol === '' ? 'selected' : ''}>Usuario</option>
+                  <option value="admin" ${u.rol === 'admin' ? 'selected' : ''}>Admin</option>
+                 </select>`
+              : `<span class="text-xs px-2 py-1 text-[#6B6B6B]">${roleLabel}</span>`}
+          </td>
+          <td class="px-6 py-3">
+            <span class="${u.verificado ? 'bg-campo-100 text-campo-700' : 'bg-coral-100 text-coral-700'} px-2 py-0.5 rounded-full text-xs font-medium">
+              ${u.verificado ? 'Sí' : 'No'}
+            </span>
+          </td>
+          <td class="px-6 py-3">
+            ${isRootUser && u.rol !== 'root' ? `<button class="btn-eliminar-usuario text-xs text-coral-600 hover:underline" data-id="${u.id}">Eliminar</button>` : '<span class="text-xs text-[#C0B0A0]">—</span>'}
+          </td>
+        </tr>
+      `}).join('');
+
+      tbody.querySelectorAll('.rol-select').forEach(sel => {
+        sel.addEventListener('change', async () => {
+          const userId = parseInt(sel.dataset.id);
+          const newRol = sel.value;
+          await fetch(`/api/admin/usuarios/${userId}`, {
+            method: 'PUT',
+            headers: getHeaders(),
+            body: JSON.stringify({ rol: newRol }),
+          });
+          cargarUsuarios();
+          cargarStats();
+        });
+      });
+
+      tbody.querySelectorAll('.btn-eliminar-usuario').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (!confirm('¿Eliminar este usuario? Esta acción no se puede deshacer.')) return;
+          const id = parseInt(btn.dataset.id);
+          await fetch(`/api/admin/usuarios/${id}`, { method: 'DELETE', headers: getHeaders() });
+          cargarUsuarios();
+          cargarStats();
+        });
+      });
+    } catch {}
+  }
+
+  async function cargarCategorias() {
+    try {
+      const res = await fetch('/api/admin/categorias', { headers: getHeaders() });
+      const data = await res.json();
+      const cats = data.categorias || [];
+
+      const list = document.getElementById('categorias-list');
+      if (cats.length === 0) {
+        list.innerHTML = '<div class="px-6 py-8 text-center text-[#6B6B6B]">No hay categorías</div>';
+        return;
+      }
+
+      const isRootUser = currentUserRole === 'root';
+      list.innerHTML = cats.map(c => `
+        <div class="px-6 py-4 flex items-center justify-between hover:bg-[#F5F0E8]">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">${c.icono}</span>
+            <div>
+              <p class="font-medium text-[#1A0E08]">${escapeHtml(c.nombre)}</p>
+              <p class="text-xs text-[#6B6B6B]">${c.color} · ${c.cantidad} productos</p>
+            </div>
+          </div>
+          ${isRootUser ? `<button class="btn-eliminar-categoria text-xs text-coral-600 hover:underline" data-id="${c.id}">Eliminar</button>` : ''}
+        </div>
+      `).join('');
+
+      list.querySelectorAll('.btn-eliminar-categoria').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (!confirm('¿Eliminar esta categoría?')) return;
+          await fetch(`/api/admin/categorias/${btn.dataset.id}`, { method: 'DELETE', headers: getHeaders() });
+          cargarCategorias();
+          cargarStats();
+        });
+      });
+    } catch {}
+  }
+
+  async function cargarProductos() {
+    try {
+      const res = await fetch('/api/productos');
+      const data = await res.json();
+      const productos = data.productos || [];
+
+      document.getElementById('productos-count').textContent = `${productos.length} productos`;
+      const tbody = document.getElementById('productos-tbody');
+
+      if (productos.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-[#6B6B6B]">No hay productos</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = productos.map(p => `
+        <tr>
+          <td class="px-6 py-3 text-[#6B6B6B]">${p.id}</td>
+          <td class="px-6 py-3 font-medium text-[#1A0E08]">${escapeHtml(p.nombre)}</td>
+          <td class="px-6 py-3 text-[#6B6B6B]">${escapeHtml(p.vendedor)}</td>
+          <td class="px-6 py-3 text-[#1A0E08] font-medium">$${(p.precio || 0).toLocaleString('es-CO')}</td>
+          <td class="px-6 py-3">
+            <span class="capitalize text-xs ${p.estado === 'disponible' ? 'bg-campo-100 text-campo-700' : p.estado === 'vendido' ? 'bg-[#F5F0E8] text-[#6B6B6B]' : 'bg-gold-100 text-gold-800'} px-2 py-0.5 rounded-full">${p.estado || 'disponible'}</span>
+          </td>
+          <td class="px-6 py-3 text-[#6B6B6B] capitalize">${p.categoria}</td>
+          <td class="px-6 py-3 text-[#6B6B6B] text-xs">${p.created_at ? new Date(p.created_at).toLocaleDateString() : '-'}</td>
+          <td class="px-6 py-3">
+            <a href="/marketplace/${p.id}" class="text-gold-700 hover:underline text-xs">Ver</a>
+          </td>
+          <td class="px-6 py-3">
+            <button class="admin-edit-producto text-xs text-gold-700 hover:underline mr-3" data-id="${p.id}">Editar</button>
+            ${currentUserRole === 'root'
+              ? `<button class="admin-eliminar-producto text-xs text-coral-600 hover:underline" data-id="${p.id}">Eliminar</button>`
+              : `<span class="text-xs text-[#C0B0A0] cursor-not-allowed" title="Los administradores no pueden eliminar productos">Eliminar</span>`}
+          </td>
+        </tr>
+      `).join('');
+
+      tbody.querySelectorAll('.admin-edit-producto').forEach(btn => {
+        btn.addEventListener('click', () => abrirEditProducto(parseInt(btn.dataset.id)));
+      });
+
+      tbody.querySelectorAll('.admin-eliminar-producto').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (!confirm('¿Eliminar este producto? Esta acción no se puede deshacer.')) return;
+          const id = parseInt(btn.dataset.id);
+          try {
+            const res = await fetch(`/api/productos/${id}`, { method: 'DELETE', headers: getHeaders() });
+            if (!res.ok) { const err = await res.json(); alert(err.error || 'Error'); return; }
+            cargarProductos();
+            cargarStats();
+          } catch { alert('Error al eliminar'); }
+        });
+      });
+
+    } catch {}
+  }
+
+  let adminEditandoId = null;
+
+  async function abrirEditProducto(productoId) {
+    adminEditandoId = productoId;
+    const container = document.getElementById('admin-edit-form-container');
+
+    try {
+      const res = await fetch(`/api/productos/${productoId}`);
+      if (!res.ok) throw new Error('No se pudo cargar');
+      const data = await res.json();
+      const p = data.producto || data;
+
+      container.innerHTML = `
+        <form id="admin-edit-form" class="space-y-6">
+          <div id="admin-edit-error" class="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-600 hidden"></div>
+
+          <div>
+            <label class="block text-sm font-medium text-[#2D2D2D] mb-1">Nombre *</label>
+            <input type="text" id="ae-nombre" required value="${escapeHtml(p.nombre)}" class="w-full px-3 py-2 border border-[#E8E0D8] rounded-lg text-sm" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-[#2D2D2D] mb-1">Categoría</label>
+              <select id="ae-categoria" class="w-full px-3 py-2 border border-[#E8E0D8] rounded-lg text-sm bg-white">
+                <option value="bovino" ${p.categoria === 'bovino' ? 'selected' : ''}>Bovinos</option>
+                <option value="equino" ${p.categoria === 'equino' ? 'selected' : ''}>Equinos</option>
+                <option value="porcino" ${p.categoria === 'porcino' ? 'selected' : ''}>Porcinos</option>
+                <option value="ovino" ${p.categoria === 'ovino' ? 'selected' : ''}>Ovinos</option>
+                <option value="avicola" ${p.categoria === 'avicola' ? 'selected' : ''}>Avicolas</option>
+                <option value="cultivos" ${p.categoria === 'cultivos' ? 'selected' : ''}>Cultivos</option>
+                <option value="servicios" ${p.categoria === 'servicios' ? 'selected' : ''}>Servicios</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-[#2D2D2D] mb-1">Raza</label>
+              <input type="text" id="ae-raza" value="${escapeHtml(p.raza || '')}" class="w-full px-3 py-2 border border-[#E8E0D8] rounded-lg text-sm" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-[#2D2D2D] mb-1">Peso (kg)</label>
+              <input type="number" id="ae-peso" value="${p.peso || ''}" class="w-full px-3 py-2 border border-[#E8E0D8] rounded-lg text-sm" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-[#2D2D2D] mb-1">Stock *</label>
+              <input type="number" id="ae-stock" required value="${p.stock || '1'}" class="w-full px-3 py-2 border border-[#E8E0D8] rounded-lg text-sm" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-[#2D2D2D] mb-1">Ubicación</label>
+              <input type="text" id="ae-ubicacion" value="${escapeHtml(p.ubicacion || '')}" class="w-full px-3 py-2 border border-[#E8E0D8] rounded-lg text-sm" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-[#2D2D2D] mb-1">Departamento</label>
+              <input type="text" id="ae-departamento" value="${escapeHtml(p.departamento || 'Caldas')}" class="w-full px-3 py-2 border border-[#E8E0D8] rounded-lg text-sm" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-[#2D2D2D] mb-1">Precio (COP) *</label>
+              <input type="number" id="ae-precio" required value="${p.precio || ''}" class="w-full px-3 py-2 border border-[#E8E0D8] rounded-lg text-sm" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-[#2D2D2D] mb-1">Estado de salud</label>
+              <select id="ae-salud" class="w-full px-3 py-2 border border-[#E8E0D8] rounded-lg text-sm bg-white">
+                <option value="Bueno" ${(p.salud || 'Bueno') === 'Bueno' ? 'selected' : ''}>Bueno</option>
+                <option value="Regular" ${p.salud === 'Regular' ? 'selected' : ''}>Regular</option>
+                <option value="Excelente" ${p.salud === 'Excelente' ? 'selected' : ''}>Excelente</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-[#2D2D2D] mb-1">Estado</label>
+            <select id="ae-estado" class="w-full px-3 py-2 border border-[#E8E0D8] rounded-lg text-sm bg-white">
+              <option value="disponible" ${(p.estado || 'disponible') === 'disponible' ? 'selected' : ''}>Disponible</option>
+              <option value="reservado" ${p.estado === 'reservado' ? 'selected' : ''}>Reservado</option>
+              <option value="vendido" ${p.estado === 'vendido' ? 'selected' : ''}>Vendido</option>
+            </select>
+          </div>
+
+          <div class="flex gap-3">
+            <button type="submit" class="flex-1 py-3 bg-campo-600 text-white font-semibold rounded-lg hover:bg-campo-700" id="admin-edit-submit">Guardar Cambios</button>
+            <button type="button" onclick="cerrarAdminEditModal()" class="px-6 py-3 border border-[#E8E0D8] text-[#2D2D2D] font-semibold rounded-lg hover:bg-[#F5F0E8]">Cancelar</button>
+          </div>
+        </form>
+      `;
+
+      document.getElementById('admin-edit-form').addEventListener('submit', guardarEditProducto);
+      document.getElementById('admin-edit-modal').classList.remove('hidden');
+    } catch {
+      container.innerHTML = '<p class="text-coral-600">Error al cargar el producto</p>';
+      document.getElementById('admin-edit-modal').classList.remove('hidden');
+    }
+  }
+
+  async function guardarEditProducto(e) {
+    e.preventDefault();
+    const btn = document.getElementById('admin-edit-submit');
+    const errorEl = document.getElementById('admin-edit-error');
+    btn.disabled = true;
+    btn.textContent = 'Guardando...';
+    errorEl.classList.add('hidden');
+
+    const data = {
+      nombre: document.getElementById('ae-nombre').value,
+      categoria: document.getElementById('ae-categoria').value,
+      raza: document.getElementById('ae-raza').value,
+      peso: document.getElementById('ae-peso').value ? parseFloat(document.getElementById('ae-peso').value) : null,
+      stock: parseInt(document.getElementById('ae-stock').value),
+      ubicacion: document.getElementById('ae-ubicacion').value,
+      departamento: document.getElementById('ae-departamento').value,
+      precio: parseFloat(document.getElementById('ae-precio').value),
+      salud: document.getElementById('ae-salud').value,
+      estado: document.getElementById('ae-estado').value,
+    };
+
+    try {
+      const res = await fetch(`/api/productos/${adminEditandoId}`, {
+        method: 'PUT',
+        headers: getHeaders(),
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error('Error al guardar');
+      cerrarAdminEditModal();
+      cargarProductos();
+      cargarStats();
+    } catch (err) {
+      errorEl.textContent = err.message;
+      errorEl.classList.remove('hidden');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Guardar Cambios';
+    }
+  }
+
+  function cerrarAdminEditModal() {
+    document.getElementById('admin-edit-modal').classList.add('hidden');
+    adminEditandoId = null;
+  }
+  (window as any).cerrarAdminEditModal = cerrarAdminEditModal;
+
+  document.getElementById('create-root-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const errorEl = document.getElementById('root-form-error');
+    const successEl = document.getElementById('root-form-success');
+    errorEl.classList.add('hidden');
+    successEl.classList.add('hidden');
+
+    const data = {
+      nombre: document.getElementById('root-nombre').value,
+      email: document.getElementById('root-email').value,
+      password: document.getElementById('root-password').value,
+      secret: document.getElementById('root-secret').value,
+    };
+
+    try {
+      const res = await fetch('/api/admin/root', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      const result = await res.json();
+
+      if (res.ok && result.success) {
+        successEl.textContent = 'Usuario administrador creado exitosamente. Ahora puedes iniciar sesión.';
+        successEl.classList.remove('hidden');
+        document.getElementById('create-root-form').reset();
+      } else {
+        errorEl.textContent = result.error || 'Error al crear usuario';
+        errorEl.classList.remove('hidden');
+      }
+    } catch (err) {
+      errorEl.textContent = 'Error de conexión';
+      errorEl.classList.remove('hidden');
+    }
+  });
+
+  document.getElementById('create-categoria-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = {
+      nombre: document.getElementById('cat-nombre').value,
+      icono: document.getElementById('cat-icono').value,
+      color: document.getElementById('cat-color').value,
+    };
+
+    await fetch('/api/admin/categorias', {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(data),
+    });
+
+    document.getElementById('create-categoria-form').reset();
+    cargarCategorias();
+    cargarStats();
+  });
+
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.remove('active', 'text-gold-700', 'border-b-2', 'border-gold-700');
+        b.classList.add('text-[#6B6B6B]');
+      });
+      btn.classList.add('active', 'text-gold-700', 'border-b-2', 'border-gold-700');
+      btn.classList.remove('text-[#6B6B6B]');
+
+      document.querySelectorAll('.tab-content').forEach(tc => tc.classList.add('hidden'));
+      const tabId = btn.dataset.tab;
+      document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+    });
+  });
+
+  checkRoot();
+</script>

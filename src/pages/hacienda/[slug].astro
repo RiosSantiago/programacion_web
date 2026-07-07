@@ -1,0 +1,205 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProductCard from '../../components/ProductCard.astro';
+
+const { slug } = Astro.params;
+const slugNombre = (slug || '').replace(/-/g, ' ');
+
+const productosLS = typeof localStorage !== 'undefined'
+  ? JSON.parse(localStorage.getItem('agroup_productos') || '[]')
+  : [];
+
+const haciendaProductos = productosLS.filter((p: any) => {
+  const v = (p.vendedor || '').toLowerCase().replace(/\s+/g, '-');
+  return v === slug || slugNombre.includes((p.vendedor || '').toLowerCase());
+});
+
+const haciendaRaw = typeof localStorage !== 'undefined'
+  ? JSON.parse(localStorage.getItem('agroup_hacienda_perfil') || '{}')
+  : {};
+
+const hacienda = {
+  nombre: haciendaRaw.nombre || (slug ? slug.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()) : 'Hacienda'),
+  slug: slug || 'hacienda',
+  logo: haciendaRaw.logo || '',
+  portada: haciendaRaw.portada || '',
+  descripcion: haciendaRaw.descripcion || 'Hacienda familiar dedicada a la cría y engorde de ganado bovino con trazabilidad completa.',
+  ubicacion: `${haciendaRaw.municipio || 'Manizales'}, ${haciendaRaw.departamento || 'Caldas'}`,
+  departamento: haciendaRaw.departamento || 'Caldas',
+  municipio: haciendaRaw.municipio || 'Manizales',
+  whatsapp: haciendaRaw.whatsapp || '3001234567',
+  especies: haciendaRaw.especies || ['Bovinos', 'Porcinos'],
+  rating: parseFloat(haciendaRaw.rating) || 4.8,
+  ventas: parseInt(haciendaRaw.ventas) || 12,
+  miembroDesde: haciendaRaw.miembroDesde || 'marzo 2026',
+  urlPublica: `/hacienda/${slug || 'hacienda'}`,
+  publicacionesActivas: haciendaProductos.length,
+};
+
+const ventasData = typeof localStorage !== 'undefined'
+  ? JSON.parse(localStorage.getItem('agroup_ventas_verificadas') || '[]')
+  : [];
+
+const ventasHacienda = ventasData.filter((v: any) =>
+  v.vendedor?.toLowerCase() === hacienda.nombre.toLowerCase()
+);
+---
+
+<BaseLayout>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center gap-2 text-sm text-slate-500">
+      <a href="/" class="hover:text-emerald-600 transition-colors font-medium">Marketplace</a>
+      <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+      <span class="text-emerald-700 font-semibold">{hacienda.nombre}</span>
+    </nav>
+
+    <!-- Portada -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      {hacienda.portada ? (
+        <img src={hacienda.portada} alt="" class="w-full h-48 object-cover" />
+      ) : (
+        <div class="w-full h-48 bg-gradient-to-r from-emerald-600 to-emerald-800"></div>
+      )}
+
+      <div class="px-6 pb-6">
+        <!-- Avatar -->
+        <div class="flex flex-col sm:flex-row gap-6 -mt-12 relative">
+          <div class="shrink-0">
+            {hacienda.logo ? (
+              <img src={hacienda.logo} alt={hacienda.nombre} class="w-24 h-24 rounded-2xl border-4 border-white shadow-md object-cover bg-white" />
+            ) : (
+              <div class="w-24 h-24 rounded-2xl border-4 border-white shadow-md bg-emerald-100 flex items-center justify-center">
+                <span class="text-3xl font-bold text-emerald-700">{hacienda.nombre[0]}</span>
+              </div>
+            )}
+          </div>
+
+          <div class="flex-1 pt-4 sm:pt-0 sm:self-end">
+            <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+              <div>
+                <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900">{hacienda.nombre}</h1>
+                <div class="flex flex-wrap items-center gap-3 mt-2 text-sm text-slate-500">
+                  <span class="flex items-center gap-1">
+                    <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    {hacienda.ubicacion}
+                  </span>
+                  <span class="text-slate-300">|</span>
+                  <span>Miembro desde {hacienda.miembroDesde}</span>
+                </div>
+              </div>
+              <a
+                href={`https://wa.me/57${hacienda.whatsapp.replace(/\D/g, '')}`}
+                target="_blank"
+                class="inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white text-sm font-bold rounded-xl hover:bg-green-700 transition-colors shadow-sm shrink-0"
+              >
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/>
+                </svg>
+                Contactar por WhatsApp
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats + Especies -->
+        <div class="mt-6 pt-6 border-t border-slate-200">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+            <div class="text-center p-3 bg-emerald-50 rounded-xl">
+              <p class="text-2xl font-extrabold text-emerald-700">{hacienda.publicacionesActivas}</p>
+              <p class="text-xs text-emerald-600 mt-0.5">Publicaciones activas</p>
+            </div>
+            <div class="text-center p-3 bg-amber-50 rounded-xl">
+              <p class="text-2xl font-extrabold text-amber-700">{hacienda.ventas}</p>
+              <p class="text-xs text-amber-600 mt-0.5">Ventas verificadas</p>
+            </div>
+            <div class="text-center p-3 bg-blue-50 rounded-xl">
+              <p class="text-2xl font-extrabold text-blue-700 flex items-center justify-center gap-1">
+                {hacienda.rating}
+                <svg class="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                </svg>
+              </p>
+              <p class="text-xs text-blue-600 mt-0.5">Calificación promedio</p>
+            </div>
+            <div class="text-center p-3 bg-purple-50 rounded-xl">
+              <p class="text-2xl font-extrabold text-purple-700">{hacienda.especies.length}</p>
+              <p class="text-xs text-purple-600 mt-0.5">Especies manejadas</p>
+            </div>
+          </div>
+
+          <!-- Especies tags -->
+          <div class="flex flex-wrap gap-2">
+            {hacienda.especies.map((specie: string) => (
+              <span class="px-3 py-1.5 bg-slate-100 text-slate-700 text-sm font-medium rounded-lg">{specie}</span>
+            ))}
+          </div>
+        </div>
+
+        <!-- Descripcion -->
+        {hacienda.descripcion && (
+          <div class="mt-6 pt-6 border-t border-slate-200">
+            <h3 class="text-sm font-semibold text-slate-700 mb-2">Acerca de</h3>
+            <p class="text-sm text-slate-600 leading-relaxed">{hacienda.descripcion}</p>
+          </div>
+        )}
+      </div>
+    </div>
+
+    <!-- Ventas verificadas -->
+    {ventasHacienda.length > 0 && (
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+        <h2 class="text-lg font-bold text-slate-900 mb-4">Historial de Ventas Verificadas</h2>
+        <div class="space-y-3">
+          {ventasHacienda.map((venta: any) => (
+            <div class="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
+                  <span class="text-sm font-bold text-emerald-700">{venta.comprador?.[0] || 'C'}</span>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-slate-900">{venta.producto}</p>
+                  <p class="text-xs text-slate-500">Comprador: {venta.comprador || 'Anónimo'}</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <div class="flex items-center gap-0.5">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <svg key={star} class={`w-4 h-4 ${star <= venta.calificacion ? 'text-amber-400' : 'text-slate-300'}`} fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                    </svg>
+                  ))}
+                </div>
+                <p class="text-xs text-slate-400 mt-0.5">{venta.fecha || ''}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+
+    <!-- Publicaciones -->
+    <div>
+      <h2 class="text-xl font-bold text-slate-900 mb-4">Publicaciones Activas ({hacienda.publicacionesActivas})</h2>
+      {haciendaProductos.length > 0 ? (
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+          {haciendaProductos.map((producto: any) => (
+            <ProductCard producto={producto} />
+          ))}
+        </div>
+      ) : (
+        <div class="text-center py-12 bg-white rounded-xl border border-slate-200">
+          <svg class="w-12 h-12 text-slate-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+          </svg>
+          <p class="text-slate-500 mt-3">Esta hacienda no tiene publicaciones activas</p>
+        </div>
+      )}
+    </div>
+  </div>
+</BaseLayout>

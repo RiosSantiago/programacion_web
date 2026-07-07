@@ -1,0 +1,98 @@
+---
+const reportes = [
+  {
+    id: 'creditos',
+    titulo: 'Solicitud de Créditos',
+    descripcion: 'Reporte financiero para solicitud de créditos agropecuarios con historial de producción y activos.',
+    icono: 'credito',
+    color: 'emerald',
+  },
+  {
+    id: 'finagro',
+    titulo: 'Subsidios FINAGRO',
+    descripcion: 'Documentación requerida para acceder a subsidios y líneas de crédito FINAGRO con garantías.',
+    icono: 'finagro',
+    color: 'blue',
+  },
+  {
+    id: 'ica',
+    titulo: 'Certificaciones ICA',
+    descripcion: 'Certificaciones sanitarias, de trazabilidad y buenas prácticas pecuarias exigidas por el ICA.',
+    icono: 'ica',
+    color: 'purple',
+  },
+  {
+    id: 'bancos',
+    titulo: 'Reportes Bancarios',
+    descripcion: 'Estados financieros, inventario avaluado y proyecciones para entidades bancarias y cooperativas.',
+    icono: 'banco',
+    color: 'amber',
+  },
+];
+
+const colorClases: Record<string, { bg: string; text: string; hover: string; iconBg: string; iconText: string }> = {
+  emerald: { bg: 'bg-emerald-50', text: 'text-emerald-700', hover: 'hover:bg-emerald-100', iconBg: 'bg-emerald-100', iconText: 'text-emerald-600' },
+  blue: { bg: 'bg-blue-50', text: 'text-blue-700', hover: 'hover:bg-blue-100', iconBg: 'bg-blue-100', iconText: 'text-blue-600' },
+  purple: { bg: 'bg-purple-50', text: 'text-purple-700', hover: 'hover:bg-purple-100', iconBg: 'bg-purple-100', iconText: 'text-purple-600' },
+  amber: { bg: 'bg-amber-50', text: 'text-amber-700', hover: 'hover:bg-amber-100', iconBg: 'bg-amber-100', iconText: 'text-amber-600' },
+};
+---
+
+<div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+  <div class="px-6 py-4 border-b border-slate-200">
+    <h3 class="text-lg font-semibold text-slate-900">Reportes Exportables</h3>
+    <p class="text-sm text-slate-500 mt-0.5">Documentos para créditos, subsidios y certificaciones</p>
+  </div>
+
+  <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+    {reportes.map((r) => {
+      const colores = colorClases[r.color];
+      return (
+        <div class={`p-5 rounded-xl border border-slate-200 ${colores.bg} hover:shadow-md transition-all cursor-pointer`}>
+          <div class="flex items-start gap-4">
+            <div class={`w-12 h-12 rounded-xl ${colores.iconBg} flex items-center justify-center shrink-0`}>
+              {r.icono === 'credito' && (
+                <svg class={`w-6 h-6 ${colores.iconText}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              )}
+              {r.icono === 'finagro' && (
+                <svg class={`w-6 h-6 ${colores.iconText}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              )}
+              {r.icono === 'ica' && (
+                <svg class={`w-6 h-6 ${colores.iconText}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                </svg>
+              )}
+              {r.icono === 'banco' && (
+                <svg class={`w-6 h-6 ${colores.iconText}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              )}
+            </div>
+            <div class="flex-1">
+              <h4 class="text-sm font-semibold text-slate-900">{r.titulo}</h4>
+              <p class="text-xs text-slate-500 mt-1">{r.descripcion}</p>
+              <div class="flex items-center gap-3 mt-3">
+                <button class={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg ${colores.bg} ${colores.text} ${colores.hover} transition-colors`}>
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  PDF
+                </button>
+                <button class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7" />
+                  </svg>
+                  Vista Previa
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    })}
+  </div>
+</div>

@@ -1,0 +1,176 @@
+---
+interface Hacienda {
+  id: number;
+  nombre: string;
+  ubicacion: string;
+  valorInversion: number;
+  rendimientoEsperado: number;
+  periodo: number;
+  riesgo: string;
+}
+
+interface Props {
+  haciendas: Hacienda[];
+}
+
+const { haciendas } = Astro.props;
+
+const formatearPrecio = (precio: number): string => {
+  return new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    minimumFractionDigits: 0,
+  }).format(precio);
+};
+
+const riesgoEstilos: Record<string, string> = {
+  Bajo: 'bg-emerald-100 text-emerald-700',
+  Medio: 'bg-amber-100 text-amber-700',
+  Alto: 'bg-red-100 text-red-700',
+};
+---
+
+<div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden" id="calculadora">
+  <div class="px-6 py-5 border-b border-slate-200 bg-gradient-to-r from-emerald-50 to-white">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-lg flex items-center justify-center">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+        </svg>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold text-slate-900">Calculadora de Rentabilidad</h3>
+        <p class="text-sm text-slate-500">Simula tu retorno de inversion proyectado</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-6">
+    <!-- Selector de hacienda -->
+    <div class="mb-6">
+      <label class="block text-sm font-medium text-slate-700 mb-2">Selecciona una hacienda</label>
+      <select
+        id="hacienda-select"
+        class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white"
+      >
+        <option value="">-- Seleccionar hacienda --</option>
+        {haciendas.map((h) => (
+          <option
+            value={h.id}
+            data-inversion={h.valorInversion}
+            data-rendimiento={h.rendimientoEsperado}
+            data-periodo={h.periodo}
+            data-riesgo={h.riesgo}
+          >
+            {h.nombre} - {h.ubicacion}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    <!-- Monto de inversion -->
+    <div class="mb-6">
+      <label class="block text-sm font-medium text-slate-700 mb-2">
+        Monto a invertir (COP)
+      </label>
+      <input
+        type="number"
+        id="monto-input"
+        placeholder="5000000"
+        class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+        min="1000000"
+        step="500000"
+      />
+    </div>
+
+    <!-- Boton calcular -->
+    <button
+      id="calcular-btn"
+      class="w-full py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200"
+    >
+      Calcular Rentabilidad
+    </button>
+
+    <!-- Resultados -->
+    <div id="resultado" class="hidden mt-6 space-y-4">
+      <div class="p-4 bg-emerald-50 rounded-lg border border-emerald-200">
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-medium text-emerald-700">Retorno proyectado</span>
+          <span class="text-xs text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full" id="resultado-periodo"></span>
+        </div>
+        <p class="text-2xl font-bold text-emerald-800 mt-1" id="resultado-retorno"></p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+          <p class="text-xs text-slate-500">Rendimiento anual</p>
+          <p class="text-lg font-bold text-slate-800 mt-0.5" id="resultado-rendimiento"></p>
+        </div>
+        <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+          <p class="text-xs text-slate-500">Ganancia estimada</p>
+          <p class="text-lg font-bold text-slate-800 mt-0.5" id="resultado-ganancia"></p>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200">
+        <span class="text-sm text-slate-600">Nivel de riesgo</span>
+        <span class="px-3 py-1 rounded-full text-xs font-semibold" id="resultado-riesgo"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const select = document.getElementById('hacienda-select') as HTMLSelectElement;
+  const montoInput = document.getElementById('monto-input') as HTMLInputElement;
+  const calcularBtn = document.getElementById('calcular-btn');
+  const resultado = document.getElementById('resultado');
+
+  function formatearCOP(valor: number): string {
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      minimumFractionDigits: 0,
+    }).format(valor);
+  }
+
+  calcularBtn?.addEventListener('click', () => {
+    const opcion = select?.selectedOptions[0];
+    const monto = parseFloat(montoInput?.value || '0');
+
+    if (!opcion || !monto) {
+      alert('Selecciona una hacienda e ingresa un monto');
+      return;
+    }
+
+    const rendimiento = parseFloat(opcion.getAttribute('data-rendimiento') || '0');
+    const periodo = parseInt(opcion.getAttribute('data-periodo') || '12');
+    const riesgo = opcion.getAttribute('data-riesgo') || 'Medio';
+
+    const ganancia = monto * (rendimiento / 100) * (periodo / 12);
+    const retorno = monto + ganancia;
+
+    const riesgoEstilos: Record<string, string> = {
+      Bajo: 'bg-emerald-100 text-emerald-700',
+      Medio: 'bg-amber-100 text-amber-700',
+      Alto: 'bg-red-100 text-red-700',
+    };
+
+    const retornoEl = document.getElementById('resultado-retorno');
+    const periodoEl = document.getElementById('resultado-periodo');
+    const rendimientoEl = document.getElementById('resultado-rendimiento');
+    const gananciaEl = document.getElementById('resultado-ganancia');
+    const riesgoEl = document.getElementById('resultado-riesgo');
+
+    if (retornoEl) retornoEl.textContent = formatearCOP(retorno);
+    if (periodoEl) periodoEl.textContent = `a ${periodo} meses`;
+    if (rendimientoEl) rendimientoEl.textContent = `${rendimiento}%`;
+    if (gananciaEl) gananciaEl.textContent = formatearCOP(ganancia);
+    if (riesgoEl) {
+      riesgoEl.textContent = riesgo;
+      riesgoEl.className = `px-3 py-1 rounded-full text-xs font-semibold ${riesgoEstilos[riesgo]}`;
+    }
+
+    resultado?.classList.remove('hidden');
+  });
+</script>

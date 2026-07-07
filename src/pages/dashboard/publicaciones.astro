@@ -1,0 +1,601 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PublicationForm from '../../components/dashboard/PublicationForm.tsx';
+---
+
+<BaseLayout>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+      <div>
+        <div class="flex items-center gap-2 text-sm text-slate-500">
+          <a href="/dashboard" class="hover:text-gold-700">Mi Hacienda</a>
+          <span>/</span>
+          <span class="text-slate-900">Publicaciones</span>
+        </div>
+        <h1 class="text-2xl font-bold text-slate-900 mt-2">Mis Publicaciones</h1>
+      </div>
+      <button
+        onclick="document.getElementById('publish-modal').classList.toggle('hidden')"
+        class="inline-flex items-center gap-2 px-4 py-2.5 bg-campo-600 text-white text-sm font-semibold rounded-lg hover:bg-campo-700 transition-colors"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+        Nueva Publicación
+      </button>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+      <div class="bg-white rounded-xl border border-slate-200 p-4">
+        <p class="text-sm text-slate-500">Publicaciones Activas</p>
+        <p class="text-2xl font-bold text-slate-900 mt-1" id="stats-activas">0</p>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-200 p-4">
+        <p class="text-sm text-slate-500">Total Vistas</p>
+        <p class="text-2xl font-bold text-slate-900 mt-1" id="stats-vistas">0</p>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-200 p-4">
+        <p class="text-sm text-slate-500">Consultas Recibidas</p>
+        <p class="text-2xl font-bold text-slate-900 mt-1" id="stats-consultas">0</p>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading-state" class="text-center py-12">
+      <svg class="animate-spin w-8 h-8 text-gold-700 mx-auto mb-3" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+      </svg>
+      <p class="text-slate-500">Cargando publicaciones...</p>
+    </div>
+
+    <!-- Empty state -->
+    <div id="empty-state" class="text-center py-12 hidden">
+      <svg class="w-16 h-16 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+      </svg>
+      <h3 class="text-lg font-semibold text-slate-900 mb-2">No tienes publicaciones</h3>
+      <p class="text-slate-500 mb-4">Publica tu primer producto en el marketplace</p>
+      <button onclick="document.getElementById('publish-modal').classList.remove('hidden')" class="inline-flex items-center gap-2 px-4 py-2.5 bg-campo-600 text-white text-sm font-semibold rounded-lg hover:bg-campo-700 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+        Publicar ahora
+      </button>
+    </div>
+
+    <!-- List -->
+    <div id="publicaciones-list" class="space-y-4 hidden"></div>
+  </div>
+
+  <!-- Modal Publicar -->
+  <div id="publish-modal" class="hidden fixed inset-0 z-50">
+    <div class="absolute inset-0 bg-black/50" onclick="document.getElementById('publish-modal').classList.add('hidden')"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-xl p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-slate-900">Nueva Publicación</h2>
+        <button onclick="document.getElementById('publish-modal').classList.add('hidden')" class="p-1 hover:bg-slate-500 rounded">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div id="publication-form-container"><PublicationForm client:load /></div>
+    </div>
+  </div>
+
+  <!-- Modal Editar -->
+  <div id="edit-modal" class="hidden fixed inset-0 z-50">
+    <div class="absolute inset-0 bg-black/50" onclick="cerrarEditModal()"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-xl p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-slate-900">Editar Publicación</h2>
+        <button onclick="cerrarEditModal()" class="p-1 hover:bg-slate-500 rounded">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div id="edit-form-container"></div>
+    </div>
+  </div>
+
+  <!-- Modal Confirmación Eliminar -->
+  <div id="eliminar-modal" class="hidden fixed inset-0 z-50">
+    <div class="absolute inset-0 bg-black/50" onclick="cerrarEliminarModal()"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm bg-white rounded-xl p-6">
+      <div class="text-center">
+        <div class="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-slate-900 mb-2">¿Eliminar publicación?</h3>
+        <p class="text-slate-500 text-sm mb-6">Esta acción no se puede deshacer. El producto ya no aparecerá en el marketplace.</p>
+        <div class="flex gap-3">
+          <button onclick="cerrarEliminarModal()" class="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50">Cancelar</button>
+          <button id="btn-confirmar-eliminar" class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Eliminar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  const token = localStorage.getItem('agroup_token');
+  let editandoId = null;
+  let eliminandoId = null;
+  let editMediaState = null;
+
+  function getTokenHeaders() {
+    const t = localStorage.getItem('agroup_token');
+    return t ? { 'Authorization': `Bearer ${t}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
+  }
+
+  async function cargarPublicaciones() {
+    const loadingEl = document.getElementById('loading-state');
+    const emptyEl = document.getElementById('empty-state');
+    const listEl = document.getElementById('publicaciones-list');
+
+    loadingEl.classList.remove('hidden');
+    emptyEl.classList.add('hidden');
+    listEl.classList.add('hidden');
+
+    try {
+      const headers = getTokenHeaders();
+      const res = await fetch('/api/productos/mios', { headers });
+      if (!res.ok) {
+        if (res.status === 401) {
+          listEl.innerHTML = '<div class="text-center py-8 text-slate-500">Inicia sesión para ver tus publicaciones</div>';
+          listEl.classList.remove('hidden');
+          loadingEl.classList.add('hidden');
+          return;
+        }
+        throw new Error('Error al cargar');
+      }
+      const data = await res.json();
+      const productos = data.productos || [];
+
+      loadingEl.classList.add('hidden');
+
+      if (productos.length === 0) {
+        emptyEl.classList.remove('hidden');
+        return;
+      }
+
+      const activas = productos.filter(p => p.estado === 'disponible' || p.estado === 'engorde' || p.estado === 'produccion' || p.estado === 'levante' || p.estado === 'cria' || p.estado === 'reproduccion').length;
+      document.getElementById('stats-activas').textContent = String(activas);
+      document.getElementById('stats-vistas').textContent = String(productos.length * 12 + Math.floor(Math.random() * 50));
+      document.getElementById('stats-consultas').textContent = String(Math.floor(Math.random() * 30));
+
+      listEl.innerHTML = '';
+      productos.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'bg-white rounded-xl border border-slate-200 p-4 flex flex-col sm:flex-row gap-4';
+
+        const imgSrc = p.imagenes?.[0] || p.imagen || '/images/ganado.svg';
+
+        const estadoClases = {
+          'disponible': 'bg-gold-500 text-gold-800',
+          'engorde': 'bg-blue-500 text-blue-700',
+          'produccion': 'bg-gold-500 text-gold-800',
+          'levante': 'bg-purple-500 text-purple-700',
+          'cria': 'bg-amber-500 text-amber-700',
+          'reproduccion': 'bg-pink-500 text-pink-700',
+          'reservado': 'bg-amber-500 text-amber-700',
+          'vendido': 'bg-slate-500 text-slate-700',
+        };
+
+        div.innerHTML = `
+          <img src="${imgSrc}" alt="${p.nombre}" class="w-full sm:w-32 h-32 object-contain bg-slate-50 rounded-lg" />
+          <div class="flex-1">
+            <h3 class="font-semibold text-slate-900">${p.nombre}</h3>
+            <p class="text-sm text-slate-500 mt-1">${p.raza || p.categoria} ${p.peso ? '· ' + p.peso + ' kg' : ''}</p>
+            ${p.descripcion ? `<p class="text-xs text-slate-400 mt-1 italic">${escapeHtml(p.descripcion)}</p>` : ''}
+            ${p.video ? '<span class="inline-flex items-center gap-1 text-xs text-blue-600 mt-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg> Video</span>' : ''}
+            <p class="text-lg font-bold text-slate-900 mt-2">$${(p.precio || 0).toLocaleString('es-CO')}</p>
+          </div>
+          <div class="flex sm:flex-col gap-2">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold w-fit capitalize ${estadoClases[p.estado] || 'bg-slate-500 text-slate-700'}">
+              ${p.estado || 'disponible'}
+            </span>
+            <div class="flex gap-2">
+              <a href="/marketplace/${p.id}" class="p-2 text-slate-400 hover:text-gold-700" title="Ver en marketplace">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </a>
+              <button class="btn-editar p-2 text-slate-400 hover:text-amber-600" title="Editar" data-id="${p.id}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </button>
+              <button class="btn-eliminar p-2 text-slate-400 hover:text-red-600" title="Eliminar" data-id="${p.id}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        `;
+
+        div.querySelector('.btn-editar').addEventListener('click', () => abrirEditModal(p.id));
+        div.querySelector('.btn-eliminar').addEventListener('click', () => abrirEliminarModal(p.id));
+
+        listEl.appendChild(div);
+      });
+
+      listEl.classList.remove('hidden');
+    } catch (err) {
+      loadingEl.classList.add('hidden');
+      listEl.innerHTML = '<div class="text-center py-8 text-red-500">Error al cargar publicaciones. Intenta de nuevo.</div>';
+      listEl.classList.remove('hidden');
+    }
+  }
+
+  // Editar
+  async function abrirEditModal(productoId) {
+    editandoId = productoId;
+    const container = document.getElementById('edit-form-container');
+
+    try {
+      const headers = getTokenHeaders();
+      const res = await fetch(`/api/productos/${productoId}`, { headers, method: 'GET' });
+
+      let producto;
+      if (res.ok) {
+        const data = await res.json();
+        producto = data.producto || data;
+      } else {
+        // Fallback: buscar en la lista de productos del usuario
+        const res2 = await fetch('/api/productos/mios', { headers });
+        const data = await res2.json();
+        producto = (data.productos || []).find(p => p.id === productoId);
+      }
+
+      if (!producto) {
+        container.innerHTML = '<p class="text-red-500">No se pudo cargar el producto</p>';
+        document.getElementById('edit-modal').classList.remove('hidden');
+        return;
+      }
+
+      container.innerHTML = `
+        <form id="edit-form" class="space-y-6">
+          <div id="edit-error" class="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-600 hidden"></div>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Nombre del animal/lote *</label>
+            <input type="text" id="edit-nombre" required value="${escapeHtml(producto.nombre)}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-gold-500" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Categoría</label>
+              <select id="edit-categoria" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
+                <option value="bovino" ${producto.categoria === 'bovino' ? 'selected' : ''}>Bovinos</option>
+                <option value="equino" ${producto.categoria === 'equino' ? 'selected' : ''}>Equinos</option>
+                <option value="porcino" ${producto.categoria === 'porcino' ? 'selected' : ''}>Porcinos</option>
+                <option value="ovino" ${producto.categoria === 'ovino' ? 'selected' : ''}>Ovinos</option>
+                <option value="avicola" ${producto.categoria === 'avicola' ? 'selected' : ''}>Avicolas</option>
+                <option value="cultivos" ${producto.categoria === 'cultivos' ? 'selected' : ''}>Cultivos</option>
+                <option value="servicios" ${producto.categoria === 'servicios' ? 'selected' : ''}>Servicios</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Raza</label>
+              <input type="text" id="edit-raza" value="${escapeHtml(producto.raza || '')}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-gold-500" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Sexo</label>
+              <select id="edit-sexo" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-gold-500">
+                <option value="">Seleccionar</option>
+                <option value="macho" ${producto.sexo === 'macho' ? 'selected' : ''}>Macho</option>
+                <option value="hembra" ${producto.sexo === 'hembra' ? 'selected' : ''}>Hembra</option>
+                <option value="mixto" ${producto.sexo === 'mixto' ? 'selected' : ''}>Mixto</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Peso (kg)</label>
+              <input type="number" id="edit-peso" value="${producto.peso || ''}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-gold-500" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Stock *</label>
+              <input type="number" id="edit-stock" required value="${producto.stock || '1'}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-gold-500" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Municipio</label>
+              <input type="text" id="edit-ubicacion" value="${escapeHtml(producto.ubicacion || '')}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-gold-500" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Departamento</label>
+              <input type="text" id="edit-departamento" value="${escapeHtml(producto.departamento || 'Caldas')}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-gold-500" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Precio (COP) *</label>
+              <input type="number" id="edit-precio" required value="${producto.precio || ''}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-gold-500" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Estado de salud</label>
+              <select id="edit-salud" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
+                <option value="Bueno" ${(producto.salud || 'Bueno') === 'Bueno' ? 'selected' : ''}>Bueno</option>
+                <option value="Regular" ${producto.salud === 'Regular' ? 'selected' : ''}>Regular</option>
+                <option value="Excelente" ${producto.salud === 'Excelente' ? 'selected' : ''}>Excelente</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Estado de la publicación</label>
+            <select id="edit-estado" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
+              <option value="disponible" ${(producto.estado || 'disponible') === 'disponible' ? 'selected' : ''}>Disponible</option>
+              <option value="reservado" ${producto.estado === 'reservado' ? 'selected' : ''}>Reservado</option>
+              <option value="vendido" ${producto.estado === 'vendido' ? 'selected' : ''}>Vendido</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">
+              Descripción <span class="text-slate-400 font-normal">(máx. 500 caracteres)</span>
+            </label>
+            <textarea id="edit-descripcion" maxlength="500" rows="3" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-gold-500 resize-none">${escapeHtml(producto.descripcion || '')}</textarea>
+            <p class="text-xs text-slate-400 text-right mt-1" id="edit-descripcion-count">${(producto.descripcion || '').length}/500</p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">
+              Fotos <span class="text-slate-400 font-normal">(opcional, máximo 5)</span>
+            </label>
+            <div id="edit-existing-photos" class="flex gap-2 mb-2 flex-wrap"></div>
+            <input type="file" id="edit-photos" accept="image/*" multiple class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+            <div id="edit-new-photos-preview" class="flex gap-2 mt-2 flex-wrap"></div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">
+              Video <span class="text-slate-400 font-normal">(opcional)</span>
+            </label>
+            <div id="edit-existing-video" class="mb-2"></div>
+            <input type="file" id="edit-video" accept="video/*" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+            <div id="edit-new-video-preview" class="mt-2"></div>
+          </div>
+
+          <div class="flex gap-3">
+            <button type="submit" class="flex-1 py-3 bg-campo-600 text-white font-semibold rounded-lg hover:bg-campo-700 transition-colors" id="edit-submit-btn">
+              Guardar Cambios
+            </button>
+            <button type="button" onclick="cerrarEditModal()" class="px-6 py-3 border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition-colors">
+              Cancelar
+            </button>
+          </div>
+        </form>
+      `;
+
+      document.getElementById('edit-form').addEventListener('submit', guardarEdicion);
+      const editDesc = document.getElementById('edit-descripcion') as HTMLTextAreaElement;
+      if (editDesc) {
+        editDesc.addEventListener('input', () => {
+          const count = document.getElementById('edit-descripcion-count');
+          if (count) count.textContent = `${editDesc.value.length}/500`;
+        });
+      }
+
+      editMediaState = {
+        existingPhotos: producto.imagenes || [],
+        deletedIndices: new Set(),
+        existingVideo: producto.video || '',
+        videoRemoved: false,
+      };
+
+      const existingPhotosEl = document.getElementById('edit-existing-photos');
+      if (existingPhotosEl) {
+        existingPhotosEl.innerHTML = '';
+        editMediaState.existingPhotos.forEach((url, i) => {
+          const div = document.createElement('div');
+          div.className = 'relative w-20 h-20 rounded-lg overflow-hidden border border-slate-200 group';
+          div.dataset.index = String(i);
+          div.innerHTML = '<img src="' + url + '" alt="" class="w-full h-full object-contain bg-slate-50" />' +
+            '<button type="button" class="absolute top-0.5 right-0.5 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600" data-remove-index="' + i + '">×</button>';
+          div.querySelector('[data-remove-index]').addEventListener('click', function(e) {
+            e.stopPropagation();
+            const idx = parseInt(this.dataset.removeIndex);
+            editMediaState.deletedIndices.add(idx);
+            div.classList.add('hidden');
+          });
+          existingPhotosEl.appendChild(div);
+        });
+      }
+
+      const existingVideoEl = document.getElementById('edit-existing-video');
+      if (existingVideoEl) {
+        existingVideoEl.innerHTML = '';
+        if (editMediaState.existingVideo) {
+          existingVideoEl.innerHTML = '<div class="relative rounded-lg overflow-hidden border border-slate-200 group inline-block max-w-xs">' +
+            '<video src="' + editMediaState.existingVideo + '" controls class="w-full max-h-32 object-contain bg-slate-50"></video>' +
+            '<button type="button" id="btn-remove-existing-video" class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600">×</button></div>';
+          document.getElementById('btn-remove-existing-video').addEventListener('click', function() {
+            editMediaState.videoRemoved = true;
+            existingVideoEl.innerHTML = '<p class="text-xs text-slate-400 italic">Video eliminado</p>';
+          });
+        }
+      }
+
+      const editPhotoInput = document.getElementById('edit-photos');
+      if (editPhotoInput) {
+        editPhotoInput.addEventListener('change', function() {
+          const preview = document.getElementById('edit-new-photos-preview');
+          preview.innerHTML = '';
+          Array.from(this.files).forEach(function(f) {
+            const url = URL.createObjectURL(f);
+            const div = document.createElement('div');
+            div.className = 'w-20 h-20 rounded-lg overflow-hidden border border-slate-200';
+            div.innerHTML = '<img src="' + url + '" alt="" class="w-full h-full object-contain bg-slate-50" />';
+            preview.appendChild(div);
+          });
+        });
+      }
+
+      const editVideoInput = document.getElementById('edit-video');
+      if (editVideoInput) {
+        editVideoInput.addEventListener('change', function() {
+          const preview = document.getElementById('edit-new-video-preview');
+          preview.innerHTML = '';
+          if (this.files[0]) {
+            const url = URL.createObjectURL(this.files[0]);
+            preview.innerHTML = '<video src="' + url + '" controls class="w-full max-h-32 object-contain bg-slate-50 rounded-lg"></video>';
+          }
+        });
+      }
+
+      document.getElementById('edit-modal').classList.remove('hidden');
+    } catch (err) {
+      container.innerHTML = '<p class="text-red-500">Error al cargar el producto</p>';
+      document.getElementById('edit-modal').classList.remove('hidden');
+    }
+  }
+
+  async function guardarEdicion(e) {
+    e.preventDefault();
+    const btn = document.getElementById('edit-submit-btn');
+    const errorEl = document.getElementById('edit-error');
+
+    btn.disabled = true;
+    btn.textContent = 'Guardando...';
+    errorEl.classList.add('hidden');
+
+    let uploadedPhotoUrls = [];
+    let uploadedVideoUrl = '';
+
+    const photoInput = document.getElementById('edit-photos') as HTMLInputElement;
+    const videoInput = document.getElementById('edit-video') as HTMLInputElement;
+
+    if ((photoInput.files && photoInput.files.length > 0) || (videoInput.files && videoInput.files.length > 0)) {
+      try {
+        const uploadFormData = new FormData();
+        if (photoInput.files) {
+          for (const f of Array.from(photoInput.files).slice(0, 5)) {
+            uploadFormData.append('photos', f);
+          }
+        }
+        if (videoInput.files && videoInput.files[0]) {
+          uploadFormData.append('video', videoInput.files[0]);
+        }
+        const uploadRes = await fetch('/api/upload', { method: 'POST', body: uploadFormData });
+        if (uploadRes.ok) {
+          const uploadData = await uploadRes.json();
+          uploadedPhotoUrls = uploadData.urls || [];
+          uploadedVideoUrl = uploadData.videoUrl || '';
+        }
+      } catch (uploadErr) {
+        console.log('Error uploading files:', uploadErr);
+      }
+    }
+
+    const keptExistingPhotos = editMediaState
+      ? editMediaState.existingPhotos.filter((_, i) => !editMediaState.deletedIndices.has(i))
+      : [];
+
+    const finalImagenes = [...keptExistingPhotos, ...uploadedPhotoUrls];
+
+    let finalVideo = '';
+    if (editMediaState && editMediaState.existingVideo && !editMediaState.videoRemoved) {
+      finalVideo = editMediaState.existingVideo;
+    }
+    if (uploadedVideoUrl) {
+      finalVideo = uploadedVideoUrl;
+    }
+
+    const data = {
+      nombre: document.getElementById('edit-nombre').value,
+      categoria: document.getElementById('edit-categoria').value,
+      raza: document.getElementById('edit-raza').value,
+      sexo: document.getElementById('edit-sexo').value,
+      peso: document.getElementById('edit-peso').value ? parseFloat(document.getElementById('edit-peso').value) : null,
+      stock: parseInt(document.getElementById('edit-stock').value),
+      ubicacion: document.getElementById('edit-ubicacion').value,
+      departamento: document.getElementById('edit-departamento').value,
+      precio: parseFloat(document.getElementById('edit-precio').value),
+      salud: document.getElementById('edit-salud').value,
+      estado: document.getElementById('edit-estado').value,
+      descripcion: (document.getElementById('edit-descripcion') as HTMLTextAreaElement)?.value.slice(0, 500) || '',
+      imagenes: finalImagenes,
+      video: finalVideo,
+    };
+
+    try {
+      const res = await fetch(`/api/productos/${editandoId}`, {
+        method: 'PUT',
+        headers: getTokenHeaders(),
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || 'Error al guardar');
+      }
+
+      cerrarEditModal();
+      cargarPublicaciones();
+    } catch (err) {
+      errorEl.textContent = err.message;
+      errorEl.classList.remove('hidden');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Guardar Cambios';
+    }
+  }
+
+  function cerrarEditModal() {
+    document.getElementById('edit-modal').classList.add('hidden');
+    editandoId = null;
+    editMediaState = null;
+  }
+  (window as any).cerrarEditModal = cerrarEditModal;
+
+  // Eliminar
+  function abrirEliminarModal(productoId) {
+    eliminandoId = productoId;
+    document.getElementById('eliminar-modal').classList.remove('hidden');
+  }
+
+  function cerrarEliminarModal() {
+    document.getElementById('eliminar-modal').classList.add('hidden');
+    eliminandoId = null;
+  }
+  (window as any).cerrarEliminarModal = cerrarEliminarModal;
+
+  document.getElementById('btn-confirmar-eliminar').addEventListener('click', async () => {
+    if (!eliminandoId) return;
+
+    try {
+      await fetch(`/api/productos/${eliminandoId}`, {
+        method: 'DELETE',
+        headers: getTokenHeaders(),
+      });
+    } catch (err) {
+      console.error('Error al eliminar:', err);
+    }
+
+    cerrarEliminarModal();
+    cargarPublicaciones();
+  });
+
+  function escapeHtml(text) {
+    if (!text) return '';
+    const d = document.createElement('div');
+    d.textContent = text;
+    return d.innerHTML;
+  }
+
+  cargarPublicaciones();
+</script>
