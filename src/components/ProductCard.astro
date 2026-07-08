@@ -45,15 +45,15 @@ const tieneDescuento = producto.precioAnterior && producto.precioAnterior > prod
 const descuento = tieneDescuento ? Math.round((1 - producto.precio / producto.precioAnterior!) * 100) : 0;
 
 const categoriaIconos: Record<string, string> = {
-  bovino: '/images/ganado.svg',
-  equino: '/images/caballo.svg',
-  porcino: '/images/cerdo.svg',
-  ovino: '/images/ganado.svg',
-  avicola: '/images/gallina.svg',
+  bovino: '/images/categories/bovino.png',
+  equino: '/images/categories/equino.png',
+  porcino: '/images/categories/porcino.png',
+  ovino: '/images/categories/ovino.png',
+  avicola: '/images/categories/avicola.png',
   agricultura: '/images/cultivos.svg',
   insumos: '/images/default.svg',
 };
-const iconoCategoria = categoriaIconos[producto.categoria?.toLowerCase() || 'bovino'] || '/images/ganado.svg';
+const iconoCategoria = categoriaIconos[producto.categoria?.toLowerCase() || 'bovino'] || '/images/categories/bovino.png';
 
 const badgeInfo: Record<string, { label: string; class: string; icon: string }> = {
   top: { label: 'Top', class: 'bg-amber-600 text-white', icon: '★' },
