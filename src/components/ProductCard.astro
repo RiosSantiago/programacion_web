@@ -72,16 +72,16 @@ const atributos = [
 ---
 
 <article
-  class="group bg-white rounded-xl border border-[#E8E0D8] overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] hover:border-campo-400/50 active:scale-[0.98]"
+  class="group bg-white rounded-2xl border border-[#E8DCCB] overflow-hidden cursor-pointer transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_30px_rgba(0,0,0,0.1)] hover:border-campo-400 active:scale-[0.99]"
   data-href={`/marketplace/${producto.id}`}
   data-imagenes={JSON.stringify(todasLasImagenes)}
   data-img-index="0"
 >
-  <div class="relative aspect-[4/3] bg-[#FAF8F3] overflow-hidden">
+  <div class="relative h-[200px] w-full bg-[#FAF8F3] overflow-hidden">
     <img
       src={imagen}
       alt={producto.nombre}
-      class="card-img w-full h-full object-contain p-3 group-hover:scale-105 transition-transform duration-500"
+      class="card-img w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
       loading="lazy"
     />
 
@@ -173,17 +173,17 @@ const atributos = [
     </div>
   </div>
 
-  <div class="p-3 space-y-2">
+  <div class="p-4 sm:p-5 space-y-3">
     <div class="min-w-0">
-      <h3 class="text-sm font-display font-bold text-[#2D2D2D] leading-tight line-clamp-1 group-hover:text-campo-700 transition-colors">
+      <h3 class="text-[17px] font-sans font-bold text-[#333333] leading-snug line-clamp-1 group-hover:text-campo-600 transition-colors">
         {producto.nombre}
       </h3>
     </div>
 
     {atributos.length > 0 && (
-      <div class="flex flex-wrap gap-1">
+      <div class="flex flex-wrap gap-1.5">
         {atributos.map((attr) => (
-          <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-[#F5F0E8] text-[11px] font-medium text-[#6B6B6B]">
+          <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-stone-50 text-[11px] font-medium text-stone-500 border border-stone-200/60">
             {attr!.value}
           </span>
         ))}
@@ -196,11 +196,11 @@ const atributos = [
           <span class="text-white font-bold text-[10px]">{vendedorInicial}</span>
         </div>
         <div class="flex-1 min-w-0">
-          <p class="text-[11px] font-semibold text-[#2D2D2D] leading-tight truncate">{producto.vendedor}</p>
+          <p class="text-[11px] font-medium text-stone-500 leading-tight truncate">{producto.vendedor}</p>
           <div class="flex items-center gap-1.5">
             <div class="flex items-center gap-0.5">
               <span class="text-[10px] font-bold text-amber-600">★</span>
-              <span class="text-[10px] font-semibold text-[#6B6B6B]">{producto.vendedorRating?.toFixed(1) || '4.5'}</span>
+              <span class="text-[10px] font-semibold text-stone-400">{producto.vendedorRating?.toFixed(1) || '4.5'}</span>
             </div>
             {vendedorBadge && badgeInfo[vendedorBadge] && (
               <span class={`inline-flex items-center gap-0.5 px-1.5 py-0 rounded text-[9px] font-bold ${badgeInfo[vendedorBadge].class}`}>
@@ -219,31 +219,31 @@ const atributos = [
           {formatearPrecio(producto.precioAnterior!)}
         </span>
       )}
-      <p class="text-base font-extrabold text-[#2D2D2D] leading-tight">
+      <p class="text-[18px] font-bold text-campo-600 leading-tight">
         {formatearPrecio(producto.precio)}
       </p>
     </div>
 
-    <div class="flex gap-1.5 pt-1">
+    <div class="flex gap-2 pt-1">
       <a
         href={`/marketplace/${producto.id}`}
-        class="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-[#FFFDF7] text-[#2D2D2D] font-semibold rounded-lg border border-[#E8E0D8] hover:border-campo-400 hover:bg-campo-50 active:scale-[0.98] transition-all duration-200 text-[11px]"
+        class="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-white text-campo-600 font-bold rounded-xl border-2 border-campo-600 hover:bg-campo-50 hover:border-campo-700 hover:text-campo-700 active:scale-[0.98] transition-all duration-200 text-[13px]"
       >
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
         </svg>
         Ver
       </a>
       <button
-        class="agregar-carrito-btn flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-campo-600 text-white font-bold rounded-lg shadow-sm hover:bg-campo-700 active:scale-[0.98] transition-all duration-200 text-[11px]"
+        class="agregar-carrito-btn flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-campo-600 text-white font-bold rounded-xl shadow-sm hover:bg-campo-700 active:scale-[0.98] transition-all duration-200 text-[13px]"
         data-id={producto.id}
         data-nombre={producto.nombre}
         data-precio={producto.precio}
         data-imagen={producto.imagen || (producto.imagenes && producto.imagenes[0]) || '/images/ganado.svg'}
         data-vendedor={producto.vendedor || 'Vendedor'}
       >
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
         </svg>
         Agregar

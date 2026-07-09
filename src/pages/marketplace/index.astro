@@ -56,11 +56,19 @@ const productosConReputacion = filtrados.map(p => {
     vendedorBadge: rep.badge,
   };
 });
+
+const sortLabelsMap: Record<string, string> = {
+  'relevancia': 'Más relevantes',
+  'precio-asc': 'Menor precio',
+  'precio-desc': 'Mayor precio',
+  'recientes': 'Más recientes',
+};
+const sortLabel = sortLabelsMap[sortBy] || 'Más relevantes';
 ---
 
 <BaseLayout navVariant="market">
-  <!-- Panel de filtros (sticky debajo del Navbar) -->
-  <div class="sticky top-[64px] z-30 shadow-sm bg-[#1F4628]">
+  <!-- Panel de filtros (no sticky) -->
+  <div class="bg-[#1F4628] border-b border-campo-850 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <FilterPanel
         client:load
@@ -94,26 +102,34 @@ const productosConReputacion = filtrados.map(p => {
         </p>
       </div>
       <div class="flex items-center gap-3">
-        <div class="relative">
-          <select
-            id="sort-select"
-            class="appearance-none pl-4 pr-10 py-2.5 bg-white border border-[#E8E0D8] rounded-xl text-sm font-medium text-[#6B6B6B] focus:border-orange-500 focus:ring-2 focus:ring-orange-100 transition-all cursor-pointer hover:border-orange-400"
+        <div class="relative inline-block" id="sort-dropdown-container">
+          <button
+            type="button"
+            onclick="toggleSortMenu(event)"
+            class="inline-flex items-center justify-between w-48 px-4 py-2.5 bg-white border border-[#E8DCCB] rounded-xl text-sm font-semibold text-stone-700 hover:text-campo-700 hover:border-campo-400 focus:outline-none transition-all duration-200 cursor-pointer shadow-sm"
           >
-            <option value="relevancia">Más relevantes</option>
-            <option value="precio-asc">Menor precio</option>
-            <option value="precio-desc">Mayor precio</option>
-            <option value="recientes">Más recientes</option>
-          </select>
-          <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-          </svg>
+            <span id="sort-current-label">{sortLabel}</span>
+            <svg id="sort-dropdown-arrow" class="w-4 h-4 ml-2 text-campo-600 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          <div
+            id="sort-dropdown-menu"
+            style="display:none; position:absolute; right:0; top:calc(100% + 6px); z-index:9999; min-width:192px;"
+            class="bg-white border border-stone-200 rounded-xl shadow-2xl py-1"
+          >
+            <button onclick="applySort('relevancia')" class="w-full text-left px-4 py-2.5 text-sm text-stone-700 hover:bg-[#f0faf3] hover:text-campo-700 transition-colors font-medium cursor-pointer">Más relevantes</button>
+            <button onclick="applySort('precio-asc')" class="w-full text-left px-4 py-2.5 text-sm text-stone-700 hover:bg-[#f0faf3] hover:text-campo-700 transition-colors font-medium cursor-pointer">Menor precio</button>
+            <button onclick="applySort('precio-desc')" class="w-full text-left px-4 py-2.5 text-sm text-stone-700 hover:bg-[#f0faf3] hover:text-campo-700 transition-colors font-medium cursor-pointer">Mayor precio</button>
+            <button onclick="applySort('recientes')" class="w-full text-left px-4 py-2.5 text-sm text-stone-700 hover:bg-[#f0faf3] hover:text-campo-700 transition-colors font-medium cursor-pointer">Más recientes</button>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Grid de productos -->
     <div>
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4" id="productos-grid">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8" id="productos-grid">
           {productosConReputacion.map((producto) => (
             <ProductCard producto={producto} />
           ))}
@@ -165,6 +181,36 @@ const productosConReputacion = filtrados.map(p => {
     </div>
   </div>
 </BaseLayout>
+
+<script is:inline>
+  // Dropdown de ordenamiento — debe ser is:inline para que onclick="" lo encuentre
+  function toggleSortMenu(e) {
+    e.stopPropagation();
+    var menu = document.getElementById('sort-dropdown-menu');
+    var arrow = document.getElementById('sort-dropdown-arrow');
+    if (!menu) return;
+    var isOpen = menu.style.display === 'block';
+    menu.style.display = isOpen ? 'none' : 'block';
+    if (arrow) arrow.style.transform = isOpen ? '' : 'rotate(180deg)';
+  }
+
+  function applySort(val) {
+    var params = new URLSearchParams(window.location.search);
+    if (val && val !== 'relevancia') params.set('sort', val);
+    else params.delete('sort');
+    window.location.href = '/marketplace?' + params.toString();
+  }
+
+  document.addEventListener('click', function(e) {
+    var container = document.getElementById('sort-dropdown-container');
+    if (container && !container.contains(e.target)) {
+      var menu = document.getElementById('sort-dropdown-menu');
+      var arrow = document.getElementById('sort-dropdown-arrow');
+      if (menu) menu.style.display = 'none';
+      if (arrow) arrow.style.transform = '';
+    }
+  });
+</script>
 
 <script>
   function cerrarLocalModal() {
@@ -222,18 +268,16 @@ const productosConReputacion = filtrados.map(p => {
     document.body.style.overflow = '';
   };
 
-  const sortSelect = document.getElementById('sort-select') as HTMLSelectElement;
-  const paramsSort = new URLSearchParams(window.location.search);
-  const currentSort = paramsSort.get('sort') || 'relevancia';
-  if (sortSelect) sortSelect.value = currentSort;
-
-  sortSelect?.addEventListener('change', (e: any) => {
-    const params = new URLSearchParams(window.location.search);
-    const val = e.target.value;
-    if (val && val !== 'relevancia') params.set('sort', val);
-    else params.delete('sort');
-    window.location.href = '/marketplace?' + params.toString();
-  });
+  // Marcar opción activa del sort según URL
+  const sortLabels: Record<string, string> = {
+    'relevancia': 'Más relevantes',
+    'precio-asc': 'Menor precio',
+    'precio-desc': 'Mayor precio',
+    'recientes': 'Más recientes'
+  };
+  const currentSort = new URLSearchParams(window.location.search).get('sort') || 'relevancia';
+  const labelEl = document.getElementById('sort-current-label');
+  if (labelEl) labelEl.textContent = sortLabels[currentSort] || 'Más relevantes';
 
   document.getElementById('mobile-filter-btn')?.addEventListener('click', () => {
     document.getElementById('mobile-filter-overlay')?.classList.remove('hidden');
@@ -271,13 +315,13 @@ const productosConReputacion = filtrados.map(p => {
         const pIndex = localProductos.indexOf(p);
         
         const card = document.createElement('article');
-        card.className = 'card-elegante overflow-hidden group cursor-pointer';
+        card.className = 'group bg-white rounded-2xl border border-[#E8DCCB] overflow-hidden cursor-pointer transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_30px_rgba(0,0,0,0.1)] hover:border-campo-400 active:scale-[0.99]';
         card.setAttribute('data-href', `/marketplace/${p.id}`);
         card.setAttribute('data-imagenes', JSON.stringify(allImgs));
         card.setAttribute('data-img-index', '0');
         card.innerHTML = `
-          <div class="relative aspect-[4/3] bg-[#FAF8F3] overflow-hidden">
-            <img src="${imgSrc}" alt="${p.nombre}" class="card-img w-full h-full object-contain p-3 group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+          <div class="relative h-[200px] w-full bg-[#FAF8F3] overflow-hidden">
+            <img src="${imgSrc}" alt="${p.nombre}" class="card-img w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
             <div class="absolute inset-0 bg-gradient-to-t from-black/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <div class="absolute top-2 left-2">
               <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-campo-600 text-white shadow-sm">
@@ -301,25 +345,25 @@ const productosConReputacion = filtrados.map(p => {
               </span>
             </div>
           </div>
-          <div class="p-3 space-y-2">
-            <h3 class="text-sm font-display font-bold text-[#2D2D2D] leading-tight line-clamp-1 group-hover:text-campo-700 transition-colors">${p.nombre}</h3>
-            <p class="text-base font-extrabold text-[#2D2D2D]">$${parseInt(p.precio || 0).toLocaleString('es-CO')}</p>
-            <div class="flex gap-1.5 pt-1">
-              <button onclick="abrirLocalModal(${pIndex})" class="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-[#FFFDF7] text-[#2D2D2D] font-semibold rounded-lg border border-[#E8E0D8] hover:border-campo-400 hover:bg-campo-50 active:scale-[0.98] transition-all duration-200 text-[11px] cursor-pointer">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="p-4 sm:p-5 space-y-3">
+            <h3 class="text-[17px] font-sans font-bold text-[#333333] leading-snug line-clamp-1 group-hover:text-campo-600 transition-colors">${p.nombre}</h3>
+            <p class="text-[18px] font-bold text-campo-600 leading-tight">$${parseInt(p.precio || 0).toLocaleString('es-CO')}</p>
+            <div class="flex gap-2 pt-1">
+              <button onclick="abrirLocalModal(${pIndex})" class="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-white text-campo-600 font-bold rounded-xl border-2 border-campo-600 hover:bg-campo-50 hover:border-campo-700 hover:text-campo-700 active:scale-[0.98] transition-all duration-200 text-[13px] cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>
                 Ver
               </button>
-              <button class="agregar-carrito-btn flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-campo-600 text-white font-bold rounded-lg shadow-sm hover:bg-campo-700 active:scale-[0.98] transition-all duration-200 text-[11px]"
+              <button class="agregar-carrito-btn flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-campo-600 text-white font-bold rounded-xl shadow-sm hover:bg-campo-700 active:scale-[0.98] transition-all duration-200 text-[13px]"
                 data-id="${p.id}"
                 data-nombre="${p.nombre}"
                 data-precio="${p.precio}"
                 data-imagen="${imgSrc}"
                 data-vendedor="Mi Hacienda"
               >
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
                 Agregar

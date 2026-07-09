@@ -326,7 +326,7 @@ export default function FilterPanel({
               defaultValue={initialPrecioMin}
               onChange={(e) => setPrecioMin(e.target.value)}
               placeholder="Min"
-              className="w-20 px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:border-campo-400 focus:ring-2 focus:ring-campo-100 transition-all"
+              className="w-20 px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:border-campo-400 focus:ring-2 focus:ring-campo-100 transition-all outline-none text-slate-800"
             />
             <span className="text-white/40 text-xs">—</span>
             <input
@@ -334,7 +334,7 @@ export default function FilterPanel({
               defaultValue={initialPrecioMax}
               onChange={(e) => setPrecioMax(e.target.value)}
               placeholder="Max"
-              className="w-20 px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:border-campo-400 focus:ring-2 focus:ring-campo-100 transition-all"
+              className="w-20 px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:border-campo-400 focus:ring-2 focus:ring-campo-100 transition-all outline-none text-slate-800"
             />
           </div>
         </div>
@@ -347,7 +347,7 @@ export default function FilterPanel({
             defaultValue={initialRaza}
             onChange={(e) => setRaza(e.target.value.trim())}
             placeholder="Ej: Angus, Brangus..."
-            className="w-28 px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:border-campo-400 focus:ring-2 focus:ring-campo-100 transition-all"
+            className="w-28 px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:border-campo-400 focus:ring-2 focus:ring-campo-100 transition-all outline-none text-slate-800"
           />
         </div>
 
@@ -413,14 +413,14 @@ export default function FilterPanel({
         <div className="flex items-center gap-2 pt-2">
           <button
             onClick={applyFilters}
-            className="px-4 py-1.5 bg-white text-black text-[11px] font-bold rounded-lg hover:bg-white/90 active:scale-[0.98] transition-all shadow-sm"
+            className="px-4 py-1.5 bg-white text-campo-800 text-[11px] font-bold rounded-lg hover:bg-white/95 active:scale-[0.98] transition-all shadow-sm cursor-pointer"
           >
             Aplicar filtros
           </button>
           {tieneFiltrosActivos && (
             <button
               onClick={clearFilters}
-              className="px-3 py-1.5 text-[11px] font-semibold text-white/80 bg-white/20 rounded-lg hover:bg-white/30 transition-all"
+              className="px-3 py-1.5 text-[11px] font-semibold text-white/80 bg-white/20 rounded-lg hover:bg-white/30 transition-all cursor-pointer"
             >
               Limpiar
             </button>
