@@ -104,6 +104,8 @@ export default function FilterPanel({
 
   const applyFilters = () => {
     const params = new URLSearchParams(window.location.search);
+    params.delete('page');
+    params.delete('pagina');
 
     if (categoriasSel.length > 0) params.set('categoria', joinCSV(categoriasSel));
     else params.delete('categoria');

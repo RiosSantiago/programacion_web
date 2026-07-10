@@ -1,0 +1,84 @@
+================================================================================
+          LOG DE PROCESO - AGENTE ANTIGRAVITY (DEEPMIND CODING TEAM)
+================================================================================
+
+Este documento registra el paso a paso técnico realizado para la limpieza,
+generación y estandarización del set de imágenes para la publicación "La consentida".
+
+--------------------------------------------------------------------------------
+1. IDENTIFICACIÓN DE IMÁGENES DESCARTADAS
+--------------------------------------------------------------------------------
+* Causa del problema:
+  La publicación de "La consentida" (ID: 44, una cerda de raza Pietrain "Doble Jamón")
+  solo contaba con una foto real en la base de datos. Para completar las 5 imágenes
+  requeridas por el carrusel de la interfaz de usuario, el componente 
+  `PhotoCarousel.tsx` cargaba automáticamente 4 imágenes de relleno (placeholders) 
+  provenientes del servicio externo "picsum.photos".
+  
+* Descarte de imágenes:
+  Estas 4 imágenes de Picsum generaban paisajes aleatorios (montañas, praderas, 
+  árboles) que no correspondían en absoluto al tema de la publicación (porcicultura). 
+  Se descartaron todas ellas debido a la incoherencia temática y la falta de 
+  continuidad en el catálogo del marketplace.
+
+--------------------------------------------------------------------------------
+2. CREACIÓN DE LAS NUEVAS IMÁGENES
+--------------------------------------------------------------------------------
+Se generaron 4 nuevas imágenes realistas de alta definición que son 100% acordes
+con la publicación original, respetando el estilo fotográfico y las características
+específicas del animal:
+
+* Raza específica: Cerda Pietrain (Pietrain pig).
+* Características visuales clave: Piel rosada con manchas negras irregulares 
+  dispersas, orejas caídas, cuerpo ancho y musculoso con lomo plano, y cuartos 
+  traseros muy desarrollados ("Doble Jamón").
+* Entorno: Pesebrera de granja limpia, cama de paja y luz de día natural.
+* Proceso de creación: Generadas mediante IA de difusión de imágenes utilizando 
+  prompts técnicos muy detallados para garantizar coherencia visual con la foto 
+  original de "La consentida".
+
+--------------------------------------------------------------------------------
+3. ESTRUCTURA DE ARCHIVOS Y ORDEN LÓGICO
+--------------------------------------------------------------------------------
+El lote final está compuesto por 5 archivos estandarizados en formato PNG con la
+siguiente nomenclatura y orden de visualización:
+
+1. [ORIGINAL] publicacion_01.png
+   - Descripción: La foto de portada original que ya tenías de "La consentida", 
+     convertida a PNG sin pérdida de calidad. Muestra a la cerda Pietrain de 
+     perfil hacia la izquierda en su corral.
+     
+2. [NUEVO]    publicacion_02.png
+   - Descripción: Cerda Pietrain en plano general de 3/4 mostrando su lomo plano 
+     y conformación muscular en un corral de granja soleado.
+     
+3. [NUEVO]    publicacion_03.png
+   - Descripción: Plano medio lateral de la cerda Pietrain destacando la textura 
+     de su piel rosada con manchas oscuras y las orejas características.
+     
+4. [NUEVO]    publicacion_04.png
+   - Descripción: Foto de espaldas/perfil enfocada en el desarrollo muscular de 
+     los cuartos traseros (doble jamón) de la cerda.
+     
+5. [NUEVO]    publicacion_05.png
+   - Descripción: Cerda Pietrain en pastoreo abierto en la región andina, con 
+     luz natural suave en el fondo.
+
+--------------------------------------------------------------------------------
+4. RUTAS RECOMENDADAS PARA EL USUARIO
+--------------------------------------------------------------------------------
+Para tu comodidad, hemos organizado y guardado los archivos en tu equipo:
+
+* Carpeta de entrega final (en tu espacio de trabajo):
+  c:\Users\riosv\OneDrive\Escritorio\Agrotech-main\Publicacion_Final\
+  - Contiene los 5 archivos: `publicacion_01.png` hasta `publicacion_05.png`
+  - Contiene este archivo de registro `LOG_PROCESO_ANTIGRAVITY.txt`
+
+* Carpeta recomendada si deseas usarlas directamente en el Marketplace:
+  c:\Users\riosv\OneDrive\Escritorio\Agrotech-main\public\uploads\animales\
+  - Si copias las imágenes allí, podrás enlazarlas en tu base de datos SQLite 
+    (`database/agroup.db`) usando la columna `imagenes` del producto con el ID 44.
+
+================================================================================
+                       AGENTE ANTIGRAVITY - FINALIZADO
+================================================================================
