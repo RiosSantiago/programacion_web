@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { db } from '../../../lib/db';
-import crypto from 'sha256';
+import crypto from 'node:crypto';
 
 const WOMPI_PRIVATE_KEY = import.meta.env.WOMPI_PRIVATE_KEY || 'prv_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxx';
 

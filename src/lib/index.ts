@@ -1,4 +1,4 @@
-export { inicializar } from './db';
+export { inicializar, inicializarTablas } from './db';
 export { db } from './db';
 export { getCategorias, getCategoriaById, getCategoriaPorNombre } from './models/categorias';
 export { getProductos, getProductosDestacados, getProductoById, filtrarProductos, getTotalProductos, crearProducto } from './models/productos';

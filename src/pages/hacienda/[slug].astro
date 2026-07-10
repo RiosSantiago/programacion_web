@@ -1,48 +1,41 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProductCard from '../../components/ProductCard.astro';
+import '../../lib/db';
+import { getProductos } from '../../lib/models/productos.js';
 
 const { slug } = Astro.params;
 const slugNombre = (slug || '').replace(/-/g, ' ');
 
-const productosLS = typeof localStorage !== 'undefined'
-  ? JSON.parse(localStorage.getItem('agroup_productos') || '[]')
-  : [];
-
-const haciendaProductos = productosLS.filter((p: any) => {
+const allProductos = getProductos();
+const haciendaProductos = allProductos.filter((p: any) => {
   const v = (p.vendedor || '').toLowerCase().replace(/\s+/g, '-');
   return v === slug || slugNombre.includes((p.vendedor || '').toLowerCase());
 });
 
-const haciendaRaw = typeof localStorage !== 'undefined'
-  ? JSON.parse(localStorage.getItem('agroup_hacienda_perfil') || '{}')
-  : {};
+const vendedorNombre = haciendaProductos.length > 0
+  ? haciendaProductos[0].vendedor
+  : slug ? slug.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()) : 'Hacienda';
 
 const hacienda = {
-  nombre: haciendaRaw.nombre || (slug ? slug.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()) : 'Hacienda'),
+  nombre: vendedorNombre,
   slug: slug || 'hacienda',
-  logo: haciendaRaw.logo || '',
-  portada: haciendaRaw.portada || '',
-  descripcion: haciendaRaw.descripcion || 'Hacienda familiar dedicada a la cría y engorde de ganado bovino con trazabilidad completa.',
-  ubicacion: `${haciendaRaw.municipio || 'Manizales'}, ${haciendaRaw.departamento || 'Caldas'}`,
-  departamento: haciendaRaw.departamento || 'Caldas',
-  municipio: haciendaRaw.municipio || 'Manizales',
-  whatsapp: haciendaRaw.whatsapp || '3001234567',
-  especies: haciendaRaw.especies || ['Bovinos', 'Porcinos'],
-  rating: parseFloat(haciendaRaw.rating) || 4.8,
-  ventas: parseInt(haciendaRaw.ventas) || 12,
-  miembroDesde: haciendaRaw.miembroDesde || 'marzo 2026',
+  logo: '',
+  portada: '',
+  descripcion: 'Hacienda familiar dedicada a la cría y engorde de ganado bovino con trazabilidad completa.',
+  ubicacion: `${haciendaProductos[0]?.departamento || 'Manizales'}, ${haciendaProductos[0]?.departamento || 'Caldas'}`,
+  departamento: haciendaProductos[0]?.departamento || 'Caldas',
+  municipio: haciendaProductos[0]?.ubicacion || 'Manizales',
+  whatsapp: '3001234567',
+  especies: [...new Set(haciendaProductos.map((p: any) => p.categoria).filter(Boolean))] as string[] || ['Bovinos', 'Porcinos'],
+  rating: 4.8,
+  ventas: 12,
+  miembroDesde: 'marzo 2026',
   urlPublica: `/hacienda/${slug || 'hacienda'}`,
   publicacionesActivas: haciendaProductos.length,
 };
 
-const ventasData = typeof localStorage !== 'undefined'
-  ? JSON.parse(localStorage.getItem('agroup_ventas_verificadas') || '[]')
-  : [];
-
-const ventasHacienda = ventasData.filter((v: any) =>
-  v.vendedor?.toLowerCase() === hacienda.nombre.toLowerCase()
-);
+const ventasHacienda: any[] = [];
 ---
 
 <BaseLayout>

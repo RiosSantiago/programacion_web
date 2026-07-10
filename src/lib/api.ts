@@ -33,17 +33,52 @@ export interface Hacienda {
 }
 
 export async function getProductos(filters?: Record<string, string>): Promise<Producto[]> {
-  const params = new URLSearchParams(filters).toString();
-  const url = `${API_BASE}/marketplace/listings${params ? '?' + params : ''}`;
-  
-  // For now, return mock data from local file
-  const { productos } = await import('../data/productos.js');
-  return productos;
+  const { getProductos: dbGetProductos } = await import('./models/productos.js');
+  const rows = dbGetProductos();
+  return rows.map((r: any) => ({
+    id: r.id,
+    nombre: r.nombre,
+    categoria: r.categoria,
+    raza: r.raza || '',
+    peso: r.peso || 0,
+    ubicacion: r.ubicacion,
+    precio: r.precio,
+    stock: r.stock,
+    imagenes: r.imagenes ? JSON.parse(r.imagenes) : [],
+    estado: r.estado || 'disponible',
+    vendedor: r.vendedor,
+    vendedorSlug: r.vendedor?.toLowerCase().replace(/\s+/g, '-') || '',
+    vendedorRating: r.vendedor_rating || 4.5,
+    trazabilidad: !!r.trazabilidad,
+    destacado: !!r.destacado,
+    oferta: !!r.oferta,
+    createdAt: r.created_at || '',
+  }));
 }
 
 export async function getProducto(slug: string): Promise<Producto | undefined> {
-  const { productos } = await import('../data/productos.js');
-  return productos.find((p: Producto) => p.id.toString() === slug);
+  const { getProductoById } = await import('./models/productos.js');
+  const r = getProductoById(parseInt(slug));
+  if (!r) return undefined;
+  return {
+    id: r.id,
+    nombre: r.nombre,
+    categoria: r.categoria,
+    raza: r.raza || '',
+    peso: r.peso || 0,
+    ubicacion: r.ubicacion,
+    precio: r.precio,
+    stock: r.stock,
+    imagenes: r.imagenes ? JSON.parse(r.imagenes) : [],
+    estado: r.estado || 'disponible',
+    vendedor: r.vendedor,
+    vendedorSlug: r.vendedor?.toLowerCase().replace(/\s+/g, '-') || '',
+    vendedorRating: r.vendedor_rating || 4.5,
+    trazabilidad: !!r.trazabilidad,
+    destacado: !!r.destacado,
+    oferta: !!r.oferta,
+    createdAt: r.created_at || '',
+  };
 }
 
 export async function getHacienda(slug: string): Promise<Hacienda | undefined> {

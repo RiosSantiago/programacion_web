@@ -105,6 +105,11 @@ export default function FilterPanel({
   const applyFilters = () => {
     const params = new URLSearchParams(window.location.search);
 
+
+    params.delete('page');
+    params.delete('pagina');
+
+
     if (categoriasSel.length > 0) params.set('categoria', joinCSV(categoriasSel));
     else params.delete('categoria');
 
@@ -413,14 +418,14 @@ export default function FilterPanel({
         <div className="flex items-center gap-2 pt-2">
           <button
             onClick={applyFilters}
-            className="px-4 py-1.5 bg-white text-black text-[11px] font-bold rounded-lg hover:bg-white/90 active:scale-[0.98] transition-all shadow-sm"
+            className="px-4 py-1.5 bg-white text-campo-800 text-[11px] font-bold rounded-lg hover:bg-white/95 active:scale-[0.98] transition-all shadow-sm cursor-pointer"
           >
             Aplicar filtros
           </button>
           {tieneFiltrosActivos && (
             <button
               onClick={clearFilters}
-              className="px-3 py-1.5 text-[11px] font-semibold text-white/80 bg-white/20 rounded-lg hover:bg-white/30 transition-all"
+              className="px-3 py-1.5 text-[11px] font-semibold text-white/80 bg-white/20 rounded-lg hover:bg-white/30 transition-all cursor-pointer"
             >
               Limpiar
             </button>
