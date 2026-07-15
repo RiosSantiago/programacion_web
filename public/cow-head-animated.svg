@@ -1,219 +1,57 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="86 47 388 393" width="100%" height="100%">
-  <!--
-    Cow Head Animated SVG — Empty State Microanimation
-    Pixel-precise coordinates from skeleton analysis of reference illustration.
-    
-    Key measurements:
-    - Global bbox: X:86..474, Y:47..439
-    - Left ear tip: (91, 160), Right ear tip: (469, 160)
-    - Left horn tip: Y=47, X≈163 | Right horn tip: Y=48, X≈397
-    - Eye centers: (210,228) and (348,229) | radius ≈9
-    - Nostril centers: (246,352) and (310,352) | radius ≈9.5
-    - Muzzle: X:192..368, Y:295..415
-    - Jaw bottom: Y=439
-    
-    Background: transparent
-    Stroke: #1a1a1a, rounded caps/joins
-  -->
-  <style>
-    /* ── Chewing: 3 gentle jaw drops, then long rest ── */
-    @keyframes chew {
-      0%,  8%   { transform: translateY(0);  }
-      12%         { transform: translateY(5px); }
-      16%         { transform: translateY(0);  }
-      20%         { transform: translateY(5px); }
-      24%         { transform: translateY(0);  }
-      28%         { transform: translateY(5px); }
-      32%         { transform: translateY(0);  }
-      32.01%,100% { transform: translateY(0);  }
-    }
+<svg viewBox="0 0 480 480" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Vaca animada masticando">
+  <title>Vaca masticando</title>
+  <g stroke="#111111" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" fill="none">
 
-    /* ── Single natural blink at ~65% ── */
-    @keyframes blink {
-      0%,62%    { transform: scaleY(1);    }
-      65%        { transform: scaleY(0.05); }
-      68%,100%  { transform: scaleY(1);    }
-    }
+    <!-- orejas -->
+    <ellipse cx="75" cy="165" rx="68" ry="32" transform="rotate(-8 75 165)"/>
+    <ellipse cx="405" cy="165" rx="68" ry="32" transform="rotate(8 405 165)"/>
 
-    /* ── Ear twitches at ~80% ── */
-    @keyframes earL {
-      0%,77%    { transform: rotate(0deg);  }
-      81%        { transform: rotate(-5deg); }
-      85%        { transform: rotate(2deg);  }
-      89%,100%  { transform: rotate(0deg);  }
-    }
-    @keyframes earR {
-      0%,77%    { transform: rotate(0deg);  }
-      81%        { transform: rotate(5deg);  }
-      85%        { transform: rotate(-2deg); }
-      89%,100%  { transform: rotate(0deg);  }
-    }
+    <!-- cuernos -->
+    <path d="M188 92 C168 72,162 50,178 35 C182 55,192 72,205 85"/>
+    <path d="M292 92 C312 72,318 50,302 35 C298 55,288 72,275 85"/>
 
-    .anim-jaw  { animation: chew  7s ease-in-out infinite; transform-origin: 280px 415px; }
-    .anim-eyeL { animation: blink 7s ease-in-out infinite; transform-origin: 210px 228px; }
-    .anim-eyeR { animation: blink 7s ease-in-out infinite; transform-origin: 348px 229px; }
-    .anim-earL { animation: earL  7s ease-in-out infinite; transform-origin: 185px 175px; }
-    .anim-earR { animation: earR  7s ease-in-out infinite; transform-origin: 375px 175px; }
-  </style>
+    <!-- cabeza -->
+    <path d="M192 88
+             C168 88, 148 104, 142 132
+             L 138 195
+             C 135 235, 145 272, 168 300
+             C 190 324, 213 335, 240 335
+             C 267 335, 290 324, 312 300
+             C 335 272, 345 235, 342 195
+             L 338 132
+             C 332 104, 312 88, 288 88
+             Z"/>
 
-  <!-- ═══════════ LEFT EAR ═══════════
-       Wide leaf-shaped ear. Reference pixel data:
-       - Left extreme: X=91, Y≈160
-       - Top junction to face: ~(180,165)
-       - Bottom junction to face: ~(183,234)
-       - Crease line: X≈108-174, Y≈183-193
-  ════════════════════════════════════ -->
-  <g class="anim-earL">
-    <path fill="none" stroke="#1a1a1a" stroke-width="10"
-          stroke-linecap="round" stroke-linejoin="round"
-      d="M 180,162
-         C 162,158 132,152  98,148
-         C  76,146  67,156  69,170
-         C  71,184  90,207 117,220
-         C 140,232 165,236 180,232"/>
-    <!-- inner crease -->
-    <path fill="none" stroke="#1a1a1a" stroke-width="8"
-          stroke-linecap="round"
-      d="M 103,180 C 126,184 152,189 172,192"/>
+    <!-- ojos -->
+    <ellipse cx="197" cy="197" rx="9" ry="12" fill="#111111" stroke="none"/>
+    <ellipse cx="283" cy="197" rx="9" ry="12" fill="#111111" stroke="none"/>
+
+    <!-- hocico -->
+    <path d="M175 258
+             C 175 244, 191 235, 211 235
+             L 269 235
+             C 289 235, 305 244, 305 258
+             L 305 301
+             C 305 321, 284 336, 259 336
+             L 221 336
+             C 196 336, 175 321, 175 301
+             Z"/>
+
+    <!-- fosas nasales -->
+    <ellipse cx="212" cy="270" rx="15" ry="19"/>
+    <ellipse cx="268" cy="270" rx="15" ry="19"/>
+
+    <!-- mandibula / boca animada -->
+    <g id="mandibula">
+      <path d="M212 305 C 222 316, 234 316, 240 308 C 246 316, 258 316, 268 305"/>
+      <animateTransform
+        attributeName="transform"
+        type="translate"
+        values="0,0; 0,6; 0,0"
+        dur="0.9s"
+        repeatCount="indefinite"
+        calcMode="spline"
+        keySplines="0.42 0 0.58 1; 0.42 0 0.58 1"/>
+    </g>
   </g>
-
-  <!-- ═══════════ RIGHT EAR (mirrored over cx=280) ═══════════ -->
-  <g class="anim-earR">
-    <path fill="none" stroke="#1a1a1a" stroke-width="10"
-          stroke-linecap="round" stroke-linejoin="round"
-      d="M 380,162
-         C 398,158 428,152 462,148
-         C 484,146 493,156 491,170
-         C 489,184 470,207 443,220
-         C 420,232 395,236 380,232"/>
-    <path fill="none" stroke="#1a1a1a" stroke-width="8"
-          stroke-linecap="round"
-      d="M 457,180 C 434,184 408,189 388,192"/>
-  </g>
-
-  <!-- ═══════════ STATIC HEAD STRUCTURE ═══════════ -->
-  <g fill="none" stroke="#1a1a1a" stroke-linecap="round" stroke-linejoin="round">
-
-    <!-- LEFT HORN
-         Outer edge: face junction (170,137) → tip (163,47)
-         Inner edge: tip (163,47) → hair-base (222,99)
-         The horn curves: starts near left-inner-face-line, arcs up and outward to tip,
-         then back inward to the forehead hair.
-    -->
-    <path stroke-width="10" d="
-      M 170,137
-      C 158,112 143,86 142,68
-      C 141,54 148,47 158,47
-      C 168,47 180,57 194,76
-      C 207,93 218,98 222,100"/>
-
-    <!-- RIGHT HORN -->
-    <path stroke-width="10" d="
-      M 390,137
-      C 402,112 417,86 418,68
-      C 419,54 412,47 402,47
-      C 392,47 380,57 366,76
-      C 353,93 342,98 338,100"/>
-
-    <!-- FOREHEAD HAIR — 3 wave bumps
-         Data from skeleton path 1 (center hair): 305,72→297,81→282,75→270,80→255,75
-         Mapped to horn-base span 222→338
-    -->
-    <path stroke-width="9" d="
-      M 222,100
-      C 228,84 243,80 252,90
-      C 261,80 279,79 280,82
-      C 281,79 299,80 308,90
-      C 317,80 332,84 338,100"/>
-
-    <!-- OUTER LEFT FACE — upper (horn-base to ear-top junction) -->
-    <path stroke-width="10" d="
-      M 222,100
-      C 212,112 198,126 188,142
-      C 181,154 180,163 181,170
-      L 182,168"/>
-
-    <!-- OUTER LEFT FACE — lower (ear-bottom junction to muzzle) -->
-    <path stroke-width="10" d="
-      M 182,230
-      C 182,252 184,278 186,298
-      C 188,312 191,320 192,323"/>
-
-    <!-- OUTER RIGHT FACE — upper -->
-    <path stroke-width="10" d="
-      M 338,100
-      C 348,112 362,126 372,142
-      C 379,154 380,163 379,170
-      L 378,168"/>
-
-    <!-- OUTER RIGHT FACE — lower -->
-    <path stroke-width="10" d="
-      M 378,230
-      C 378,252 376,278 374,298
-      C 372,312 369,320 368,323"/>
-
-    <!-- INNER LEFT FACE LINE
-         The distinctive dividing line that separates dark patches from light face.
-         Goes from forehead (222,100) down to muzzle junction (210,323).
-         From skeleton: path 3 starts at (367,171) which mirrored is ~(193,171) on left.
-         Path traces: (184,168)→(201,171)→(212,177)→(223,188)→(228,196)→(235,217)→(229,276)→(220,312)
-    -->
-    <path stroke-width="10" d="
-      M 222,100
-      C 214,112 204,128 199,146
-      C 194,164 193,182 196,200
-      C 201,224 209,252 210,284
-      C 210,304 210,318 210,323"/>
-
-    <!-- INNER RIGHT FACE LINE (mirrored) -->
-    <path stroke-width="10" d="
-      M 338,100
-      C 346,112 356,128 361,146
-      C 366,164 367,182 364,200
-      C 359,224 351,252 350,284
-      C 350,304 350,318 350,323"/>
-
-    <!-- MUZZLE / SNOUT — elliptical capsule
-         From pixel data:
-           Left junction: (192,323) | Right junction: (368,323)
-           Top center: Y≈295 | Bottom center: Y≈415
-           Width: ~176px, Height: ~120px
-    -->
-    <path stroke-width="10" d="
-      M 192,323
-      C 193,301 220,293 252,292
-      L 280,291
-      L 308,292
-      C 340,293 367,301 368,323
-      C 369,346 358,374 343,392
-      C 328,410 306,418 280,418
-      C 254,418 232,410 217,392
-      C 202,374 191,346 192,323
-      Z"/>
-
-    <!-- NOSTRILS (filled, drawn after muzzle so they render on top) -->
-  </g>
-
-  <!-- nostrils as filled circles -->
-  <circle fill="#1a1a1a" cx="246" cy="352" r="9"/>
-  <circle fill="#1a1a1a" cx="314" cy="352" r="9"/>
-
-  <!-- ═══════════ EYES ═══════════ -->
-  <g class="anim-eyeL">
-    <circle fill="#1a1a1a" cx="210" cy="228" r="9.5"/>
-  </g>
-  <g class="anim-eyeR">
-    <circle fill="#1a1a1a" cx="348" cy="229" r="9.5"/>
-  </g>
-
-  <!-- ═══════════ LOWER JAW / SMILE ═══════════
-       Sits just below the muzzle bottom (Y≈418).
-       When animated, it translates down ~5px to simulate jaw drop.
-       From pixel data: jaw bottom at Y=439, center x≈279
-  ════════════════════════════════════════════════ -->
-  <g class="anim-jaw">
-    <path fill="none" stroke="#1a1a1a" stroke-width="9" stroke-linecap="round"
-      d="M 236,418 C 248,436 268,442 280,442 C 292,442 312,436 324,418"/>
-  </g>
-
 </svg>
