@@ -4,10 +4,23 @@ interface PhotoCarouselProps {
   fotos: string[];
   videoUrl?: string;
   productoId?: number;
+  nombre?: string;
+  precio?: number;
+  vendedor?: string;
+  ubicacion?: string;
+  categoria?: string;
 }
 
-
-export default function PhotoCarousel({ fotos, videoUrl, productoId }: PhotoCarouselProps) {
+export default function PhotoCarousel({
+  fotos,
+  videoUrl,
+  productoId,
+  nombre = '',
+  precio = 0,
+  vendedor = '',
+  ubicacion = '',
+  categoria = ''
+}: PhotoCarouselProps) {
   // Usar solo las fotos reales del producto, sin rellenos externos
   const allFotos = fotos.length > 0 ? [...fotos] : ['/images/ganado.svg'];
 
@@ -18,30 +31,33 @@ export default function PhotoCarousel({ fotos, videoUrl, productoId }: PhotoCaro
   const [isFavorite, setIsFavorite] = useState(false);
   const touchStartX = useRef<number | null>(null);
 
-  // Cargar estado de favoritos desde localStorage en el cliente
+  // Cargar estado de favoritos desde localStorage (agroup-favoritos con guion)
   useEffect(() => {
     if (typeof window !== 'undefined' && productoId) {
-      const favoritos = JSON.parse(localStorage.getItem('agroup_favoritos') || '[]');
-      setIsFavorite(favoritos.includes(productoId));
+      const getFavoriteStatus = () => {
+        try {
+          const favs = JSON.parse(localStorage.getItem('agroup-favoritos') || '[]');
+          return favs.some((f: any) => f.id === productoId);
+        } catch (e) {
+          return false;
+        }
+      };
+
+      setIsFavorite(getFavoriteStatus());
+
+      // Escuchar cambios reactivos desde otros botones o el Drawer
+      const handleFavsChanged = (e: Event) => {
+        const customEvent = e as CustomEvent;
+        const ids = customEvent.detail?.ids || [];
+        setIsFavorite(ids.includes(productoId));
+      };
+
+      document.addEventListener('favoritos-changed', handleFavsChanged);
+      return () => {
+        document.removeEventListener('favoritos-changed', handleFavsChanged);
+      };
     }
   }, [productoId]);
-
-  // Alternar el estado de favorito
-  const toggleFavorite = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Evitar que el clic active el zoom de la imagen
-    if (!productoId) return;
-
-    const favoritos = JSON.parse(localStorage.getItem('agroup_favoritos') || '[]');
-    let nuevosFavoritos;
-    if (isFavorite) {
-      nuevosFavoritos = favoritos.filter((id: number) => id !== productoId);
-    } else {
-      nuevosFavoritos = [...favoritos, productoId];
-    }
-
-    localStorage.setItem('agroup_favoritos', JSON.stringify(nuevosFavoritos));
-    setIsFavorite(!isFavorite);
-  };
 
   // Navegar con animación de fade suave
   const goTo = (idx: number) => {
@@ -122,13 +138,21 @@ export default function PhotoCarousel({ fotos, videoUrl, productoId }: PhotoCaro
           {/* Botón de Favorito (Corazón flotante) */}
           {!zoomed && productoId && (
             <button
-              onClick={toggleFavorite}
               aria-label={isFavorite ? "Quitar de favoritos" : "Añadir a favoritos"}
-              className="absolute top-3 right-3 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md hover:bg-white hover:scale-110 active:scale-95 transition-all border border-white/40 z-10"
+              className={`btn-favorito absolute top-3 right-3 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md hover:bg-white hover:scale-110 active:scale-95 transition-all border border-white/40 z-10 ${
+                isFavorite ? 'activo' : ''
+              }`}
+              data-id={productoId}
+              data-nombre={nombre}
+              data-precio={precio}
+              data-imagen={allFotos[0] || '/images/ganado.svg'}
+              data-vendedor={vendedor}
+              data-ubicacion={ubicacion}
+              data-categoria={categoria}
             >
               {isFavorite ? (
                 // Corazón relleno rojo
-                <svg className="w-6 h-6 text-red-500 fill-current animate-heartbeat" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 text-red-500 fill-current animate-heartbeat animate-pulse" viewBox="0 0 24 24">
                   <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                 </svg>
               ) : (

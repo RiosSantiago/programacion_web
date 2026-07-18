@@ -195,9 +195,23 @@ export function filtrarProductos(options: {
   }
 
   if (options.busqueda) {
-    query += ' AND (nombre LIKE ? OR raza LIKE ? OR vendedor LIKE ? OR ubicacion LIKE ?)';
-    const searchTerm = `%${options.busqueda}%`;
-    params.push(searchTerm, searchTerm, searchTerm, searchTerm);
+    // Normalize: lowercase + remove accents for robust matching
+    const normalized = options.busqueda
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+    const searchTerm = `%${normalized}%`;
+    // Search across all relevant fields using LOWER() for case-insensitive matching
+    // Also map common synonyms: "cerdo/cerdos" → porcino, "vaca/toro/novillo" → bovino, etc.
+    query += ` AND (
+      LOWER(nombre) LIKE ? OR
+      LOWER(COALESCE(raza, '')) LIKE ? OR
+      LOWER(vendedor) LIKE ? OR
+      LOWER(ubicacion) LIKE ? OR
+      LOWER(categoria) LIKE ? OR
+      LOWER(COALESCE(descripcion, '')) LIKE ?
+    )`;
+    params.push(searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm);
   }
 
   switch (options.sortBy) {

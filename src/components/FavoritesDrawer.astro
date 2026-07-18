@@ -4,7 +4,7 @@
 <div id="favoritos-overlay" class="fixed inset-0 bg-black/40 z-40 hidden backdrop-blur-sm" onclick="cerrarFavoritos()"></div>
 
 <div id="favoritos-drawer" class="fixed top-0 right-0 h-full w-full sm:w-[28rem] bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
-  <div class="flex items-center justify-between p-5 border-b border-[#E8E0D8] bg-gradient-to-r from-campo-600 to-campo-700">
+  <div class="flex items-center justify-between p-5 border-b border-[#E8E0D8] bg-gradient-to-r from-campo-850 to-campo-900">
     <div class="flex items-center gap-3">
       <div class="w-10 h-10 bg-coral-500 rounded-xl flex items-center justify-center">
         <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
@@ -13,10 +13,10 @@
       </div>
       <div>
         <h3 class="text-lg font-display font-bold text-white">Mis Favoritos</h3>
-        <span id="favoritos-count" class="text-sm text-coral-300 font-medium">0 productos guardados</span>
+        <span id="favoritos-count" class="text-sm text-coral-200 font-medium">0 productos guardados</span>
       </div>
     </div>
-    <button onclick="cerrarFavoritos()" class="w-10 h-10 flex items-center justify-center rounded-xl text-coral-300 hover:bg-campo-500 hover:text-white transition-colors">
+    <button onclick="cerrarFavoritos()" class="w-10 h-10 flex items-center justify-center rounded-xl text-coral-200 hover:bg-campo-800 hover:text-white transition-colors" aria-label="Cerrar favoritos">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
       </svg>
@@ -51,6 +51,9 @@
     fechaAgregado: string;
   }
 
+  // ─── ÚNICA fuente de verdad: localStorage con clave canónica ───
+  const LS_KEY = 'agroup-favoritos';
+
   let favoritos: Favorito[] = [];
 
   function formatearCOP(valor: number): string {
@@ -78,38 +81,41 @@
     const existe = favoritos.find(f => f.id === item.id);
     if (!existe) {
       favoritos.unshift({ ...item, fechaAgregado: new Date().toISOString() });
-      actualizarFavoritos();
-      guardarFavoritos();
+      _commit();
     }
   }
 
   function eliminarFavorito(id: number) {
     favoritos = favoritos.filter(f => f.id !== id);
-    actualizarFavoritos();
-    guardarFavoritos();
-    actualizarBotonesFavoritos();
+    _commit();
   }
 
-  function guardarFavoritos() {
+  /** Guarda en localStorage y notifica a todos los oyentes en la página */
+  function _commit() {
     try {
-      localStorage.setItem('agroup-favoritos', JSON.stringify(favoritos));
+      localStorage.setItem(LS_KEY, JSON.stringify(favoritos));
     } catch (e) {}
+    actualizarUI();
+    actualizarBotonesFavoritos();
+    // CustomEvent reactivo: cualquier componente de la página puede escuchar esto
+    document.dispatchEvent(new CustomEvent('favoritos-changed', {
+      detail: { favoritos, ids: favoritos.map(f => f.id) }
+    }));
   }
 
   function cargarFavoritos() {
     try {
-      const saved = localStorage.getItem('agroup-favoritos');
+      const saved = localStorage.getItem(LS_KEY);
       if (saved) {
         favoritos = JSON.parse(saved);
-        actualizarFavoritos();
-        actualizarBotonesFavoritos();
       }
-    } catch (e) {}
+    } catch (e) { favoritos = []; }
+    actualizarUI();
+    actualizarBotonesFavoritos();
   }
 
-  function actualizarFavoritos() {
+  function actualizarUI() {
     const container = document.getElementById('favoritos-items');
-    const emptyState = document.getElementById('favoritos-empty');
     const countEl = document.getElementById('favoritos-count');
     const navBadge = document.getElementById('nav-favoritos-count');
 
@@ -119,43 +125,39 @@
       navBadge.classList.toggle('hidden', favoritos.length === 0);
     }
 
+    if (!container) return;
+
     if (favoritos.length === 0) {
-      if (container) {
-        container.innerHTML = '';
-        container.appendChild(createEmptyState());
-      }
+      container.innerHTML = '';
+      container.appendChild(createEmptyState());
       return;
     }
 
-    if (emptyState) emptyState.style.display = 'none';
-
-    if (container) {
-      container.innerHTML = '';
-      favoritos.forEach(item => {
-        const itemEl = document.createElement('div');
-        itemEl.className = 'flex gap-4 p-4 bg-white rounded-2xl border border-[#E8E0D8] shadow-sm hover:shadow-md transition-shadow';
-        itemEl.innerHTML = `
-          <a href="/marketplace/${item.id}" class="shrink-0">
-            <img src="${item.imagen}" alt="${item.nombre}" class="w-20 h-20 rounded-xl object-cover" />
-          </a>
-          <div class="flex-1 min-w-0">
-            <a href="/marketplace/${item.id}" class="text-sm font-bold text-[#2D2D2D] line-clamp-2 hover:text-gold-700 transition-colors">${item.nombre}</a>
-            <p class="text-xs text-[#6B6B6B] mt-1">${item.vendedor}</p>
-            <p class="text-lg font-extrabold text-[#2D2D2D] mt-1">${formatearCOP(item.precio)}</p>
-            <div class="flex items-center justify-between mt-3">
-              <span class="text-xs text-[#6B6B6B] capitalize">${item.categoria}</span>
-              <button onclick="eliminarFavorito(${item.id})" class="text-xs text-coral-500 hover:text-coral-700 font-medium transition-colors flex items-center gap-1">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-                Quitar
-              </button>
-            </div>
+    container.innerHTML = '';
+    favoritos.forEach(item => {
+      const itemEl = document.createElement('div');
+      itemEl.className = 'flex gap-4 p-4 bg-white rounded-2xl border border-[#E8E0D8] shadow-sm hover:shadow-md transition-shadow';
+      itemEl.innerHTML = `
+        <a href="/marketplace/${item.id}" class="shrink-0">
+          <img src="${item.imagen}" alt="${item.nombre}" class="w-20 h-20 rounded-xl object-cover" onerror="this.src='/images/ganado.svg'" />
+        </a>
+        <div class="flex-1 min-w-0">
+          <a href="/marketplace/${item.id}" class="text-sm font-bold text-[#2D2D2D] line-clamp-2 hover:text-gold-700 transition-colors">${item.nombre}</a>
+          <p class="text-xs text-[#6B6B6B] mt-1">${item.vendedor || ''}</p>
+          <p class="text-lg font-extrabold text-[#2D2D2D] mt-1">${formatearCOP(item.precio)}</p>
+          <div class="flex items-center justify-between mt-3">
+            <span class="text-xs text-[#6B6B6B] capitalize">${item.categoria || ''}</span>
+            <button onclick="eliminarFavorito(${item.id})" class="text-xs text-coral-500 hover:text-coral-700 font-medium transition-colors flex items-center gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              Quitar
+            </button>
           </div>
-        `;
-        container.appendChild(itemEl);
-      });
-    }
+        </div>
+      `;
+      container.appendChild(itemEl);
+    });
   }
 
   function createEmptyState(): HTMLElement {
@@ -177,52 +179,89 @@
     return div;
   }
 
+  /** Actualiza el estado visual (rojo/vacío) de TODOS los .btn-favorito del DOM */
   function actualizarBotonesFavoritos() {
+    const ids = new Set(favoritos.map(f => f.id));
     document.querySelectorAll('.btn-favorito').forEach(btn => {
       const id = parseInt(btn.getAttribute('data-id') || '0');
-      const esFavorito = favoritos.some(f => f.id === id);
+      const esFavorito = ids.has(id);
       btn.classList.toggle('activo', esFavorito);
+      const svg = btn.querySelector('svg');
+      if (svg) {
+        svg.setAttribute('fill', esFavorito ? '#f55a4e' : 'none');
+        svg.setAttribute('stroke', esFavorito ? '#f55a4e' : 'currentColor');
+      }
     });
   }
 
   function toggleFavorito(id: number, nombre: string, precio: number, imagen: string, vendedor: string, ubicacion: string, categoria: string) {
-    const existe = favoritos.find(f => f.id === id);
-    if (existe) {
+    if (favoritos.find(f => f.id === id)) {
       eliminarFavorito(id);
     } else {
       agregarFavorito({ id, nombre, precio, imagen, vendedor, ubicacion, categoria, fechaAgregado: '' });
     }
   }
 
-  // Expose globally
+  // ─── Exponer globalmente para uso inline desde Astro/HTML ───
   (window as any).abrirFavoritos = abrirFavoritos;
   (window as any).cerrarFavoritos = cerrarFavoritos;
   (window as any).toggleFavorito = toggleFavorito;
   (window as any).eliminarFavorito = eliminarFavorito;
+  (window as any).esFavorito = (id: number) => favoritos.some(f => f.id === id);
 
-  // Load on page load
+  // ─── Carga inicial ───
   cargarFavoritos();
 
-  // Listen for favorite buttons
-  document.addEventListener('click', (e) => {
-    const btn = (e.target as HTMLElement).closest('.btn-favorito');
-    if (btn) {
-      const id = parseInt(btn.getAttribute('data-id') || '0');
-      const nombre = btn.getAttribute('data-nombre') || '';
-      const precio = parseFloat(btn.getAttribute('data-precio') || '0');
-      const imagen = btn.getAttribute('data-imagen') || '';
-      const vendedor = btn.getAttribute('data-vendedor') || '';
-      const ubicacion = btn.getAttribute('data-ubicacion') || '';
-      const categoria = btn.getAttribute('data-categoria') || '';
-      toggleFavorito(id, nombre, precio, imagen, vendedor, ubicacion, categoria);
-    }
+  // ─── Sincronizar en navegación atrás/adelante (bfcache) ───
+  window.addEventListener('pageshow', () => {
+    cargarFavoritos();
   });
 
-  // Open favoritos drawer
+  // ─── Escuchar cambios externos en el localStorage ───
+  document.addEventListener('favoritos-changed', (e: Event) => {
+    const customEvent = e as CustomEvent;
+    // Si viene del mismo commit no es necesario recargar, pero evitamos desincronizaciones
+    try {
+      const saved = localStorage.getItem(LS_KEY);
+      const parsed = saved ? JSON.parse(saved) : [];
+      if (JSON.stringify(parsed) !== JSON.stringify(favoritos)) {
+        favoritos = parsed;
+        actualizarUI();
+        actualizarBotonesFavoritos();
+      }
+    } catch (err) {}
+  });
+
+  // ─── Delegación de clicks: captura .btn-favorito en cualquier parte de la página ───
+  document.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('.btn-favorito');
+    if (!btn) return;
+    e.stopPropagation();
+    const id       = parseInt(btn.getAttribute('data-id') || '0');
+    const nombre   = btn.getAttribute('data-nombre') || '';
+    const precio   = parseFloat(btn.getAttribute('data-precio') || '0');
+    const imagen   = btn.getAttribute('data-imagen') || '';
+    const vendedor = btn.getAttribute('data-vendedor') || '';
+    const ubicacion = btn.getAttribute('data-ubicacion') || '';
+    const categoria = btn.getAttribute('data-categoria') || '';
+    toggleFavorito(id, nombre, precio, imagen, vendedor, ubicacion, categoria);
+  }, true); // useCapture=true para interceptar antes que el stopPropagation de la tarjeta
+
+  // ─── Abrir drawer desde botón de nav ───
   document.addEventListener('click', (e) => {
     const btn = (e.target as HTMLElement).closest('[data-open-favoritos]');
-    if (btn) {
-      abrirFavoritos();
-    }
+    if (btn) abrirFavoritos();
   });
+
+  // ─── MutationObserver: actualiza corazones cuando se añaden nuevas tarjetas al DOM ───
+  // (útil si el grid carga dinámicamente o hay filtros que re-renderizan tarjetas)
+  const observer = new MutationObserver((mutations) => {
+    const hasNewButtons = mutations.some(m =>
+      Array.from(m.addedNodes).some(n =>
+        n instanceof HTMLElement && (n.classList?.contains('btn-favorito') || n.querySelector?.('.btn-favorito'))
+      )
+    );
+    if (hasNewButtons) actualizarBotonesFavoritos();
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
 </script>
