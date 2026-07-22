@@ -9,7 +9,7 @@ interface Usuario {
 }
 
 function generarToken(id: number, email: string): string {
-  const payload = { id, email, exp: Date.now() + 7 * 24 * 60 * 60 * 1000 };
+  const payload = { id, email, exp: Date.now() + 365 * 24 * 60 * 60 * 1000 };
   return Buffer.from(JSON.stringify(payload)).toString('base64');
 }
 
@@ -65,11 +65,18 @@ export const POST: APIRoute = async ({ request }) => {
       nombre,
       verificado: true,
       rol: '',
+      avatar: '',
       hacienda: '',
       ciudad: '',
       direccion: '',
       municipio: '',
       corregimiento: '',
+      departamento: '',
+      whatsapp: '',
+      descripcion: '',
+      especies: '[]',
+      logo: '',
+      portada: '',
     };
 
     return new Response(JSON.stringify({ 

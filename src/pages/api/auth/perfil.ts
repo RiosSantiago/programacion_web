@@ -17,6 +17,12 @@ interface Usuario {
   direccion: string | null;
   municipio: string | null;
   corregimiento: string | null;
+  departamento: string | null;
+  whatsapp: string | null;
+  descripcion: string | null;
+  especies: string | null;
+  logo: string | null;
+  portada: string | null;
 }
 
 function hashPassword(password: string): string {
@@ -24,7 +30,7 @@ function hashPassword(password: string): string {
 }
 
 function generarToken(id: number, email: string): string {
-  const payload = { id, email, exp: Date.now() + 7 * 24 * 60 * 60 * 1000 };
+  const payload = { id, email, exp: Date.now() + 365 * 24 * 60 * 60 * 1000 };
   return Buffer.from(JSON.stringify(payload)).toString('base64');
 }
 
@@ -48,22 +54,7 @@ export const PUT: APIRoute = async ({ request }) => {
       });
     }
 
-    if (tokenPayload.exp < Date.now()) {
-      return new Response(JSON.stringify({ error: 'Token expirado' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-
-    const { nombre, email, celular, passwordActual, password, hacienda, ciudad, direccion, municipio, corregimiento } = await request.json();
-
-    if (!nombre || !email || !celular) {
-      return new Response(JSON.stringify({ error: 'Nombre, email y celular son requeridos' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-
+    const tokenExpired = tokenPayload.exp < Date.now();
     const usuarioActual = db.prepare('SELECT * FROM usuarios WHERE id = ?').get(tokenPayload.id) as Usuario | undefined;
     if (!usuarioActual) {
       return new Response(JSON.stringify({ error: 'Usuario no encontrado' }), {
@@ -71,6 +62,27 @@ export const PUT: APIRoute = async ({ request }) => {
         headers: { 'Content-Type': 'application/json' },
       });
     }
+
+    const nuevoToken = generarToken(tokenPayload.id, usuarioActual.email);
+
+    const body = await request.json();
+    const nombre = body.nombre ?? usuarioActual.nombre;
+    const email = body.email ?? usuarioActual.email;
+    const celular = body.celular ?? usuarioActual.celular;
+    const hacienda = body.hacienda ?? usuarioActual.hacienda ?? '';
+    const ciudad = body.ciudad ?? usuarioActual.ciudad ?? '';
+    const direccion = body.direccion ?? usuarioActual.direccion ?? '';
+    const municipio = body.municipio ?? usuarioActual.municipio ?? '';
+    const corregimiento = body.corregimiento ?? usuarioActual.corregimiento ?? '';
+    const departamento = body.departamento ?? usuarioActual.departamento ?? '';
+    const whatsapp = body.whatsapp ?? usuarioActual.whatsapp ?? '';
+    const descripcion = body.descripcion ?? usuarioActual.descripcion ?? '';
+    const especies = body.especies ?? usuarioActual.especies ?? '[]';
+    const logo = body.logo ?? usuarioActual.logo ?? '';
+    const portada = body.portada ?? usuarioActual.portada ?? '';
+    const avatar = body.avatar ?? usuarioActual.avatar ?? '';
+    const passwordActual = body.passwordActual;
+    const password = body.password;
 
     if (email !== usuarioActual.email) {
       const existente = db.prepare('SELECT id FROM usuarios WHERE email = ? AND id != ?').get(email, tokenPayload.id);
@@ -115,18 +127,20 @@ export const PUT: APIRoute = async ({ request }) => {
       const passwordHash = hashPassword(password);
       db.prepare(`
         UPDATE usuarios SET nombre = ?, email = ?, celular = ?, password_hash = ?, password_text = ?,
-          hacienda = ?, ciudad = ?, direccion = ?, municipio = ?, corregimiento = ?
+          hacienda = ?, ciudad = ?, direccion = ?, municipio = ?, corregimiento = ?,
+          departamento = ?, whatsapp = ?, descripcion = ?, especies = ?, logo = ?, portada = ?, avatar = ?
         WHERE id = ?
-      `).run(nombre, email, celular, passwordHash, password, hacienda || '', ciudad || '', direccion || '', municipio || '', corregimiento || '', tokenPayload.id);
+      `).run(nombre, email, celular, passwordHash, password, hacienda, ciudad, direccion, municipio, corregimiento,
+        departamento, whatsapp, descripcion, especies, logo, portada, avatar, tokenPayload.id);
     } else {
       db.prepare(`
         UPDATE usuarios SET nombre = ?, email = ?, celular = ?,
-          hacienda = ?, ciudad = ?, direccion = ?, municipio = ?, corregimiento = ?
+          hacienda = ?, ciudad = ?, direccion = ?, municipio = ?, corregimiento = ?,
+          departamento = ?, whatsapp = ?, descripcion = ?, especies = ?, logo = ?, portada = ?, avatar = ?
         WHERE id = ?
-      `).run(nombre, email, celular, hacienda || '', ciudad || '', direccion || '', municipio || '', corregimiento || '', tokenPayload.id);
+      `).run(nombre, email, celular, hacienda, ciudad, direccion, municipio, corregimiento,
+        departamento, whatsapp, descripcion, especies, logo, portada, avatar, tokenPayload.id);
     }
-
-    const token = email !== usuarioActual.email ? generarToken(tokenPayload.id, email) : null;
 
     const userResponse = {
       id: tokenPayload.id,
@@ -135,15 +149,21 @@ export const PUT: APIRoute = async ({ request }) => {
       nombre,
       verificado: usuarioActual.verificado === 1,
       rol: usuarioActual.rol,
-      avatar: usuarioActual.avatar,
-      hacienda: hacienda || '',
-      ciudad: ciudad || '',
-      direccion: direccion || '',
-      municipio: municipio || '',
-      corregimiento: corregimiento || '',
+      avatar: body.avatar ?? usuarioActual.avatar,
+      hacienda,
+      ciudad,
+      direccion,
+      municipio,
+      corregimiento,
+      departamento,
+      whatsapp,
+      descripcion,
+      especies,
+      logo,
+      portada,
     };
 
-    return new Response(JSON.stringify({ success: true, user: userResponse, token }), {
+    return new Response(JSON.stringify({ success: true, user: userResponse, token: nuevoToken }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });

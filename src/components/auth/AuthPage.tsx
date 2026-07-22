@@ -21,20 +21,12 @@ export default function AuthPage({ initialMode = 'login' }: { initialMode?: 'log
     <>
       <div class="fixed inset-0 -z-10 bg-[#0B5D3B]">
         <img 
-          src={isLogin ? "/images/imagen2.webp" : "/images/bg-mountains.jpg"} 
+          src={isLogin ? "/images/imagen2.webp" : "/images/bg-mountains.webp"} 
           alt="" 
           class="absolute inset-0 w-full h-full object-cover" 
         />
-        <div class="absolute inset-0 bg-black/20"></div>
+        <div class={`absolute inset-0 ${isLogin ? 'bg-black/30' : 'bg-black/20'}`}></div>
       </div>
-
-      {!isLogin && (
-        <img 
-          src="/images/logo-agroup.png" 
-          alt="AgroUp" 
-          class="fixed bottom-10 left-10 w-[170px] z-10 filter drop-shadow-lg hidden md:block" 
-        />
-      )}
 
       <div class="min-h-screen flex items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
         <div
@@ -78,7 +70,7 @@ export default function AuthPage({ initialMode = 'login' }: { initialMode?: 'log
             <div class="flex" style={{ width: '50%' }}>
               <div class="w-[55%] flex items-center justify-center p-2">
                 <div class="relative w-full h-full rounded-[20px] overflow-hidden">
-                  <img src="/images/farm-cows-sunset.jpg" alt="Ganadería colombiana" class="absolute inset-0 w-full h-full object-cover" style={{ objectPosition: 'center center' }} />
+                  <img src="/images/farm-cows-sunset.webp" alt="Ganadería colombiana" class="absolute inset-0 w-full h-full object-cover" style={{ objectPosition: 'center center' }} />
                   <div class="absolute inset-0 shadow-[inset_0_0_40px_rgba(0,0,0,0.25)] pointer-events-none"></div>
                 </div>
               </div>

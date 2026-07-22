@@ -14,6 +14,12 @@ export interface User {
   direccion?: string;
   municipio?: string;
   corregimiento?: string;
+  departamento?: string;
+  whatsapp?: string;
+  descripcion?: string;
+  especies?: string;
+  logo?: string;
+  portada?: string;
 }
 
 export const $user = atom<User | null>(null);

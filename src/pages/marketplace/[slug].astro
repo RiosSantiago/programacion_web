@@ -33,7 +33,7 @@ const badgeInfo: Record<string, { label: string; class: string; icon: string }> 
 const catLower = producto?.categoria?.toLowerCase() || 'bovino';
 ---
 
-<BaseLayout>
+<BaseLayout navVariant="market">
   {producto ? (
 
   <div
@@ -41,6 +41,7 @@ const catLower = producto?.categoria?.toLowerCase() || 'bovino';
     style="background: linear-gradient(160deg, #FDFBF7 0%, #F5ECE0 50%, #EAE0CD 100%);"
     data-producto-id={producto.id}
     data-producto-nombre={producto.nombre}
+    data-vendedor-id={producto.vendedor_id || ''}
   >
 
     <!-- ══ Franja verde superior decorativa ══ -->
@@ -136,7 +137,7 @@ const catLower = producto?.categoria?.toLowerCase() || 'bovino';
 
               {['bovino', 'equino', 'porcino', 'ovino', 'avicola'].includes(catLower) ? (
                 <img
-                  src={`/images/categories/${catLower}.png`}
+                  src={`/images/categories/${catLower}.webp`}
                   alt={producto.categoria}
                   class="w-6 h-6 object-contain shrink-0"
                 />
@@ -677,6 +678,23 @@ const catLower = producto?.categoria?.toLowerCase() || 'bovino';
      SCRIPTS — Lógica sin cambios
 ════════════════════════════════════════════ -->
 <script>
+  (function() {
+    const mainDiv = document.querySelector('[data-producto-id]');
+    const productoId = mainDiv ? parseInt(mainDiv.getAttribute('data-producto-id') || '0') : 0;
+    const vendedorId = mainDiv ? parseInt(mainDiv.getAttribute('data-vendedor-id') || '0') : 0;
+    if (productoId && vendedorId) {
+      const token = localStorage.getItem('agroup_token');
+      fetch('/api/vendor/vistas', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ vendedor_id: vendedorId, producto_id: productoId }),
+      }).catch(() => {});
+    }
+  })();
+
   // ── Fallback localStorage ──
   (function() {
     try {

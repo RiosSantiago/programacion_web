@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { cwd } from 'process';
+import sharp from 'sharp';
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -15,10 +16,10 @@ export const POST: APIRoute = async ({ request }) => {
     const photoUrls: string[] = [];
 
     for (const file of photoFiles.slice(0, 5)) {
-      const ext = path.extname(file.name) || '.jpg';
-      const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${ext}`;
       const buffer = Buffer.from(await file.arrayBuffer());
-      await writeFile(path.join(uploadDir, filename), buffer);
+      const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.webp`;
+      const webpBuffer = await sharp(buffer).webp({ quality: 85 }).toBuffer();
+      await writeFile(path.join(uploadDir, filename), webpBuffer);
       photoUrls.push(`/uploads/animales/${filename}`);
     }
 

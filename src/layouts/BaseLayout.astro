@@ -7,7 +7,7 @@ import '../styles/global.css';
 
 export interface Props {
   hideNav?: boolean;
-  navVariant?: 'dark' | 'light' | 'home' | 'market' | 'publicar';
+  navVariant?: 'dark' | 'light' | 'home' | 'market' | 'publicar' | 'perfil';
 }
 
 const { hideNav, navVariant } = Astro.props;
@@ -24,7 +24,15 @@ const { hideNav, navVariant } = Astro.props;
     <meta property="og:title" content="Agroup | Marketplace Ganadero - Manizales, Colombia" />
     <meta property="og:description" content="El marketplace ganadero de los Andes colombianos. Compra y vende directamente sin intermediarios." />
     <meta property="og:type" content="website" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicon-512x512.png" />
+    <link rel="icon" type="image/png" sizes="256x256" href="/favicon-256x256.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png" />
+    <link rel="icon" type="image/png" sizes="128x128" href="/favicon-128x128.png" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/favicon-192x192.png" />
     <title>Agroup | Marketplace Ganadero - Manizales, Colombia</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

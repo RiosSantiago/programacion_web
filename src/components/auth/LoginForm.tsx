@@ -122,7 +122,7 @@ export default function LoginForm({ onToggle }: { onToggle?: () => void }) {
 
       {/* Forgot password */}
       <div className="flex justify-end -mt-1">
-        <a href="/auth/recuperar" className="text-xs text-[#1F2937] hover:text-[#0B5D3B] transition-colors">
+        <a href="/auth/recuperar-contrasena" className="text-xs text-[#1F2937] hover:text-[#0B5D3B] transition-colors">
           ¿Olvidaste tu contraseña?
         </a>
       </div>

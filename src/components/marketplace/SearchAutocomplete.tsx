@@ -15,11 +15,11 @@ interface SearchAutocompleteProps {
 
 const getCategoryIcon = (categoria: string): string => {
   const normalized = (categoria || '').toLowerCase().trim();
-  if (normalized.startsWith('equin')) return '/images/categories/equino.png';
-  if (normalized.startsWith('bovin')) return '/images/categories/bovino.png';
-  if (normalized.startsWith('porcin')) return '/images/categories/porcino.png';
-  if (normalized.startsWith('ovin')) return '/images/categories/ovino.png';
-  if (normalized.startsWith('avicol') || normalized.startsWith('avícol')) return '/images/categories/avicola.png';
+  if (normalized.startsWith('equin')) return '/images/categories/equino.webp';
+  if (normalized.startsWith('bovin')) return '/images/categories/bovino.webp';
+  if (normalized.startsWith('porcin')) return '/images/categories/porcino.webp';
+  if (normalized.startsWith('ovin')) return '/images/categories/ovino.webp';
+  if (normalized.startsWith('avicol') || normalized.startsWith('avícol')) return '/images/categories/avicola.webp';
   return '/images/default.svg';
 };
 

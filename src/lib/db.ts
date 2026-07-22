@@ -108,6 +108,17 @@ export function inicializarTablas() {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
     );
+
+    CREATE TABLE IF NOT EXISTS vistas_vendedor (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      vendedor_id INTEGER NOT NULL,
+      producto_id INTEGER NOT NULL,
+      viewer_id INTEGER,
+      viewer_ip TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (vendedor_id) REFERENCES usuarios(id),
+      FOREIGN KEY (viewer_id) REFERENCES usuarios(id)
+    );
   `);
 
   try { db.exec('ALTER TABLE productos ADD COLUMN tipo_precio TEXT DEFAULT \'fijo\''); } catch {}
@@ -121,6 +132,14 @@ export function inicializarTablas() {
   try { db.exec('ALTER TABLE usuarios ADD COLUMN direccion TEXT DEFAULT \'\''); } catch {}
   try { db.exec('ALTER TABLE usuarios ADD COLUMN municipio TEXT DEFAULT \'\''); } catch {}
   try { db.exec('ALTER TABLE usuarios ADD COLUMN corregimiento TEXT DEFAULT \'\''); } catch {}
+  try { db.exec('ALTER TABLE usuarios ADD COLUMN reset_token TEXT DEFAULT \'\''); } catch {}
+  try { db.exec('ALTER TABLE usuarios ADD COLUMN reset_token_exp INTEGER DEFAULT 0'); } catch {}
+  try { db.exec('ALTER TABLE usuarios ADD COLUMN departamento TEXT DEFAULT \'\''); } catch {}
+  try { db.exec('ALTER TABLE usuarios ADD COLUMN whatsapp TEXT DEFAULT \'\''); } catch {}
+  try { db.exec('ALTER TABLE usuarios ADD COLUMN descripcion TEXT DEFAULT \'\''); } catch {}
+  try { db.exec('ALTER TABLE usuarios ADD COLUMN especies TEXT DEFAULT \'[]\''); } catch {}
+  try { db.exec('ALTER TABLE usuarios ADD COLUMN logo TEXT DEFAULT \'\''); } catch {}
+  try { db.exec('ALTER TABLE usuarios ADD COLUMN portada TEXT DEFAULT \'\''); } catch {}
   try { db.exec('ALTER TABLE productos ADD COLUMN video TEXT DEFAULT \'\''); } catch {}
 }
 

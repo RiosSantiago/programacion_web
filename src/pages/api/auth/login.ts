@@ -20,7 +20,7 @@ interface Usuario {
 }
 
 function generarToken(id: number, email: string): string {
-  const payload = { id, email, exp: Date.now() + 7 * 24 * 60 * 60 * 1000 };
+  const payload = { id, email, exp: Date.now() + 365 * 24 * 60 * 60 * 1000 };
   return Buffer.from(JSON.stringify(payload)).toString('base64');
 }
 
@@ -76,12 +76,18 @@ export const POST: APIRoute = async ({ request }) => {
       nombre: usuario.nombre,
       verificado: usuario.verificado === 1,
       rol: usuario.rol,
-      avatar: usuario.avatar,
+      avatar: usuario.avatar || '',
       hacienda: usuario.hacienda || '',
       ciudad: usuario.ciudad || '',
       direccion: usuario.direccion || '',
       municipio: usuario.municipio || '',
       corregimiento: usuario.corregimiento || '',
+      departamento: usuario.departamento || '',
+      whatsapp: usuario.whatsapp || '',
+      descripcion: usuario.descripcion || '',
+      especies: usuario.especies || '[]',
+      logo: usuario.logo || '',
+      portada: usuario.portada || '',
     };
 
     return new Response(JSON.stringify({ 
