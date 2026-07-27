@@ -10,11 +10,11 @@ export default defineConfig({
   vite: {
     build: {
       rollupOptions: {
-        external: ['better-sqlite3', 'bcryptjs'],
+        external: ['pg', 'bcryptjs'],
       },
     },
     optimizeDeps: {
-      exclude: ['better-sqlite3', 'bcryptjs'],
+      exclude: ['pg', 'bcryptjs'],
     },
   },
 });

@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
-import { db, inicializar } from '../../../lib/db';
+import { queryGet, queryRun } from '../../../lib/db';
 
-function getUserId(request: Request): number | null {
+async function getUserId(request: Request): Promise<number | null> {
   const auth = request.headers.get('Authorization');
   if (!auth || !auth.startsWith('Bearer ')) return null;
   try {
@@ -12,189 +12,130 @@ function getUserId(request: Request): number | null {
   }
 }
 
-function getUserRole(userId: number): string | null {
-  try {
-    const row = db.prepare('SELECT rol FROM usuarios WHERE id = ?').get(userId) as { rol: string } | undefined;
-    return row?.rol || null;
-  } catch {
-    return null;
-  }
-}
-
-function isRoot(userId: number): boolean {
-  try {
-    const row = db.prepare('SELECT rol FROM usuarios WHERE id = ?').get(userId) as { rol: string } | undefined;
-    return row?.rol === 'root';
-  } catch {
-    return false;
-  }
-}
-
-function isAdmin(userId: number): boolean {
-  try {
-    const row = db.prepare('SELECT rol FROM usuarios WHERE id = ?').get(userId) as { rol: string } | undefined;
-    return row?.rol === 'admin';
-  } catch {
-    return false;
-  }
+async function getUserRole(userId: number): Promise<string | null> {
+  const row = await queryGet<{ rol: string }>('SELECT rol FROM usuarios WHERE id = ?', [userId]);
+  return row?.rol || null;
 }
 
 export const GET: APIRoute = async ({ params }) => {
   try {
     const id = parseInt(params.id || '');
-    if (!id) {
-      return new Response(JSON.stringify({ error: 'ID inválido' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
+    if (!id) return new Response(JSON.stringify({ error: 'ID inválido' }), { status: 400 });
 
-    const product = db.prepare('SELECT * FROM productos WHERE id = ?').get(id) as any;
-    if (!product) {
-      return new Response(JSON.stringify({ error: 'Producto no encontrado' }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
+    const product = await queryGet<any>(
+      `SELECT p.*, u.nombre AS vendedor
+       FROM productos p
+       LEFT JOIN usuarios u ON p.vendedor_id = u.id
+       WHERE p.id = ?`,
+      [id]
+    );
+    if (!product) return new Response(JSON.stringify({ error: 'Producto no encontrado' }), { status: 404 });
 
-    let imagenes: string[] = [];
-    try { imagenes = JSON.parse(product.imagenes); } catch { imagenes = []; }
+    const imgRows = await queryGet<any[]>('SELECT url FROM imagenes_producto WHERE producto_id = ? ORDER BY orden ASC', [id]);
+    const imagenes: string[] = Array.isArray(imgRows) ? imgRows.map(i => i.url) : [];
 
     return new Response(JSON.stringify({
       producto: { ...product, imagenes, imagen: imagenes[0] || '/images/ganado.svg' },
-    }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    }), { status: 200, headers: { 'Content-Type': 'application/json' } });
   } catch (error) {
-    console.error('Error:', error);
-    return new Response(JSON.stringify({ error: String(error) }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return new Response(JSON.stringify({ error: String(error) }), { status: 500 });
   }
 };
 
 export const PUT: APIRoute = async ({ params, request }) => {
   try {
-    const userId = getUserId(request);
-    if (!userId) {
-      return new Response(JSON.stringify({ error: 'No autorizado' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
+    const userId = await getUserId(request);
+    if (!userId) return new Response(JSON.stringify({ error: 'No autorizado' }), { status: 401 });
 
     const id = parseInt(params.id || '');
-    if (!id) {
-      return new Response(JSON.stringify({ error: 'ID inválido' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
+    if (!id) return new Response(JSON.stringify({ error: 'ID inválido' }), { status: 400 });
 
-    const userIsRoot = isRoot(userId);
-    const userIsAdmin = isAdmin(userId);
-    const canEditAny = userIsRoot || userIsAdmin;
+    const rol = await getUserRole(userId);
+    const canEditAny = rol === 'root' || rol === 'admin';
     const product = canEditAny
-      ? db.prepare('SELECT * FROM productos WHERE id = ?').get(id) as any
-      : db.prepare('SELECT * FROM productos WHERE id = ? AND (vendedor_id = ? OR vendedor_id IS NULL)').get(id, userId) as any;
+      ? await queryGet<any>(
+          `SELECT p.*, u.nombre AS vendedor
+           FROM productos p LEFT JOIN usuarios u ON p.vendedor_id = u.id
+           WHERE p.id = ?`, [id]
+        )
+      : await queryGet<any>(
+          `SELECT p.*, u.nombre AS vendedor
+           FROM productos p LEFT JOIN usuarios u ON p.vendedor_id = u.id
+           WHERE p.id = ? AND (p.vendedor_id = ? OR p.vendedor_id IS NULL)`, [id, userId]
+        );
 
-    if (!product) {
-      return new Response(JSON.stringify({ error: 'Producto no encontrado o no autorizado' }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
+    if (!product) return new Response(JSON.stringify({ error: 'Producto no encontrado o no autorizado' }), { status: 404 });
 
     const data = await request.json();
     const fields: string[] = [];
     const paramsArr: any[] = [];
 
-    const allowedFields = ['nombre', 'categoria', 'raza', 'peso', 'ubicacion', 'departamento', 'precio', 'stock', 'salud', 'estado', 'tipo_precio', 'sexo', 'fecha_nacimiento', 'descripcion', 'video'];
+    const allowedFields = [
+      'nombre', 'categoria', 'raza', 'peso', 'ubicacion', 'departamento', 'precio', 'stock',
+      'salud', 'estado', 'tipo_precio', 'sexo', 'fecha_nacimiento', 'descripcion', 'video',
+      'finca', 'vereda', 'referencia_ubicacion',
+    ];
+
+    if (data.nombre_finca !== undefined && data.finca === undefined)           data.finca = data.nombre_finca;
+    if (data.referencia   !== undefined && data.referencia_ubicacion === undefined) data.referencia_ubicacion = data.referencia;
+
     for (const field of allowedFields) {
       if (data[field] !== undefined) {
         fields.push(`${field} = ?`);
         paramsArr.push(field === 'descripcion' ? String(data[field]).slice(0, 500) : data[field]);
       }
     }
+    if (data.imagenes !== undefined && Array.isArray(data.imagenes)) {
+      await queryRun('DELETE FROM imagenes_producto WHERE producto_id = ?', [id]);
+      for (let i = 0; i < data.imagenes.length; i++) {
+        await queryRun('INSERT INTO imagenes_producto (producto_id, url, orden) VALUES (?, ?, ?)', [id, data.imagenes[i], i]);
+      }
+    }
+    if (fields.length === 0 && !Array.isArray(data.imagenes)) return new Response(JSON.stringify({ error: 'No hay campos para actualizar' }), { status: 400 });
 
-    if (data.imagenes !== undefined) {
-      fields.push('imagenes = ?');
-      paramsArr.push(JSON.stringify(data.imagenes));
+    if (fields.length > 0) {
+      paramsArr.push(id);
+      await queryRun(`UPDATE productos SET ${fields.join(', ')} WHERE id = ?`, paramsArr);
     }
 
-    if (fields.length === 0) {
-      return new Response(JSON.stringify({ error: 'No hay campos para actualizar' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
+    const updated = await queryGet<any>(
+      `SELECT p.*, u.nombre AS vendedor
+       FROM productos p LEFT JOIN usuarios u ON p.vendedor_id = u.id
+       WHERE p.id = ?`,
+      [id]
+    );
 
-    paramsArr.push(id);
-    db.prepare(`UPDATE productos SET ${fields.join(', ')} WHERE id = ?`).run(...paramsArr);
-
-    const updated = db.prepare('SELECT * FROM productos WHERE id = ?').get(id) as any;
-    let imagenes: string[] = [];
-    try { imagenes = JSON.parse(updated.imagenes); } catch { imagenes = []; }
+    const imgRows = await queryGet<any[]>('SELECT url FROM imagenes_producto WHERE producto_id = ? ORDER BY orden ASC', [id]);
+    const imagenes: string[] = Array.isArray(imgRows) ? imgRows.map(i => i.url) : [];
 
     return new Response(JSON.stringify({
       success: true,
       producto: { ...updated, imagenes, imagen: imagenes[0] || '/images/ganado.svg' },
-    }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    }), { status: 200, headers: { 'Content-Type': 'application/json' } });
   } catch (error) {
-    console.error('Error:', error);
-    return new Response(JSON.stringify({ error: String(error) }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return new Response(JSON.stringify({ error: String(error) }), { status: 500 });
   }
 };
 
 export const DELETE: APIRoute = async ({ params, request }) => {
   try {
-    const userId = getUserId(request);
-    if (!userId) {
-      return new Response(JSON.stringify({ error: 'No autorizado' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
+    const userId = await getUserId(request);
+    if (!userId) return new Response(JSON.stringify({ error: 'No autorizado' }), { status: 401 });
 
     const id = parseInt(params.id || '');
-    if (!id) {
-      return new Response(JSON.stringify({ error: 'ID inválido' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
+    if (!id) return new Response(JSON.stringify({ error: 'ID inválido' }), { status: 400 });
 
-    const userIsRoot = isRoot(userId);
-    const product = userIsRoot
-      ? db.prepare('SELECT * FROM productos WHERE id = ?').get(id) as any
-      : db.prepare('SELECT * FROM productos WHERE id = ? AND (vendedor_id = ? OR vendedor_id IS NULL)').get(id, userId) as any;
+    const rol = await getUserRole(userId);
+    const product = rol === 'root'
+      ? await queryGet<any>('SELECT id FROM productos WHERE id = ?', [id])
+      : await queryGet<any>('SELECT id FROM productos WHERE id = ? AND (vendedor_id = ? OR vendedor_id IS NULL)', [id, userId]);
 
-    if (!product) {
-      return new Response(JSON.stringify({ error: 'Producto no encontrado o no autorizado' }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
+    if (!product) return new Response(JSON.stringify({ error: 'Producto no encontrado o no autorizado' }), { status: 404 });
 
-    db.prepare('DELETE FROM productos WHERE id = ?').run(id);
+    await queryRun('DELETE FROM productos WHERE id = ?', [id]);
 
-    return new Response(JSON.stringify({ success: true }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return new Response(JSON.stringify({ success: true }), { status: 200 });
   } catch (error) {
-    console.error('Error:', error);
-    return new Response(JSON.stringify({ error: String(error) }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return new Response(JSON.stringify({ error: String(error) }), { status: 500 });
   }
 };

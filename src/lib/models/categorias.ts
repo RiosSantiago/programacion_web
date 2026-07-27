@@ -1,4 +1,4 @@
-import { db } from '../db';
+import { queryAll, queryGet, queryRun } from '../db';
 
 export interface Categoria {
   id: number;
@@ -8,22 +8,22 @@ export interface Categoria {
   cantidad: number;
 }
 
-export function getCategorias(): Categoria[] {
-  return db.prepare('SELECT id, nombre, icono, color, cantidad FROM categorias ORDER BY cantidad DESC').all() as Categoria[];
+export async function getCategorias(): Promise<Categoria[]> {
+  return queryAll<Categoria>('SELECT id, nombre, icono, color, cantidad FROM categorias ORDER BY cantidad DESC');
 }
 
-export function getCategoriaById(id: number): Categoria | undefined {
-  return db.prepare('SELECT * FROM categorias WHERE id = ?').get(id) as Categoria | undefined;
+export async function getCategoriaById(id: number): Promise<Categoria | undefined> {
+  return queryGet<Categoria>('SELECT * FROM categorias WHERE id = ?', [id]);
 }
 
-export function getCategoriaPorNombre(nombre: string): Categoria | undefined {
-  return db.prepare('SELECT * FROM categorias WHERE LOWER(nombre) = LOWER(?)').get(nombre) as Categoria | undefined;
+export async function getCategoriaPorNombre(nombre: string): Promise<Categoria | undefined> {
+  return queryGet<Categoria>('SELECT * FROM categorias WHERE LOWER(nombre) = LOWER(?)', [nombre]);
 }
 
-export function actualizarCantidadCategoria(categoria: string, delta: number) {
-  db.prepare('UPDATE categorias SET cantidad = cantidad + ? WHERE LOWER(nombre) = LOWER(?)').run(delta, categoria);
+export async function actualizarCantidadCategoria(categoria: string, delta: number): Promise<void> {
+  await queryRun('UPDATE categorias SET cantidad = cantidad + ? WHERE LOWER(nombre) = LOWER(?)', [delta, categoria]);
 }
 
-export function actualizarStockProducto(productoId: number, cantidad: number) {
-  db.prepare('UPDATE productos SET stock = stock - ? WHERE id = ?').run(cantidad, productoId);
+export async function actualizarStockProducto(productoId: number, cantidad: number): Promise<void> {
+  await queryRun('UPDATE productos SET stock = stock - ? WHERE id = ?', [cantidad, productoId]);
 }

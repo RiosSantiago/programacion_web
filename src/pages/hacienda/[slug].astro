@@ -1,13 +1,13 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProductCard from '../../components/ProductCard.astro';
-import { db } from '../../lib/db';
+import { queryGet } from '../../lib/db';
 import { getProductos } from '../../lib/models/productos.js';
 
 const { slug } = Astro.params;
 const slugNombre = (slug || '').replace(/-/g, ' ');
 
-const allProductos = getProductos();
+const allProductos = await getProductos();
 const haciendaProductos = allProductos.filter((p: any) => {
   const v = (p.vendedor || '').toLowerCase().replace(/\s+/g, '-');
   return v === slug || slugNombre.includes((p.vendedor || '').toLowerCase());
@@ -20,16 +20,26 @@ const vendedorNombre = haciendaProductos.length > 0
 const vendedorId = haciendaProductos.length > 0 ? haciendaProductos[0].vendedor_id : null;
 let vendedorUser: any = null;
 if (vendedorId) {
-  vendedorUser = db.prepare('SELECT logo, portada, descripcion, whatsapp, departamento, created_at FROM usuarios WHERE id = ?').get(vendedorId);
+  vendedorUser = await queryGet('SELECT logo, portada, descripcion, whatsapp, departamento, created_at FROM usuarios WHERE id = ?', [vendedorId]);
 }
 
-const ventasReales = vendedorId
-  ? (db.prepare("SELECT COUNT(*) as count FROM pedidos WHERE productos LIKE ?").get(`%"vendedor_id":${vendedorId}%`) as any)?.count || 0
-  : 0;
+let ventasReales = 0;
+if (vendedorId) {
+  const ventasRow = await queryGet<{ count: string }>(
+    `SELECT COUNT(DISTINCT d.pedido_id) as count FROM detalle_pedido d JOIN productos p ON d.producto_id = p.id WHERE p.vendedor_id = ?`,
+    [vendedorId]
+  );
+  ventasReales = Number(ventasRow?.count ?? 0);
+  if (ventasReales === 0) {
+    const legacyRow = await queryGet<{ count: string }>("SELECT COUNT(*) as count FROM pedidos WHERE productos LIKE ?", [`%"vendedor_id":${vendedorId}%`]);
+    ventasReales = Number(legacyRow?.count ?? 0);
+  }
+}
 
-const ratingReal = vendedorId
-  ? (db.prepare("SELECT AVG(vendedor_rating) as avg_rating FROM productos WHERE vendedor_id = ? AND vendedor_rating IS NOT NULL AND vendedor_rating > 0").get(vendedorId) as any)?.avg_rating
+const ratingRow = vendedorId
+  ? await queryGet<any>("SELECT AVG(vendedor_rating) as avg_rating FROM productos WHERE vendedor_id = ? AND vendedor_rating IS NOT NULL AND vendedor_rating > 0", [vendedorId])
   : null;
+const ratingReal = ratingRow?.avg_rating ? parseFloat(ratingRow.avg_rating) : null;
 
 const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 let miembroDesde = '2026';

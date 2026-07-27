@@ -12,7 +12,7 @@ const estadosProducto = [
   { id: 'reproduccion', nombre: 'Reproduccion' },
 ];
 
-const categorias = getCategorias();
+const categorias = await getCategorias();
 
 interface Props {
   categoriaActiva?: string;

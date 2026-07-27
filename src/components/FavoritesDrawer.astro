@@ -66,6 +66,18 @@
   }
 
   function abrirFavoritos() {
+    // Cerrar mobile menu si está abierto
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (mobileMenu && !mobileMenu.classList.contains('translate-x-full')) {
+      document.getElementById('mobile-menu-overlay')?.classList.add('hidden');
+      mobileMenu.classList.add('translate-x-full');
+    }
+    // Cerrar carrito si está abierto
+    const cartDrawer = document.getElementById('cart-drawer');
+    if (cartDrawer && !cartDrawer.classList.contains('translate-x-full')) {
+      document.getElementById('cart-overlay')?.classList.add('hidden');
+      cartDrawer.classList.add('translate-x-full');
+    }
     document.getElementById('favoritos-overlay')?.classList.remove('hidden');
     document.getElementById('favoritos-drawer')?.classList.remove('translate-x-full');
     document.body.style.overflow = 'hidden';
@@ -75,6 +87,11 @@
     document.getElementById('favoritos-overlay')?.classList.add('hidden');
     document.getElementById('favoritos-drawer')?.classList.add('translate-x-full');
     document.body.style.overflow = '';
+  }
+
+  function estaAbiertoFavoritos(): boolean {
+    const drawer = document.getElementById('favoritos-drawer');
+    return !!drawer && !drawer.classList.contains('translate-x-full');
   }
 
   function agregarFavorito(item: Favorito) {
@@ -247,10 +264,16 @@
     toggleFavorito(id, nombre, precio, imagen, vendedor, ubicacion, categoria);
   }, true); // useCapture=true para interceptar antes que el stopPropagation de la tarjeta
 
-  // ─── Abrir drawer desde botón de nav ───
+  // ─── Abrir drawer desde botón de nav (con toggle & exclusividad) ───
   document.addEventListener('click', (e) => {
     const btn = (e.target as HTMLElement).closest('[data-open-favoritos]');
-    if (btn) abrirFavoritos();
+    if (btn) {
+      if (estaAbiertoFavoritos()) {
+        cerrarFavoritos();
+      } else {
+        abrirFavoritos();
+      }
+    }
   });
 
   // ─── MutationObserver: actualiza corazones cuando se añaden nuevas tarjetas al DOM ───

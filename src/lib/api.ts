@@ -34,7 +34,7 @@ export interface Hacienda {
 
 export async function getProductos(filters?: Record<string, string>): Promise<Producto[]> {
   const { getProductos: dbGetProductos } = await import('./models/productos.js');
-  const rows = dbGetProductos();
+  const rows = await dbGetProductos();
   return rows.map((r: any) => ({
     id: r.id,
     nombre: r.nombre,
@@ -44,8 +44,9 @@ export async function getProductos(filters?: Record<string, string>): Promise<Pr
     ubicacion: r.ubicacion,
     precio: r.precio,
     stock: r.stock,
-    imagenes: r.imagenes ? JSON.parse(r.imagenes) : [],
+    imagenes: Array.isArray(r.imagenes) ? r.imagenes : (r.imagenes ? JSON.parse(r.imagenes) : []),
     estado: r.estado || 'disponible',
+    // C3: r.vendedor proviene del modelo via u.nombre (JOIN usuarios) — no de la columna denormalizada
     vendedor: r.vendedor,
     vendedorSlug: r.vendedor?.toLowerCase().replace(/\s+/g, '-') || '',
     vendedorRating: r.vendedor_rating || 4.5,
@@ -58,7 +59,7 @@ export async function getProductos(filters?: Record<string, string>): Promise<Pr
 
 export async function getProducto(slug: string): Promise<Producto | undefined> {
   const { getProductoById } = await import('./models/productos.js');
-  const r = getProductoById(parseInt(slug));
+  const r = await getProductoById(parseInt(slug));
   if (!r) return undefined;
   return {
     id: r.id,
@@ -69,8 +70,9 @@ export async function getProducto(slug: string): Promise<Producto | undefined> {
     ubicacion: r.ubicacion,
     precio: r.precio,
     stock: r.stock,
-    imagenes: r.imagenes ? JSON.parse(r.imagenes) : [],
+    imagenes: Array.isArray(r.imagenes) ? r.imagenes : (r.imagenes ? JSON.parse(r.imagenes) : []),
     estado: r.estado || 'disponible',
+    // C3: r.vendedor proviene del modelo via u.nombre (JOIN usuarios) — no de la columna denormalizada
     vendedor: r.vendedor,
     vendedorSlug: r.vendedor?.toLowerCase().replace(/\s+/g, '-') || '',
     vendedorRating: r.vendedor_rating || 4.5,

@@ -1,4 +1,4 @@
-import { db } from '../db';
+import { queryAll, queryGet } from '../db';
 
 export interface Animal {
   id: number;
@@ -28,30 +28,30 @@ export interface IndicadorCrecimiento {
   produccion: number;
 }
 
-export function getInventario(): Animal[] {
-  return db.prepare('SELECT * FROM inventario ORDER BY codigo').all() as Animal[];
+export async function getInventario(): Promise<Animal[]> {
+  return queryAll<Animal>('SELECT * FROM inventario ORDER BY codigo');
 }
 
-export function getEstadisticas(): EstadisticasDashboard {
-  const stats = db.prepare('SELECT * FROM dashboard_estadisticas WHERE id = 1').get() as any;
+export async function getEstadisticas(): Promise<EstadisticasDashboard> {
+  const stats = await queryGet<any>('SELECT * FROM dashboard_estadisticas WHERE id = 1');
   return {
-    totalCabezas: stats?.total_cabezas || 0,
-    alertasSalud: stats?.alertas_salud || 0,
-    promedioPeso: stats?.promedio_peso || 0,
-    crecimientoMensual: stats?.crecimiento_mensual || 0,
-    rendimientoPromedio: stats?.rendimiento_promedio || 0,
-    produccionLeche: stats?.produccion_leche || 0,
+    totalCabezas:       stats?.total_cabezas      ?? 0,
+    alertasSalud:       stats?.alertas_salud       ?? 0,
+    promedioPeso:       stats?.promedio_peso        ?? 0,
+    crecimientoMensual: stats?.crecimiento_mensual  ?? 0,
+    rendimientoPromedio:stats?.rendimiento_promedio  ?? 0,
+    produccionLeche:    stats?.produccion_leche      ?? 0,
   };
 }
 
-export function getIndicadoresCrecimiento(): IndicadorCrecimiento[] {
-  return db.prepare('SELECT mes, peso, produccion FROM indicadores_crecimiento ORDER BY id').all() as IndicadorCrecimiento[];
+export async function getIndicadoresCrecimiento(): Promise<IndicadorCrecimiento[]> {
+  return queryAll<IndicadorCrecimiento>('SELECT mes, peso, produccion FROM indicadores_crecimiento ORDER BY id');
 }
 
-export function getAnimalById(id: number): Animal | undefined {
-  return db.prepare('SELECT * FROM inventario WHERE id = ?').get(id) as Animal | undefined;
+export async function getAnimalById(id: number): Promise<Animal | undefined> {
+  return queryGet<Animal>('SELECT * FROM inventario WHERE id = ?', [id]);
 }
 
-export function getAnimalPorCodigo(codigo: string): Animal | undefined {
-  return db.prepare('SELECT * FROM inventario WHERE codigo = ?').get(codigo) as Animal | undefined;
+export async function getAnimalPorCodigo(codigo: string): Promise<Animal | undefined> {
+  return queryGet<Animal>('SELECT * FROM inventario WHERE codigo = ?', [codigo]);
 }

@@ -123,6 +123,13 @@ import PublicationForm from '../../components/dashboard/PublicationForm.tsx';
 </BaseLayout>
 
 <script>
+  const municipiosCaldas = [
+    'Aguadas', 'Anserma', 'Aranzazu', 'Belalcázar', 'Chinchiná', 'Filadelfia',
+    'La Dorada', 'La Merced', 'Manizales (capital)', 'Manzanares', 'Marmato',
+    'Marquetalia', 'Marulanda', 'Neira', 'Norcasia', 'Pácora', 'Palestina',
+    'Pensilvania', 'Riosucio', 'Risaralda', 'Salamina', 'Samaná', 'San José',
+    'Supía', 'Victoria', 'Villamaría', 'Viterbo'
+  ];
   const token = localStorage.getItem('agroup_token');
   let editandoId = null;
   let eliminandoId = null;
@@ -311,13 +318,32 @@ import PublicationForm from '../../components/dashboard/PublicationForm.tsx';
 
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-slate-700 mb-1">Municipio</label>
-              <input type="text" id="edit-ubicacion" value="${escapeHtml(producto.ubicacion || '')}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-gold-500" />
+              <label class="block text-sm font-medium text-slate-700 mb-1">Municipio *</label>
+              <select id="edit-ubicacion" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-gold-500">
+                <option value="">Seleccionar Municipio</option>
+                ${municipiosCaldas.map(m => `<option value="${m}" ${producto.ubicacion === m ? 'selected' : ''}>${m}</option>`).join('')}
+              </select>
             </div>
             <div>
               <label class="block text-sm font-medium text-slate-700 mb-1">Departamento</label>
-              <input type="text" id="edit-departamento" value="${escapeHtml(producto.departamento || 'Caldas')}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-gold-500" />
+              <input type="text" id="edit-departamento" value="Caldas" readonly tabindex="-1" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-500 cursor-not-allowed" />
             </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Nombre de la finca *</label>
+              <input type="text" id="edit-finca" required minlength="3" maxlength="80" value="${escapeHtml(producto.finca || '')}" placeholder="Ej. Hacienda El Paraíso" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-gold-500" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Vereda / Corregimiento</label>
+              <input type="text" id="edit-vereda" maxlength="80" value="${escapeHtml(producto.vereda || '')}" placeholder="Ej. Vereda La Esperanza" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-gold-500" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Sector o referencia</label>
+            <textarea id="edit-referencia" maxlength="200" rows="2" placeholder="Ej. A 2 km del parque principal..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-gold-500 resize-none">${escapeHtml(producto.referencia_ubicacion || '')}</textarea>
           </div>
 
           <div class="grid grid-cols-2 gap-4">
@@ -405,7 +431,7 @@ import PublicationForm from '../../components/dashboard/PublicationForm.tsx';
           div.className = 'relative w-20 h-20 rounded-lg overflow-hidden border border-slate-200 group';
           div.dataset.index = String(i);
           div.innerHTML = '<img src="' + url + '" alt="" class="w-full h-full object-contain bg-slate-50" />' +
-            '<button type="button" class="absolute top-0.5 right-0.5 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600" data-remove-index="' + i + '">×</button>';
+            '<button type="button" class="absolute top-1 right-1 w-6 h-6 text-white rounded-full flex items-center justify-center shadow-md transition-all hover:scale-110 z-10" style="background-color: #1b3928;" onmouseover="this.style.backgroundColor=\'#DC2626\'" onmouseout="this.style.backgroundColor=\'#1b3928\'" data-remove-index="' + i + '" title="Eliminar foto"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>';
           div.querySelector('[data-remove-index]').addEventListener('click', function(e) {
             e.stopPropagation();
             const idx = parseInt(this.dataset.removeIndex);
@@ -422,7 +448,7 @@ import PublicationForm from '../../components/dashboard/PublicationForm.tsx';
         if (editMediaState.existingVideo) {
           existingVideoEl.innerHTML = '<div class="relative rounded-lg overflow-hidden border border-slate-200 group inline-block max-w-xs">' +
             '<video src="' + editMediaState.existingVideo + '" controls class="w-full max-h-32 object-contain bg-slate-50"></video>' +
-            '<button type="button" id="btn-remove-existing-video" class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600">×</button></div>';
+            '<button type="button" id="btn-remove-existing-video" class="absolute top-1 right-1 w-6 h-6 text-white rounded-full flex items-center justify-center shadow-md transition-all hover:scale-110 z-10" style="background-color: #1b3928;" onmouseover="this.style.backgroundColor=\'#DC2626\'" onmouseout="this.style.backgroundColor=\'#1b3928\'" title="Eliminar video"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div>';
           document.getElementById('btn-remove-existing-video').addEventListener('click', function() {
             editMediaState.videoRemoved = true;
             existingVideoEl.innerHTML = '<p class="text-xs text-slate-400 italic">Video eliminado</p>';
@@ -522,15 +548,27 @@ import PublicationForm from '../../components/dashboard/PublicationForm.tsx';
       sexo: document.getElementById('edit-sexo').value,
       peso: document.getElementById('edit-peso').value ? parseFloat(document.getElementById('edit-peso').value) : null,
       stock: parseInt(document.getElementById('edit-stock').value),
-      ubicacion: document.getElementById('edit-ubicacion').value,
-      departamento: document.getElementById('edit-departamento').value,
-      precio: parseFloat(document.getElementById('edit-precio').value),
-      salud: document.getElementById('edit-salud').value,
-      estado: document.getElementById('edit-estado').value,
+      ubicacion: (document.getElementById('edit-ubicacion') as HTMLSelectElement).value,
+      departamento: 'Caldas',
+      finca: (document.getElementById('edit-finca') as HTMLInputElement)?.value.trim() || '',
+      vereda: (document.getElementById('edit-vereda') as HTMLInputElement)?.value.trim() || '',
+      referencia_ubicacion: (document.getElementById('edit-referencia') as HTMLTextAreaElement)?.value.trim() || '',
+      precio: parseFloat((document.getElementById('edit-precio') as HTMLInputElement).value),
+      salud: (document.getElementById('edit-salud') as HTMLSelectElement).value,
+      estado: (document.getElementById('edit-estado') as HTMLSelectElement).value,
       descripcion: (document.getElementById('edit-descripcion') as HTMLTextAreaElement)?.value.slice(0, 500) || '',
       imagenes: finalImagenes,
       video: finalVideo,
     };
+
+    if (!data.finca || data.finca.length < 3 || data.finca.length > 80) {
+      const errEl = document.getElementById('edit-error');
+      if (errEl) {
+        errEl.textContent = 'El nombre de la finca es obligatorio y debe tener entre 3 y 80 caracteres.';
+        errEl.classList.remove('hidden');
+      }
+      return;
+    }
 
     try {
       const res = await fetch(`/api/productos/${editandoId}`, {

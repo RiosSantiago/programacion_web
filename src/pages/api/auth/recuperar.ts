@@ -1,46 +1,32 @@
 import type { APIRoute } from 'astro';
-import { db } from '../../../lib/db';
+import { queryGet, queryRun } from '../../../lib/db';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
-
-interface Usuario {
-  id: number;
-  email: string;
-  nombre: string;
-}
 
 export const POST: APIRoute = async ({ request }) => {
   try {
     const { email } = await request.json();
 
     if (!email) {
-      return new Response(JSON.stringify({ error: 'El correo es requerido' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(JSON.stringify({ error: 'El correo es requerido' }), { status: 400 });
     }
 
-    const usuario = db.prepare('SELECT id, email, nombre FROM usuarios WHERE email = ?').get(email) as Usuario | undefined;
+    const usuario = await queryGet<{ id: number; email: string; nombre: string }>(
+      'SELECT id, email, nombre FROM usuarios WHERE email = ?', [email]
+    );
 
     if (!usuario) {
-      return new Response(JSON.stringify({ error: 'El correo electrónico no está registrado en nuestra plataforma' }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(JSON.stringify({ error: 'El correo electrónico no está registrado en nuestra plataforma' }), { status: 404 });
     }
 
-    // Generar token seguro
     const resetToken = crypto.randomBytes(32).toString('hex');
-    const resetTokenExp = Date.now() + 60 * 60 * 1000; // 1 hora
+    const resetTokenExp = Date.now() + 60 * 60 * 1000;
 
-    db.prepare('UPDATE usuarios SET reset_token = ?, reset_token_exp = ? WHERE id = ?')
-      .run(resetToken, resetTokenExp, usuario.id);
+    await queryRun('UPDATE usuarios SET reset_token = ?, reset_token_exp = ? WHERE id = ?', [resetToken, resetTokenExp, usuario.id]);
 
-    // Construir enlace de reseteo
-    const baseUrl = new URL(request.url).origin;
+    const baseUrl  = new URL(request.url).origin;
     const resetUrl = `${baseUrl}/auth/restablecer-contrasena?token=${resetToken}`;
 
-    // Intentar enviar correo
     const smtpHost = import.meta.env.SMTP_HOST;
     const smtpPort = import.meta.env.SMTP_PORT;
     const smtpUser = import.meta.env.SMTP_USER;
@@ -81,15 +67,9 @@ export const POST: APIRoute = async ({ request }) => {
       console.log(`[PASSWORD RESET] Enlace de recuperación para ${usuario.email}: ${resetUrl}`);
     }
 
-    return new Response(JSON.stringify({ success: true, message: 'Se envió un enlace de recuperación a tu correo electrónico.' }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return new Response(JSON.stringify({ success: true, message: 'Se envió un enlace de recuperación a tu correo electrónico.' }), { status: 200 });
   } catch (error) {
     console.error('Error en recuperar contraseña:', error);
-    return new Response(JSON.stringify({ error: 'Error interno del servidor' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return new Response(JSON.stringify({ error: 'Error interno del servidor' }), { status: 500 });
   }
 };

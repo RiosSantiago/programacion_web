@@ -1,52 +1,51 @@
 import type { APIRoute } from 'astro';
-import { db } from '../../../lib/db';
+import { queryAll, queryRun } from '../../../lib/db';
+import { getImagenesMap } from '../../../lib/models/productos';
 
 export const GET: APIRoute = async ({ request }) => {
   try {
     const auth = request.headers.get('Authorization');
     if (!auth || !auth.startsWith('Bearer ')) {
-      return new Response(JSON.stringify({ error: 'No autorizado' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(JSON.stringify({ error: 'No autorizado' }), { status: 401 });
     }
 
-    const token = auth.slice(7);
     let payload: { id: number; email: string };
     try {
-      payload = JSON.parse(Buffer.from(token, 'base64').toString());
+      payload = JSON.parse(Buffer.from(auth.slice(7), 'base64').toString());
     } catch {
-      return new Response(JSON.stringify({ error: 'Token inválido' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(JSON.stringify({ error: 'Token inválido' }), { status: 401 });
     }
 
-    const rows = db.prepare('SELECT * FROM productos WHERE vendedor_id = ? ORDER BY id DESC').all(payload.id) as any[];
+    const rows = await queryAll(
+      `SELECT p.*, u.nombre AS vendedor
+       FROM productos p
+       LEFT JOIN usuarios u ON p.vendedor_id = u.id
+       WHERE p.vendedor_id = ?
+       ORDER BY p.id DESC`,
+      [payload.id]
+    );
 
-    const productos = rows.map((row) => {
-      let imagenes: string[] = [];
-      try { imagenes = JSON.parse(row.imagenes); } catch { imagenes = []; }
+    const ids = rows.map((r: any) => r.id);
+    const imgMap = await getImagenesMap(ids);
+
+    const productos = rows.map((row: any) => {
+      const imagenes = imgMap[row.id] || (typeof row.imagenes === 'string' ? JSON.parse(row.imagenes) : []);
       return {
         ...row,
         imagenes,
-        imagen: imagenes[0] || '/images/ganado.svg',
-        destacado: row.destacado === 1,
-        oferta: row.oferta === 1,
-        trazabilidad: row.trazabilidad === 1,
-        envio: row.envio === 1,
+        imagen:       imagenes[0] || '/images/ganado.svg',
+        destacado:    Boolean(row.destacado),
+        oferta:       Boolean(row.oferta),
+        trazabilidad: Boolean(row.trazabilidad),
+        envio:        Boolean(row.envio),
       };
     });
 
     return new Response(JSON.stringify({ productos }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
+      status: 200, headers: { 'Content-Type': 'application/json' },
     });
   } catch (error) {
     console.error('Error:', error);
-    return new Response(JSON.stringify({ error: String(error) }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return new Response(JSON.stringify({ error: String(error) }), { status: 500 });
   }
 };

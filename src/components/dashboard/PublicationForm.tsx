@@ -1,5 +1,35 @@
 import { useState, useRef } from 'react';
 
+const municipiosCaldas = [
+  'Aguadas',
+  'Anserma',
+  'Aranzazu',
+  'Belalcázar',
+  'Chinchiná',
+  'Filadelfia',
+  'La Dorada',
+  'La Merced',
+  'Manizales (capital)',
+  'Manzanares',
+  'Marmato',
+  'Marquetalia',
+  'Marulanda',
+  'Neira',
+  'Norcasia',
+  'Pácora',
+  'Palestina',
+  'Pensilvania',
+  'Riosucio',
+  'Risaralda',
+  'Salamina',
+  'Samaná',
+  'San José',
+  'Supía',
+  'Victoria',
+  'Villamaría',
+  'Viterbo',
+];
+
 const categoriasDemo = [
   { value: 'bovino', label: 'Bovinos' },
   { value: 'equino', label: 'Equinos' },
@@ -34,6 +64,9 @@ export default function PublicationForm() {
     sexo: '',
     ubicacion: '',
     departamento: 'Caldas',
+    finca: '',
+    vereda: '',
+    referencia_ubicacion: '',
     descripcion: '',
   });
 
@@ -90,6 +123,19 @@ export default function PublicationForm() {
     let uploadedPhotoUrls: string[] = [];
     let uploadedVideoUrl = '';
 
+    if (!formData.finca || formData.finca.trim().length < 3 || formData.finca.trim().length > 80) {
+      setError('El nombre de la finca es obligatorio y debe tener entre 3 y 80 caracteres');
+      return;
+    }
+    if (formData.vereda && formData.vereda.length > 80) {
+      setError('La vereda no debe superar los 80 caracteres');
+      return;
+    }
+    if (formData.referencia_ubicacion && formData.referencia_ubicacion.length > 200) {
+      setError('El sector o referencia no debe superar los 200 caracteres');
+      return;
+    }
+
     if (photos.length > 0 || video) {
       try {
         const uploadFormData = new FormData();
@@ -119,6 +165,9 @@ export default function PublicationForm() {
       sexo: formData.sexo,
       ubicacion: formData.ubicacion,
       departamento: formData.departamento,
+      finca: formData.finca,
+      vereda: formData.vereda,
+      referencia_ubicacion: formData.referencia_ubicacion,
       descripcion: formData.descripcion,
       imagenes: uploadedPhotoUrls.length > 0 ? uploadedPhotoUrls : [getPlaceholderImagen(formData.categoria)],
       video: uploadedVideoUrl,
@@ -198,6 +247,9 @@ export default function PublicationForm() {
       sexo: '',
       ubicacion: '',
       departamento: 'Caldas',
+      finca: '',
+      vereda: '',
+      referencia_ubicacion: '',
       descripcion: '',
     });
     setPhotos([]);
@@ -319,57 +371,73 @@ export default function PublicationForm() {
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Municipio</label>
-          <input
-            type="text"
+          <label className="block text-sm font-medium text-slate-700 mb-1">Municipio *</label>
+          <select
             required
             value={formData.ubicacion}
             onChange={(e) => setFormData({ ...formData, ubicacion: e.target.value })}
-            placeholder="Manizales, Caldas"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-emerald-500"
+          >
+            <option value="">Seleccionar Municipio</option>
+            {municipiosCaldas.map((mun) => (
+              <option key={mun} value={mun}>
+                {mun}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Departamento</label>
+          <input
+            type="text"
+            value="Caldas"
+            readOnly
+            tabIndex={-1}
+            className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-500 cursor-not-allowed select-none"
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Nombre de la finca *</label>
+          <input
+            type="text"
+            required
+            minLength={3}
+            maxLength={80}
+            value={formData.finca}
+            onChange={(e) => setFormData({ ...formData, finca: e.target.value })}
+            placeholder="Ej. Hacienda El Paraíso"
             className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Departamento</label>
-          <select
-            value={formData.departamento}
-            onChange={(e) => setFormData({ ...formData, departamento: e.target.value })}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-emerald-500"
-          >
-            <option value="Amazonas">Amazonas</option>
-            <option value="Antioquia">Antioquia</option>
-            <option value="Arauca">Arauca</option>
-            <option value="Atlantico">Atlantico</option>
-            <option value="Bolivar">Bolivar</option>
-            <option value="Boyaca">Boyaca</option>
-            <option value="Caldas">Caldas</option>
-            <option value="Caqueta">Caqueta</option>
-            <option value="Casanare">Casanare</option>
-            <option value="Cauca">Cauca</option>
-            <option value="Cesar">Cesar</option>
-            <option value="Choco">Choco</option>
-            <option value="Cordoba">Cordoba</option>
-            <option value="Cundinamarca">Cundinamarca</option>
-            <option value="Guainia">Guainia</option>
-            <option value="Guaviare">Guaviare</option>
-            <option value="Huila">Huila</option>
-            <option value="La Guajira">La Guajira</option>
-            <option value="Magdalena">Magdalena</option>
-            <option value="Meta">Meta</option>
-            <option value="Narino">Narino</option>
-            <option value="Norte de Santander">Norte de Santander</option>
-            <option value="Putumayo">Putumayo</option>
-            <option value="Quindio">Quindio</option>
-            <option value="Risaralda">Risaralda</option>
-            <option value="San Andres">San Andres</option>
-            <option value="Santander">Santander</option>
-            <option value="Sucre">Sucre</option>
-            <option value="Tolima">Tolima</option>
-            <option value="Valle del Cauca">Valle del Cauca</option>
-            <option value="Vaupes">Vaupes</option>
-            <option value="Vichada">Vichada</option>
-          </select>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Vereda / Corregimiento</label>
+          <input
+            type="text"
+            maxLength={80}
+            value={formData.vereda}
+            onChange={(e) => setFormData({ ...formData, vereda: e.target.value })}
+            placeholder="Ej. Vereda La Esperanza"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500"
+          />
         </div>
+      </div>
+
+      <div>
+        <div className="flex justify-between items-center mb-1">
+          <label className="block text-sm font-medium text-slate-700">Sector o referencia</label>
+          <span className="text-xs text-slate-400">{formData.referencia_ubicacion.length}/200</span>
+        </div>
+        <textarea
+          maxLength={200}
+          rows={2}
+          value={formData.referencia_ubicacion}
+          onChange={(e) => setFormData({ ...formData, referencia_ubicacion: e.target.value })}
+          placeholder="Ej. A 2 km del parque principal, vía al corregimiento de San Jose."
+          className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 resize-none"
+        />
       </div>
 
       <div>

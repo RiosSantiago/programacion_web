@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { db, inicializar } from '../../../lib/db';
+import { queryGet, queryRun } from '../../../lib/db';
 import crypto from 'crypto';
 
 const ADMIN_SECRET = 'agroup-root-2026';
@@ -13,54 +13,36 @@ export const POST: APIRoute = async ({ request }) => {
     const { email, password, nombre, secret } = await request.json();
 
     if (secret !== ADMIN_SECRET) {
-      return new Response(JSON.stringify({ error: 'Clave secreta inválida' }), {
-        status: 403,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(JSON.stringify({ error: 'Clave secreta inválida' }), { status: 403 });
     }
 
     if (!email || !password || !nombre) {
-      return new Response(JSON.stringify({ error: 'Email, contraseña y nombre son requeridos' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(JSON.stringify({ error: 'Email, contraseña y nombre son requeridos' }), { status: 400 });
     }
 
     if (password.length < 6) {
-      return new Response(JSON.stringify({ error: 'La contraseña debe tener al menos 6 caracteres' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(JSON.stringify({ error: 'La contraseña debe tener al menos 6 caracteres' }), { status: 400 });
     }
 
-    inicializar();
-
-    const existing = db.prepare('SELECT id FROM usuarios WHERE email = ?').get(email);
+    const existing = await queryGet('SELECT id FROM usuarios WHERE email = ?', [email]);
     if (existing) {
-      return new Response(JSON.stringify({ error: 'El email ya está registrado' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(JSON.stringify({ error: 'El email ya está registrado' }), { status: 400 });
     }
 
     const hash = hashPassword(password);
-    const result = db.prepare(
-      'INSERT INTO usuarios (nombre, email, celular, password_hash, verificado, rol) VALUES (?, ?, ?, ?, 1, ?)'
-    ).run(nombre, email, 'root', hash, 'root');
+    const { lastInsertRowid: newId } = await queryRun(
+      'INSERT INTO usuarios (nombre, email, celular, password_hash, verificado, rol) VALUES (?, ?, ?, ?, true, ?)',
+      [nombre, email, 'root', hash, 'root']
+    );
 
     return new Response(JSON.stringify({
       success: true,
       message: 'Usuario root creado exitosamente',
-      id: result.lastInsertRowid,
-    }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+      id: newId,
+    }), { status: 200 });
+
   } catch (error) {
     console.error('Error:', error);
-    return new Response(JSON.stringify({ error: String(error) }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return new Response(JSON.stringify({ error: String(error) }), { status: 500 });
   }
 };

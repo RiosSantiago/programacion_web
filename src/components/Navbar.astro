@@ -335,6 +335,8 @@ const { variant = 'dark' } = Astro.props;
   const logoutBtn = document.getElementById('logout-btn');
 
   function abrirMobileMenu() {
+    (window as any).cerrarCarrito?.();
+    (window as any).cerrarFavoritos?.();
     mobileMenu?.classList.remove('translate-x-full');
     menuOverlay?.classList.remove('hidden');
     document.body.style.overflow = 'hidden';

@@ -5,7 +5,8 @@ import HeroMarketplace from '../components/marketplace/HeroMarketplace.astro';
 import '../lib/db';
 import { getProductosDestacados } from '../lib/models/productos.js';
 
-const productos = getProductosDestacados(6).filter(p => 
+const productosDest = await getProductosDestacados(6);
+const productos = productosDest.filter(p => 
   ['bovino', 'equino', 'porcino', 'ovino', 'avicola'].includes(p.categoria)
 );
 

@@ -21,7 +21,7 @@ const fechaPublicacion = searchParams.get('fecha_publicacion') || '';
 const destacados = searchParams.get('destacados') || '';
 const sortBy = searchParams.get('sort') || 'relevancia';
 
-const filtrados = filtrarProductos({
+const filtrados = await filtrarProductos({
   categoria,
   municipio,
   departamento,
@@ -37,7 +37,7 @@ const filtrados = filtrarProductos({
   sortBy: sortBy || undefined,
 });
 
-const total = getTotalProductos();
+const total = await getTotalProductos();
 
 // Generar datos de reputación aleatorios para demo
 const getReputacion = (vendedor: string) => {
