@@ -12,7 +12,7 @@ export const GET: APIRoute = async ({ url }) => {
              p.ubicacion, p.departamento, p.precio, p.precio_anterior AS "precioAnterior",
              p.stock,
              u.nombre AS vendedor,
-             p.vendedor_rating AS "vendedorRating", p.imagenes,
+             p.vendedor_rating AS "vendedorRating",
              p.estado, p.salud, p.envio, p.destacado, p.oferta, p.trazabilidad,
              p.descripcion, p.vendedor_id,
              p.created_at AS "createdAt"
