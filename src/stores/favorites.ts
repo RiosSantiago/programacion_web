@@ -46,8 +46,7 @@ export async function fetchFavorites() {
 
 export async function toggleFavorite(producto: { id: number; nombre: string; precio: number; imagen: string }): Promise<boolean> {
   if (!$isAuthenticated.get()) {
-    const { addToast } = await import('./toast');
-    addToast('Inicia sesión para guardar productos en favoritos', 'error', { label: 'Iniciar sesión', href: '/auth/login' });
+    (window as any).__addToast?.('Inicia sesión para guardar productos en favoritos', 'error', { label: 'Iniciar sesión', href: '/auth/login' });
     return false;
   }
   const token = getToken();
@@ -66,8 +65,10 @@ export async function toggleFavorite(producto: { id: number; nombre: string; pre
         $favorites.set(rest);
         return true;
       }
+      (window as any).__addToast?.('Error al quitar de favoritos', 'error');
     } catch (e) {
       console.error('Error removing favorite:', e);
+      (window as any).__addToast?.('Error de red al quitar de favoritos', 'error');
     }
   } else {
     try {
@@ -80,8 +81,10 @@ export async function toggleFavorite(producto: { id: number; nombre: string; pre
         await fetchFavorites();
         return true;
       }
+      (window as any).__addToast?.('Error al agregar a favoritos', 'error');
     } catch (e) {
       console.error('Error adding favorite:', e);
+      (window as any).__addToast?.('Error de red al agregar a favoritos', 'error');
     }
   }
   return false;

@@ -323,7 +323,6 @@ const { variant = 'dark' } = Astro.props;
 
 <script>
   import { $user, $isAuthenticated, logout } from '../stores/auth';
-  import { $cart } from '../stores/cart';
 
   const menuBtn = document.getElementById('mobile-menu-btn');
   const mobileMenu = document.getElementById('mobile-menu');
@@ -445,18 +444,6 @@ const { variant = 'dark' } = Astro.props;
 
   $user.subscribe(updateUserUI);
   updateUserUI();
-
-  function updateCartCount() {
-    const badge = document.getElementById('nav-cart-count');
-    if (!badge) return;
-    const items = $cart.get();
-    const count = items.reduce((sum, item) => sum + item.cantidad, 0);
-    badge.textContent = String(count);
-    badge.classList.toggle('hidden', count === 0);
-  }
-
-  $cart.subscribe(updateCartCount);
-  updateCartCount();
 
   const nav = document.getElementById('main-nav');
   if (nav?.dataset.variant === 'light' || nav?.dataset.variant === 'market' || nav?.dataset.variant === 'perfil') {

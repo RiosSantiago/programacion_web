@@ -61,8 +61,7 @@ export async function fetchCart() {
 
 export async function addToCart(item: { id: number; nombre: string; precio: number; cantidad?: number; imagen: string; vendedor: string; vendedor_id?: number }): Promise<boolean> {
   if (!$isAuthenticated.get()) {
-    const { addToast } = await import('./toast');
-    addToast('Inicia sesión para agregar productos al carrito', 'error', { label: 'Iniciar sesión', href: '/auth/login' });
+    (window as any).__addToast?.('Inicia sesión para agregar productos al carrito', 'error', { label: 'Iniciar sesión', href: '/auth/login' });
     return false;
   }
   const token = getToken();
@@ -77,8 +76,11 @@ export async function addToCart(item: { id: number; nombre: string; precio: numb
       await fetchCart();
       return true;
     }
+    const text = await res.text().catch(() => '');
+    (window as any).__addToast?.(`Error al agregar: ${res.status} ${text.slice(0, 100)}`, 'error');
   } catch (e) {
     console.error('Error adding to cart:', e);
+    (window as any).__addToast?.('Error de red al agregar al carrito', 'error');
   }
   return false;
 }
