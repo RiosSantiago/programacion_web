@@ -1,83 +1,96 @@
 import { map } from 'nanostores';
+import { $isAuthenticated } from './auth';
 
-interface Favorite {
+export interface Favorite {
   id: number;
   nombre: string;
   precio: number;
-  precioOriginal?: number;
   imagen: string;
-  addedAt: string;
-}
-
-interface PrecioAlert {
-  productoId: number;
-  precioAnterior: number;
-  precioActual: number;
-  productoNombre: string;
-  detectedAt: string;
+  fecha_agregado: string;
 }
 
 export const $favorites = map<Record<number, Favorite>>({});
-export const $precioAlerts = map<Record<number, PrecioAlert>>({});
 
-export function toggleFavorite(producto: Favorite) {
-  const current = $favorites.get();
-  if (current[producto.id]) {
-    const { [producto.id]: _, ...rest } = current;
-    $favorites.set(rest);
-  } else {
-    $favorites.setKey(producto.id, { ...producto, precioOriginal: producto.precio, addedAt: new Date().toISOString() });
+function getToken(): string | null {
+  if (typeof localStorage !== 'undefined') {
+    return localStorage.getItem('agroup_token');
   }
+  return null;
+}
+
+export async function fetchFavorites() {
+  const token = getToken();
+  if (!token) return;
+  try {
+    const res = await fetch('/api/favoritos', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (res.ok) {
+      const data: any[] = await res.json();
+      const map: Record<number, Favorite> = {};
+      for (const item of data) {
+        map[item.producto_id] = {
+          id: item.producto_id,
+          nombre: item.nombre,
+          precio: parseFloat(String(item.precio)),
+          imagen: item.imagen || '/images/ganado.svg',
+          fecha_agregado: item.fecha_agregado,
+        };
+      }
+      $favorites.set(map);
+    }
+  } catch (e) {
+    console.error('Error fetching favorites:', e);
+  }
+}
+
+export async function toggleFavorite(producto: { id: number; nombre: string; precio: number; imagen: string }): Promise<boolean> {
+  if (!$isAuthenticated.get()) {
+    const { addToast } = await import('./toast');
+    addToast('Inicia sesión para guardar productos en favoritos', 'error', { label: 'Iniciar sesión', href: '/auth/login' });
+    return false;
+  }
+  const token = getToken();
+  if (!token) return false;
+  const pid = producto.id;
+  const current = $favorites.get();
+
+  if (current[pid]) {
+    try {
+      const res = await fetch(`/api/favoritos/${pid}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const { [pid]: _, ...rest } = current;
+        $favorites.set(rest);
+        return true;
+      }
+    } catch (e) {
+      console.error('Error removing favorite:', e);
+    }
+  } else {
+    try {
+      const res = await fetch('/api/favoritos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ producto_id: pid }),
+      });
+      if (res.ok) {
+        await fetchFavorites();
+        return true;
+      }
+    } catch (e) {
+      console.error('Error adding favorite:', e);
+    }
+  }
+  return false;
 }
 
 export function isFavorite(id: number): boolean {
   return !!$favorites.get()[id];
 }
 
-export function checkPriceChanges() {
-  const favorites = $favorites.get();
-  const productos = JSON.parse(localStorage.getItem('agroup_productos') || '[]');
-
-  Object.values(favorites).forEach((fav) => {
-    const current = productos.find((p: any) => p.id === fav.id || p.id === Number(fav.id));
-    if (current && current.precio !== fav.precioOriginal) {
-      $precioAlerts.setKey(fav.id, {
-        productoId: fav.id,
-        precioAnterior: fav.precioOriginal || fav.precio,
-        precioActual: current.precio,
-        productoNombre: fav.nombre,
-        detectedAt: new Date().toISOString(),
-      });
-    }
-  });
-}
-
-// Load from localStorage
-if (typeof localStorage !== 'undefined') {
-  const saved = localStorage.getItem('agroup_favorites');
-  if (saved) {
-    try {
-      $favorites.set(JSON.parse(saved));
-    } catch (e) {
-      localStorage.removeItem('agroup_favorites');
-    }
-  }
-
-  const savedAlerts = localStorage.getItem('agroup_precio_alerts');
-  if (savedAlerts) {
-    try {
-      $precioAlerts.set(JSON.parse(savedAlerts));
-    } catch (e) {
-      localStorage.removeItem('agroup_precio_alerts');
-    }
-  }
-
-  // Save on change
-  $favorites.subscribe((value) => {
-    localStorage.setItem('agroup_favorites', JSON.stringify(value));
-  });
-
-  $precioAlerts.subscribe((value) => {
-    localStorage.setItem('agroup_precio_alerts', JSON.stringify(value));
-  });
+export function clearFavorites() {
+  $favorites.set({});
 }

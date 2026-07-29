@@ -211,18 +211,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     }
   });
 
-  // Migrate old localStorage key if present
-  if (typeof localStorage !== 'undefined') {
-    const oldCart = localStorage.getItem('agroup-cart');
-    if (oldCart) {
-      const currentCart = localStorage.getItem('agroup_cart');
-      if (!currentCart || JSON.parse(currentCart).length === 0) {
-        localStorage.setItem('agroup_cart', oldCart);
-      }
-      localStorage.removeItem('agroup-cart');
-    }
-  }
-
   function checkAuth() {
     const isAuth = $isAuthenticated.get();
     const user = $user.get();

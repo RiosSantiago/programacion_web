@@ -87,25 +87,6 @@ const sortLabel = sortLabelsMap[sortBy] || 'Más relevantes';
 ---
 
 <BaseLayout navVariant="market">
-  <!-- Panel de filtros (no sticky) -->
-  <div class="bg-[#D5CFC6] border-b border-[#BDB5A8] shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <FilterPanel
-        client:load
-        initialCategoria={categoria}
-        initialMunicipio={municipio}
-        initialPrecioMin={precioMin || ''}
-        initialPrecioMax={precioMax || ''}
-        initialRaza={raza}
-        initialSexo={sexo}
-        initialTipoPrecio={tipoPrecio}
-        initialTrazabilidad={trazabilidad}
-        initialFechaPublicacion={fechaPublicacion}
-        initialDestacados={destacados}
-      />
-    </div>
-  </div>
-
   <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Header con título y controles -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
@@ -122,6 +103,20 @@ const sortLabel = sortLabelsMap[sortBy] || 'Más relevantes';
         </p>
       </div>
       <div class="flex items-center gap-3">
+        <button
+          type="button"
+          id="btn-toggle-filters"
+          onclick="toggleFiltersPanel(event)"
+          class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-[#E8DCCB] rounded-xl text-sm font-semibold text-stone-700 hover:text-campo-700 hover:border-campo-400 focus:outline-none transition-all duration-200 cursor-pointer shadow-sm"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+          </svg>
+          <span>Filtros</span>
+          <svg id="filters-arrow" class="w-4 h-4 text-campo-600 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
         <div class="relative inline-block" id="sort-dropdown-container">
           <button
             type="button"
@@ -145,6 +140,23 @@ const sortLabel = sortLabelsMap[sortBy] || 'Más relevantes';
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Panel de filtros colapsable -->
+    <div id="filters-panel" class="hidden mb-8 bg-[#D5CFC6] border border-[#BDB5A8] rounded-2xl shadow-sm overflow-hidden">
+      <FilterPanel
+        client:load
+        initialCategoria={categoria}
+        initialMunicipio={municipio}
+        initialPrecioMin={precioMin || ''}
+        initialPrecioMax={precioMax || ''}
+        initialRaza={raza}
+        initialSexo={sexo}
+        initialTipoPrecio={tipoPrecio}
+        initialTrazabilidad={trazabilidad}
+        initialFechaPublicacion={fechaPublicacion}
+        initialDestacados={destacados}
+      />
     </div>
 
     <!-- Grid de productos -->
@@ -258,9 +270,6 @@ const sortLabel = sortLabelsMap[sortBy] || 'Más relevantes';
     </div>
   </section>
 
-  <!-- Mobile Filter Drawer -->
-  <div id="mobile-filter-overlay" class="fixed inset-0 bg-black/50 z-40 hidden backdrop-blur-sm lg:hidden" onclick="cerrarMobileFilter()"></div>
-
   <!-- Modal para productos locales (solo localStorage) -->
   <div id="local-product-modal" class="hidden fixed inset-0 z-50">
     <div class="absolute inset-0 bg-black/50" onclick="cerrarLocalModal()"></div>
@@ -274,19 +283,6 @@ const sortLabel = sortLabelsMap[sortBy] || 'Más relevantes';
         </button>
       </div>
       <div id="local-modal-content" class="space-y-4"></div>
-    </div>
-  </div>
-  <div id="mobile-filter-drawer" class="fixed top-0 left-0 h-full w-80 bg-white shadow-2xl z-50 transform -translate-x-full transition-transform duration-300 overflow-y-auto lg:hidden">
-    <div class="flex items-center justify-between p-5 border-b border-[#BDB5A8] bg-[#D5CFC6]">
-      <h3 class="text-lg font-display font-bold text-slate-800">Filtros</h3>
-      <button onclick="cerrarMobileFilter()" class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 hover:bg-slate-200 hover:text-slate-800 transition-colors">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-    </div>
-    <div class="p-5">
-      <FilterPanel client:load initialCategoria={categoria} initialMunicipio={municipio} initialPrecioMin={precioMin || ''} initialPrecioMax={precioMax || ''} initialRaza={raza} initialSexo={sexo} initialTipoPrecio={tipoPrecio} initialTrazabilidad={trazabilidad} initialFechaPublicacion={fechaPublicacion} initialDestacados={destacados} />
     </div>
   </div>
 </BaseLayout>
@@ -312,6 +308,16 @@ const sortLabel = sortLabelsMap[sortBy] || 'Más relevantes';
     window.location.href = '/marketplace?' + params.toString();
   }
 
+  function toggleFiltersPanel(e) {
+    e.stopPropagation();
+    var panel = document.getElementById('filters-panel');
+    var arrow = document.getElementById('filters-arrow');
+    if (!panel) return;
+    var isOpen = !panel.classList.contains('hidden');
+    panel.classList.toggle('hidden');
+    if (arrow) arrow.style.transform = isOpen ? '' : 'rotate(180deg)';
+  }
+
   document.addEventListener('click', function(e) {
     var container = document.getElementById('sort-dropdown-container');
     if (container && !container.contains(e.target)) {
@@ -319,6 +325,13 @@ const sortLabel = sortLabelsMap[sortBy] || 'Más relevantes';
       var arrow = document.getElementById('sort-dropdown-arrow');
       if (menu) menu.style.display = 'none';
       if (arrow) arrow.style.transform = '';
+    }
+    var btn = document.getElementById('btn-toggle-filters');
+    var panel = document.getElementById('filters-panel');
+    if (panel && !panel.classList.contains('hidden') && btn && !btn.contains(e.target) && !panel.contains(e.target)) {
+      panel.classList.add('hidden');
+      var fArrow = document.getElementById('filters-arrow');
+      if (fArrow) fArrow.style.transform = '';
     }
   });
 </script>
@@ -373,12 +386,6 @@ const sortLabel = sortLabelsMap[sortBy] || 'Más relevantes';
     document.body.style.overflow = 'hidden';
   }
 
-  (window as any).cerrarMobileFilter = function() {
-    document.getElementById('mobile-filter-overlay')?.classList.add('hidden');
-    document.getElementById('mobile-filter-drawer')?.classList.add('-translate-x-full');
-    document.body.style.overflow = '';
-  };
-
   // Marcar opción activa del sort según URL
   const sortLabels: Record<string, string> = {
     'relevancia': 'Más relevantes',
@@ -389,12 +396,6 @@ const sortLabel = sortLabelsMap[sortBy] || 'Más relevantes';
   const currentSort = new URLSearchParams(window.location.search).get('sort') || 'relevancia';
   const labelEl = document.getElementById('sort-current-label');
   if (labelEl) labelEl.textContent = sortLabels[currentSort] || 'Más relevantes';
-
-  document.getElementById('mobile-filter-btn')?.addEventListener('click', () => {
-    document.getElementById('mobile-filter-overlay')?.classList.remove('hidden');
-    document.getElementById('mobile-filter-drawer')?.classList.remove('-translate-x-full');
-    document.body.style.overflow = 'hidden';
-  });
 
   // Cargar productos de localStorage y agregarlos al grid
   (async function() {

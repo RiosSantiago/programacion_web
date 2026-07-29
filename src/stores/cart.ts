@@ -1,4 +1,5 @@
 import { atom } from 'nanostores';
+import { $isAuthenticated } from './auth';
 
 export interface CartItem {
   id: number;
@@ -13,50 +14,119 @@ export interface CartItem {
 export const $cart = atom<CartItem[]>([]);
 export const $cartOpen = atom(false);
 
-export function addToCart(item: CartItem) {
-  const current = $cart.get();
-  const existing = current.find((i) => i.id === item.id);
-  
-  if (existing) {
-    $cart.set(
-      current.map((i) =>
-        i.id === item.id ? { ...i, cantidad: i.cantidad + item.cantidad } : i
-      )
-    );
-  } else {
-    $cart.set([...current, item]);
-  }
-  
+function getToken(): string | null {
   if (typeof localStorage !== 'undefined') {
-    localStorage.setItem('agroup_cart', JSON.stringify($cart.get()));
+    return localStorage.getItem('agroup_token');
+  }
+  return null;
+}
+
+interface ApiItem {
+  producto_id: number;
+  nombre: string;
+  precio: string | number;
+  cantidad: number;
+  imagen: string | null;
+  vendedor: string;
+  vendedor_id: number;
+}
+
+function mapApiItem(item: ApiItem): CartItem {
+  return {
+    id: item.producto_id,
+    nombre: item.nombre,
+    precio: parseFloat(String(item.precio)),
+    cantidad: item.cantidad,
+    imagen: item.imagen || '/images/ganado.svg',
+    vendedor: item.vendedor || '',
+    vendedor_id: item.vendedor_id,
+  };
+}
+
+export async function fetchCart() {
+  const token = getToken();
+  if (!token) return;
+  try {
+    const res = await fetch('/api/carrito', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (res.ok) {
+      const data: ApiItem[] = await res.json();
+      $cart.set(data.map(mapApiItem));
+    }
+  } catch (e) {
+    console.error('Error fetching cart:', e);
   }
 }
 
-export function removeFromCart(id: number) {
-  $cart.set($cart.get().filter((i) => i.id !== id));
-  if (typeof localStorage !== 'undefined') {
-    localStorage.setItem('agroup_cart', JSON.stringify($cart.get()));
+export async function addToCart(item: { id: number; nombre: string; precio: number; cantidad?: number; imagen: string; vendedor: string; vendedor_id?: number }): Promise<boolean> {
+  if (!$isAuthenticated.get()) {
+    const { addToast } = await import('./toast');
+    addToast('Inicia sesión para agregar productos al carrito', 'error', { label: 'Iniciar sesión', href: '/auth/login' });
+    return false;
   }
+  const token = getToken();
+  if (!token) return false;
+  try {
+    const res = await fetch('/api/carrito', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ producto_id: item.id, cantidad: item.cantidad ?? 1 }),
+    });
+    if (res.ok) {
+      await fetchCart();
+      return true;
+    }
+  } catch (e) {
+    console.error('Error adding to cart:', e);
+  }
+  return false;
 }
 
-export function updateQuantity(id: number, cantidad: number) {
-  if (cantidad <= 0) {
-    removeFromCart(id);
-    return;
+export async function removeFromCart(id: number): Promise<boolean> {
+  if (!$isAuthenticated.get()) return false;
+  const token = getToken();
+  if (!token) return false;
+  try {
+    const res = await fetch(`/api/carrito/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (res.ok) {
+      await fetchCart();
+      return true;
+    }
+  } catch (e) {
+    console.error('Error removing from cart:', e);
   }
-  $cart.set(
-    $cart.get().map((i) => (i.id === id ? { ...i, cantidad } : i))
-  );
-  if (typeof localStorage !== 'undefined') {
-    localStorage.setItem('agroup_cart', JSON.stringify($cart.get()));
+  return false;
+}
+
+export async function updateQuantity(id: number, cantidad: number): Promise<boolean> {
+  if (!$isAuthenticated.get()) return false;
+  const token = getToken();
+  if (!token) return false;
+  try {
+    if (cantidad <= 0) {
+      return await removeFromCart(id);
+    }
+    const res = await fetch(`/api/carrito/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ cantidad }),
+    });
+    if (res.ok) {
+      await fetchCart();
+      return true;
+    }
+  } catch (e) {
+    console.error('Error updating quantity:', e);
   }
+  return false;
 }
 
 export function clearCart() {
   $cart.set([]);
-  if (typeof localStorage !== 'undefined') {
-    localStorage.removeItem('agroup_cart');
-  }
 }
 
 export function toggleCart() {
@@ -77,25 +147,4 @@ export function openCart() {
 
 export function closeCart() {
   $cartOpen.set(false);
-}
-
-if (typeof localStorage !== 'undefined') {
-  // Migrate from old key if present
-  const oldCart = localStorage.getItem('agroup-cart');
-  if (oldCart) {
-    const currentCart = localStorage.getItem('agroup_cart');
-    if (!currentCart || JSON.parse(currentCart).length === 0) {
-      localStorage.setItem('agroup_cart', oldCart);
-    }
-    localStorage.removeItem('agroup-cart');
-  }
-
-  const saved = localStorage.getItem('agroup_cart');
-  if (saved) {
-    try {
-      $cart.set(JSON.parse(saved));
-    } catch (e) {
-      localStorage.removeItem('agroup_cart');
-    }
-  }
 }

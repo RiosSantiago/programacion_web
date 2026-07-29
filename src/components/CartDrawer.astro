@@ -81,16 +81,15 @@
 </div>
 
 <script>
-  interface CartItem {
-    id: number;
-    nombre: string;
-    precio: number;
-    imagen: string;
-    vendedor: string;
-    cantidad: number;
-  }
-
-  let carrito: CartItem[] = [];
+  import {
+    $cart,
+    $cartOpen,
+    addToCart as addToCartStore,
+    removeFromCart,
+    updateQuantity,
+    getCartTotal,
+    getCartCount,
+  } from '../stores/cart';
 
   function formatearCOP(valor: number): string {
     return new Intl.NumberFormat('es-CO', {
@@ -102,13 +101,11 @@
   }
 
   function abrirCarrito() {
-    // Cerrar mobile menu si está abierto
     const mobileMenu = document.getElementById('mobile-menu');
     if (mobileMenu && !mobileMenu.classList.contains('translate-x-full')) {
       document.getElementById('mobile-menu-overlay')?.classList.add('hidden');
       mobileMenu.classList.add('translate-x-full');
     }
-    // Cerrar favoritos si está abierto
     const favDrawer = document.getElementById('favoritos-drawer');
     if (favDrawer && !favDrawer.classList.contains('translate-x-full')) {
       document.getElementById('favoritos-overlay')?.classList.add('hidden');
@@ -130,75 +127,73 @@
     return !!drawer && !drawer.classList.contains('translate-x-full');
   }
 
-  function agregarAlCarrito(item: CartItem) {
-    const existente = carrito.find(c => c.id === item.id);
-    if (existente) {
-      existente.cantidad += item.cantidad || 1;
-    } else {
-      carrito.push({ ...item, cantidad: item.cantidad || 1 });
-    }
-    actualizarCarrito();
-    saveCart();
-    abrirCarrito();
+  async function agregarAlCarrito(item: { id: number; nombre: string; precio: number; imagen: string; vendedor: string; cantidad?: number }) {
+    const ok = await addToCartStore({
+      id: item.id,
+      nombre: item.nombre,
+      precio: item.precio,
+      cantidad: item.cantidad || 1,
+      imagen: item.imagen || '/images/ganado.svg',
+      vendedor: item.vendedor || '',
+    });
+    if (ok) abrirCarrito();
   }
 
-  function eliminarDelCarrito(id: number) {
-    carrito = carrito.filter(c => c.id !== id);
-    actualizarCarrito();
-    saveCart();
+  async function eliminarDelCarrito(id: number) {
+    await removeFromCart(id);
   }
 
-  function cambiarCantidad(id: number, delta: number) {
-    const item = carrito.find(c => c.id === id);
+  async function cambiarCantidad(id: number, delta: number) {
+    const items = $cart.get();
+    const item = items.find((i) => i.id === id);
     if (item) {
-      item.cantidad += delta;
-      if (item.cantidad <= 0) {
-        eliminarDelCarrito(id);
-        return;
-      }
+      const nueva = item.cantidad + delta;
+      await updateQuantity(id, nueva);
     }
-    actualizarCarrito();
-    saveCart();
   }
 
-  function vaciarCarrito() {
-    carrito = [];
-    actualizarCarrito();
-    saveCart();
+  async function vaciarCarrito() {
+    const items = $cart.get();
+    for (const item of items) {
+      await removeFromCart(item.id);
+    }
   }
 
-  function actualizarCarrito() {
+  function actualizarUI() {
+    const items = $cart.get();
     const container = document.getElementById('cart-items');
-    const emptyState = document.getElementById('cart-empty');
     const footer = document.getElementById('cart-footer');
     const countBadge = document.getElementById('cart-count');
 
-    const totalItems = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+    const totalItems = getCartCount();
     if (countBadge) countBadge.textContent = `${totalItems} item${totalItems !== 1 ? 's' : ''}`;
 
-    if (carrito.length === 0) {
-      container.innerHTML = `
-        <div id="cart-empty" class="flex flex-col items-center justify-center h-full text-center py-12">
-          <div class="w-24 h-24 bg-[#FFFDF7] rounded-2xl flex items-center justify-center mb-6 border border-[#E8E0D8]">
-            <svg class="w-12 h-12 text-[#C4B09C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
+    if (items.length === 0) {
+      if (container) {
+        container.innerHTML = `
+          <div id="cart-empty" class="flex flex-col items-center justify-center h-full text-center py-12">
+            <div class="w-24 h-24 bg-[#FFFDF7] rounded-2xl flex items-center justify-center mb-6 border border-[#E8E0D8]">
+              <svg class="w-12 h-12 text-[#C4B09C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            </div>
+            <h4 class="text-lg font-display font-bold text-[#2D2D2D] mb-2">Tu carrito está vacío</h4>
+            <p class="text-sm text-[#6B6B6B] mb-6">Explora nuestro marketplace y encuentra los mejores productos del campo colombiano</p>
+            <a href="/marketplace" onclick="cerrarCarrito()" class="btn-primary">
+              Explorar Marketplace
+            </a>
           </div>
-          <h4 class="text-lg font-display font-bold text-[#2D2D2D] mb-2">Tu carrito está vacío</h4>
-          <p class="text-sm text-[#6B6B6B] mb-6">Explora nuestro marketplace y encuentra los mejores productos del campo colombiano</p>
-          <a href="/marketplace" onclick="cerrarCarrito()" class="btn-primary">
-            Explorar Marketplace
-          </a>
-        </div>
-      `;
+        `;
+      }
       footer?.classList.add('hidden');
       return;
     }
 
     footer?.classList.remove('hidden');
 
+    if (!container) return;
     container.innerHTML = '';
-    carrito.forEach(item => {
+    items.forEach((item: { id: number; nombre: string; precio: number; cantidad: number; imagen: string; vendedor: string }) => {
       const itemEl = document.createElement('div');
       itemEl.className = 'flex gap-4 p-4 bg-white rounded-2xl border border-[#E8E0D8] shadow-sm hover:shadow-md transition-shadow';
       itemEl.innerHTML = `
@@ -220,8 +215,8 @@
       container.appendChild(itemEl);
     });
 
-    const subtotal = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
-    const transporte = carrito.length > 0 ? 150000 : 0;
+    const subtotal = getCartTotal();
+    const transporte = items.length > 0 ? 150000 : 0;
     const total = subtotal + transporte;
 
     const subtotalEl = document.getElementById('cart-subtotal');
@@ -233,24 +228,19 @@
     if (totalEl) totalEl.textContent = formatearCOP(total);
   }
 
-  function saveCart() {
-    try {
-      localStorage.setItem('agroup_cart', JSON.stringify(carrito));
-      document.dispatchEvent(new CustomEvent('cart-updated'));
-    } catch (e) {}
-  }
+  // Open/close reactivity
+  $cartOpen.subscribe((open: boolean) => {
+    if (open) {
+      abrirCarrito();
+    } else {
+      cerrarCarrito();
+    }
+  });
 
-  function loadCart() {
-    try {
-      const saved = localStorage.getItem('agroup_cart');
-      if (saved) {
-        carrito = JSON.parse(saved);
-        actualizarCarrito();
-      }
-    } catch (e) {}
-  }
+  // Cart content reactivity
+  $cart.subscribe(() => actualizarUI());
 
-  // Expose functions globally
+  // Expose global functions
   (window as any).agregarAlCarrito = agregarAlCarrito;
   (window as any).eliminarDelCarrito = eliminarDelCarrito;
   (window as any).cambiarCantidad = cambiarCantidad;
@@ -258,8 +248,8 @@
   (window as any).abrirCarrito = abrirCarrito;
   (window as any).cerrarCarrito = cerrarCarrito;
 
-  // Load cart on page load
-  loadCart();
+  // Initial render
+  actualizarUI();
 
   // Listen for add to cart buttons
   document.addEventListener('click', (e) => {

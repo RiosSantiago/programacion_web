@@ -31,6 +31,7 @@ export function login(user: User) {
   if (typeof localStorage !== 'undefined') {
     localStorage.setItem('agroup_user', JSON.stringify(user));
   }
+  hydrateStores();
 }
 
 export function logout() {
@@ -40,6 +41,7 @@ export function logout() {
     localStorage.removeItem('agroup_user');
     localStorage.removeItem('agroup_token');
   }
+  resetStores();
 }
 
 export function updateUser(user: User) {
@@ -63,13 +65,26 @@ export function getToken(): string | null {
   return null;
 }
 
-// Check saved session
+async function hydrateStores() {
+  const { fetchCart } = await import('./cart');
+  const { fetchFavorites } = await import('./favorites');
+  await Promise.all([fetchCart(), fetchFavorites()]);
+}
+
+function resetStores() {
+  import('./cart').then(m => m.clearCart());
+  import('./favorites').then(m => m.clearFavorites());
+}
+
 if (typeof localStorage !== 'undefined') {
   const saved = localStorage.getItem('agroup_user');
   const token = localStorage.getItem('agroup_token');
   if (saved && token) {
     try {
-      login(JSON.parse(saved));
+      const user: User = JSON.parse(saved);
+      $user.set(user);
+      $isAuthenticated.set(true);
+      hydrateStores();
     } catch (e) {
       localStorage.removeItem('agroup_user');
       localStorage.removeItem('agroup_token');
