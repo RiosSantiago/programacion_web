@@ -32,6 +32,14 @@ export const PUT: APIRoute = async ({ request }) => {
     const nuevoToken = generarToken(tokenPayload.id, usuarioActual.email);
     const body = await request.json();
 
+    // Sync avatar y logo: siempre deben ser la misma imagen
+    if ('avatar' in body) {
+      body.logo = body.avatar;
+    }
+    if ('logo' in body) {
+      body.avatar = body.logo;
+    }
+
     const nombre        = body.nombre        ?? usuarioActual.nombre;
     const email         = body.email         ?? usuarioActual.email;
     const celular       = body.celular        ?? usuarioActual.celular;

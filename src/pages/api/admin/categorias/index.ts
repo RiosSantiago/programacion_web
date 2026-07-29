@@ -1,9 +1,10 @@
 import type { APIRoute } from 'astro';
 import { queryAll, queryGet, queryRun } from '../../../../lib/db';
+import { generarSlug, getCategorias } from '../../../../lib/models/categorias';
 
 export const GET: APIRoute = async () => {
   try {
-    const categorias = await queryAll('SELECT * FROM categorias ORDER BY id ASC');
+    const categorias = await getCategorias();
     return new Response(JSON.stringify({ categorias }), {
       status: 200, headers: { 'Content-Type': 'application/json' },
     });
@@ -34,9 +35,10 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ error: 'nombre, icono y color son requeridos' }), { status: 400 });
     }
 
+    const slug = data.slug || generarSlug(data.nombre);
     const { lastInsertRowid: newId } = await queryRun(
-      'INSERT INTO categorias (nombre, icono, color, cantidad) VALUES (?, ?, ?, ?)',
-      [data.nombre, data.icono, data.color, data.cantidad || 0]
+      'INSERT INTO categorias (nombre, slug, icono, color, cantidad) VALUES (?, ?, ?, ?, ?)',
+      [data.nombre, slug, data.icono, data.color, data.cantidad || 0]
     );
 
     return new Response(JSON.stringify({ success: true, id: newId }), {

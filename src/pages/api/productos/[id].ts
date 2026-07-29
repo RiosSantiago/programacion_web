@@ -73,7 +73,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
     const allowedFields = [
       'nombre', 'categoria', 'raza', 'peso', 'ubicacion', 'departamento', 'precio', 'stock',
       'salud', 'estado', 'tipo_precio', 'sexo', 'fecha_nacimiento', 'descripcion', 'video',
-      'finca', 'vereda', 'referencia_ubicacion',
+      'finca', 'vereda', 'referencia_ubicacion', 'certificaciones',
     ];
 
     if (data.nombre_finca !== undefined && data.finca === undefined)           data.finca = data.nombre_finca;
@@ -82,7 +82,10 @@ export const PUT: APIRoute = async ({ params, request }) => {
     for (const field of allowedFields) {
       if (data[field] !== undefined) {
         fields.push(`${field} = ?`);
-        paramsArr.push(field === 'descripcion' ? String(data[field]).slice(0, 500) : data[field]);
+        let val = data[field];
+        if (field === 'descripcion') val = String(val).slice(0, 500);
+        if (field === 'certificaciones') val = JSON.stringify(val);
+        paramsArr.push(val);
       }
     }
     if (data.imagenes !== undefined && Array.isArray(data.imagenes)) {

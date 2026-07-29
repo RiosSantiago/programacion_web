@@ -13,16 +13,7 @@ interface FilterPanelProps {
   initialDestacados?: string;
 }
 
-const categorias = [
-  { value: 'todos', label: 'Todos' },
-  { value: 'bovino', label: 'Bovinos' },
-  { value: 'equino', label: 'Equinos' },
-  { value: 'porcino', label: 'Porcinos' },
-  { value: 'ovino', label: 'Ovinos' },
-  { value: 'avicola', label: 'Avícolas' },
-  { value: 'agricultura', label: 'Agricultura' },
-  { value: 'insumos', label: 'Insumos' },
-];
+interface CatOption { value: string; label: string }
 
 const municipiosCaldas = [
   { value: 'Aguadas', label: 'Aguadas' },
@@ -90,9 +81,21 @@ export default function FilterPanel({
   initialFechaPublicacion = '',
   initialDestacados = '',
 }: FilterPanelProps) {
+  const [categorias, setCategorias] = useState<CatOption[]>([]);
   const [categoriasSel, setCategoriasSel] = useState<string[]>(
     initialCategoria && initialCategoria !== 'todos' ? parseCSV(initialCategoria) : []
   );
+
+  useEffect(() => {
+    fetch('/api/categorias')
+      .then(r => r.json())
+      .then(data => {
+        if (data.categorias) {
+          setCategorias(data.categorias.map((c: any) => ({ value: c.slug, label: c.nombre })));
+        }
+      })
+      .catch(() => {});
+  }, []);
   const [municipiosSel, setMunicipiosSel] = useState<string[]>(parseCSV(initialMunicipio));
   const [precioMin, setPrecioMin] = useState(initialPrecioMin);
   const [precioMax, setPrecioMax] = useState(initialPrecioMax);

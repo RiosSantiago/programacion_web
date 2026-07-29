@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import PublicationForm from '../components/dashboard/PublicationForm';
+import PublicationSelector from '../components/dashboard/PublicationSelector';
 ---
 
 <BaseLayout navVariant="publicar">
@@ -13,12 +13,12 @@ import PublicationForm from '../components/dashboard/PublicationForm';
 
     <div class="bg-white rounded-xl border border-slate-200 shadow-sm">
       <div class="px-6 py-4 border-b border-slate-200 bg-campo-800">
-        <h1 class="text-2xl font-bold text-white">Publicar mi Ganado</h1>
-        <p class="text-sm text-white/80 mt-1">Completa el formulario para publicar tu animal</p>
+        <h1 class="text-2xl font-bold text-white">Publicar</h1>
+        <p class="text-sm text-white/80 mt-1">Elige el tipo de publicación</p>
       </div>
 
       <div class="p-6">
-        <PublicationForm client:load />
+        <PublicationSelector client:load />
       </div>
     </div>
 

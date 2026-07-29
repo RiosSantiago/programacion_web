@@ -26,6 +26,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
     const paramsArr: any[] = [];
 
     if (data.nombre) { fields.push('nombre = ?'); paramsArr.push(data.nombre); }
+    if (data.slug) { fields.push('slug = ?'); paramsArr.push(data.slug); }
     if (data.icono) { fields.push('icono = ?'); paramsArr.push(data.icono); }
     if (data.color) { fields.push('color = ?'); paramsArr.push(data.color); }
     if (data.cantidad !== undefined) { fields.push('cantidad = ?'); paramsArr.push(data.cantidad); }

@@ -7,6 +7,7 @@
 CREATE TABLE IF NOT EXISTS categorias (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL UNIQUE,
+    slug VARCHAR(100) NOT NULL UNIQUE DEFAULT '',
     icono VARCHAR(50) NOT NULL,
     color VARCHAR(100) NOT NULL,
     cantidad INTEGER DEFAULT 0
@@ -69,6 +70,7 @@ CREATE TABLE IF NOT EXISTS productos (
     finca VARCHAR(255) DEFAULT '',
     vereda VARCHAR(255) DEFAULT '',
     referencia_ubicacion TEXT DEFAULT '',
+    ica_pdf TEXT DEFAULT '',
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
