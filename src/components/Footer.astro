@@ -1,13 +1,12 @@
 ---
+import { getCategorias } from '../lib/models/categorias';
 const currentYear = new Date().getFullYear();
+const categorias = await getCategorias();
 
 const links = {
   marketplace: [
     { href: '/marketplace', label: 'Ver todos' },
-    { href: '/marketplace?categoria=bovino', label: 'Bovinos' },
-    { href: '/marketplace?categoria=equino', label: 'Equinos' },
-    { href: '/marketplace?categoria=porcino', label: 'Porcinos' },
-    { href: '/marketplace?categoria=avicola', label: 'Avícolas' },
+    ...categorias.slice(0, 6).map(c => ({ href: `/marketplace?categoria=${c.slug}`, label: c.nombre })),
   ],
   vendedores: [
     { href: '/publicar', label: 'Publicar producto' },

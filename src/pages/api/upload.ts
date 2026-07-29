@@ -9,6 +9,7 @@ export const POST: APIRoute = async ({ request }) => {
     const formData = await request.formData();
     const photoFiles = formData.getAll('photos') as File[];
     const videoFile = formData.get('video') as File | null;
+    const certFiles = formData.getAll('certificaciones') as File[];
 
     const uploadDir = path.join(cwd(), 'public', 'uploads', 'animales');
     await mkdir(uploadDir, { recursive: true });
@@ -32,7 +33,18 @@ export const POST: APIRoute = async ({ request }) => {
       videoUrl = `/uploads/animales/${filename}`;
     }
 
-    return new Response(JSON.stringify({ success: true, urls: photoUrls, videoUrl }), {
+    const certUrls: string[] = [];
+    for (const file of certFiles.slice(0, 5)) {
+      if (file.size > 0) {
+        const ext = path.extname(file.name) || '.pdf';
+        const filename = `${Date.now()}-cert-${Math.random().toString(36).slice(2, 8)}${ext}`;
+        const buffer = Buffer.from(await file.arrayBuffer());
+        await writeFile(path.join(uploadDir, filename), buffer);
+        certUrls.push(`/uploads/animales/${filename}`);
+      }
+    }
+
+    return new Response(JSON.stringify({ success: true, urls: photoUrls, videoUrl, certUrls }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });

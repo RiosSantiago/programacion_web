@@ -35,6 +35,7 @@ export interface Producto {
   finca?: string;
   vereda?: string;
   referencia_ubicacion?: string;
+  certificaciones?: string[];
 }
 
 function getPlaceholderImagen(categoria: string): string {
@@ -46,6 +47,8 @@ function getPlaceholderImagen(categoria: string): string {
     avicola:   '/images/gallina.svg',
     cultivos:  '/images/cultivos.svg',
     servicios: '/images/default.svg',
+    agricultura: '/images/cultivos.svg',
+    insumos:    '/images/default.svg',
   };
   return imagenesCategoria[categoria] || '/images/default.svg';
 }
@@ -76,8 +79,9 @@ function transformarProducto(row: any, imagenesTabulares?: string[]): Producto {
   try {
     const imagenes: string[] = (imagenesTabulares && imagenesTabulares.length > 0) ? imagenesTabulares : [];
     const categoria = row.categoria || 'bovino';
+    const { ica_pdf, ...rest } = row;
     return {
-      ...row,
+      ...rest,
       destacado:    Boolean(row.destacado),
       oferta:       Boolean(row.oferta),
       trazabilidad: Boolean(row.trazabilidad),
@@ -88,6 +92,7 @@ function transformarProducto(row: any, imagenesTabulares?: string[]): Producto {
       precioAnterior:  row.precio_anterior ?? row.precioAnterior ?? null,
       vendedorRating:  row.vendedor_rating  ?? row.vendedorRating  ?? 4.5,
       vendedor_id:     row.vendedor_id      ?? null,
+      certificaciones: parseCertificaciones(ica_pdf),
     };
   } catch {
     return {
@@ -99,7 +104,19 @@ function transformarProducto(row: any, imagenesTabulares?: string[]): Producto {
       precioAnterior: row.precio_anterior ?? null,
       vendedorRating: row.vendedor_rating  ?? 4.5,
       vendedor_id:    row.vendedor_id       ?? null,
+      certificaciones: [],
     };
+  }
+}
+
+function parseCertificaciones(val: unknown): string[] {
+  if (!val) return [];
+  if (Array.isArray(val)) return val;
+  try {
+    const parsed = JSON.parse(String(val));
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
   }
 }
 
@@ -111,12 +128,20 @@ async function attachImagenes(rows: any[]): Promise<Producto[]> {
 }
 
 // ---------------------------------------------------------------------------
-// SLUG → ID map (espejo del mismo mapa en filtrarProductos)
+// SLUG → ID map (dinámico desde DB)
 // ---------------------------------------------------------------------------
-const mapSlugToId: Record<string, number> = {
-  bovino: 1, equino: 2, porcino: 3, avicola: 4,
-  cultivo: 5, servicio: 6, agricultura: 7, insumo: 8, ovino: 9,
-};
+let _slugMap: Record<string, number> | null = null;
+
+async function getMapSlugToId(): Promise<Record<string, number>> {
+  if (_slugMap) return _slugMap;
+  const rows = await queryAll<{ slug: string; id: number }>('SELECT slug, id FROM categorias');
+  _slugMap = {};
+  for (const r of rows) {
+    _slugMap[r.slug] = r.id;
+    _slugMap[r.slug.replace(/-/g, '')] = r.id;
+  }
+  return _slugMap;
+}
 
 // ---------------------------------------------------------------------------
 // LECTURAS
@@ -220,11 +245,12 @@ export async function filtrarProductos(options: {
   if (options.categoria && options.categoria !== 'todos') {
     const cats = options.categoria.split(',').map(s => s.trim()).filter(Boolean);
     if (cats.length > 0) {
+      const slugMap = await getMapSlugToId();
       const numericIds: number[] = [];
       cats.forEach(c => {
         const num = Number(c);
         if (!isNaN(num)) numericIds.push(num);
-        const mapped = mapSlugToId[c.toLowerCase()];
+        const mapped = slugMap[c.toLowerCase()];
         if (mapped && !numericIds.includes(mapped)) numericIds.push(mapped);
       });
       if (numericIds.length > 0) {
@@ -352,23 +378,25 @@ export interface CrearProductoInput {
   finca?:       string;
   vereda?:      string;
   referencia_ubicacion?: string;
+  certificaciones?: string[];
 }
 
 export async function crearProducto(data: CrearProductoInput): Promise<number> {
   const placeholderImg = data.imagenes?.[0] || getPlaceholderImagen(data.categoria);
-  const catId = data.categoria_id || mapSlugToId[data.categoria?.toLowerCase()] || null;
+  const slugMap = await getMapSlugToId();
+  const catId = data.categoria_id || slugMap[data.categoria?.toLowerCase()] || null;
 
   const { lastInsertRowid } = await queryRun(
     `INSERT INTO productos (
       nombre, categoria, categoria_id, raza, peso, peso_unitario, ubicacion, departamento,
       precio, precio_anterior, stock, vendedor_id, vendedor_rating,
       estado, salud, envio, destacado, oferta, trazabilidad, tipo_precio,
-      sexo, fecha_nacimiento, descripcion, video, finca, vereda, referencia_ubicacion
+      sexo, fecha_nacimiento, descripcion, video, finca, vereda, referencia_ubicacion, ica_pdf
     ) VALUES (
       @nombre, @categoria, @categoria_id, @raza, @peso, @peso_unitario, @ubicacion, @departamento,
       @precio, @precio_anterior, @stock, @vendedor_id, @vendedor_rating,
       @estado, @salud, @envio, @destacado, @oferta, @trazabilidad, @tipo_precio,
-      @sexo, @fecha_nacimiento, @descripcion, @video, @finca, @vereda, @referencia_ubicacion
+      @sexo, @fecha_nacimiento, @descripcion, @video, @finca, @vereda, @referencia_ubicacion, @certificaciones
     )`,
     {
       nombre: data.nombre,
@@ -398,6 +426,7 @@ export async function crearProducto(data: CrearProductoInput): Promise<number> {
       finca: data.finca || '',
       vereda: data.vereda || '',
       referencia_ubicacion: data.referencia_ubicacion || '',
+      certificaciones: data.certificaciones ? JSON.stringify(data.certificaciones) : '',
     }
   );
 
@@ -413,16 +442,22 @@ export async function actualizarProducto(id: number, data: Partial<Producto>): P
   const fields: string[] = [];
   const params: any[]    = [];
 
+  if (data.categoria !== undefined && data.categoria_id === undefined) {
+    const slugMap = await getMapSlugToId();
+    data.categoria_id = slugMap[data.categoria?.toLowerCase()] || null;
+  }
+
   const allowedFields = [
     'nombre', 'categoria', 'categoria_id', 'raza', 'peso', 'ubicacion',
     'departamento', 'precio', 'stock', 'salud', 'estado', 'tipo_precio',
-    'sexo', 'fecha_nacimiento', 'video', 'finca', 'vereda', 'referencia_ubicacion',
+    'sexo', 'fecha_nacimiento', 'video', 'finca', 'vereda', 'referencia_ubicacion', 'certificaciones',
   ];
 
   for (const field of allowedFields) {
     if (data[field as keyof Producto] !== undefined) {
       fields.push(`${field} = ?`);
-      params.push(data[field as keyof Producto]);
+      const val = data[field as keyof Producto];
+      params.push(field === 'certificaciones' ? JSON.stringify(val) : val);
     }
   }
   if (data.imagenes !== undefined && Array.isArray(data.imagenes)) {

@@ -329,6 +329,25 @@ const catLower = producto?.categoria?.toLowerCase() || 'bovino';
                 </div>
               )}
 
+              <!-- Certificaciones -->
+              {producto.certificaciones && producto.certificaciones.length > 0 && (
+                <div class="flex items-center gap-3.5 px-5 py-4 group hover:bg-[#F5FBF5] transition-colors">
+                  <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background: #EAF4EA; border: 1px solid #C8DCC8;">
+                    <svg class="w-5 h-5" fill="none" stroke="#2D5A3D" viewBox="0 0 24 24" stroke-width="1.8">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                  </div>
+                  <span class="text-sm font-bold w-24 shrink-0" style="color: #4A7C5A;">Certificaciones</span>
+                  <div class="flex flex-wrap gap-2 ml-auto">
+                    {producto.certificaciones.map((certUrl: string) => (
+                      <a href={certUrl} target="_blank" rel="noopener noreferrer" class="font-bold text-sm text-emerald-700 hover:text-emerald-600 underline truncate max-w-[180px]">
+                        Ver certificado
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <!-- Peso -->
               {producto.peso && (
                 <div class="flex items-center gap-3.5 px-5 py-4 group hover:bg-[#F5FBF5] transition-colors">

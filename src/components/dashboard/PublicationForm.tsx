@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 const municipiosCaldas = [
   'Aguadas',
@@ -30,31 +30,26 @@ const municipiosCaldas = [
   'Viterbo',
 ];
 
-const categoriasDemo = [
-  { value: 'bovino', label: 'Bovinos' },
-  { value: 'equino', label: 'Equinos' },
-  { value: 'porcino', label: 'Porcinos' },
-  { value: 'ovino', label: 'Ovinos' },
-  { value: 'avicola', label: 'Avicolas' },
-];
-
-function getPlaceholderImagen(categoria: string): string {
-  const imagenes: Record<string, string> = {
-    bovino: '/images/ganado.svg',
-    equino: '/images/caballo.svg',
-    porcino: '/images/cerdo.svg',
-    ovino: '/images/ganado.svg',
-    avicola: '/images/gallina.svg',
-  };
-  return imagenes[categoria] || '/images/ganado.svg';
-}
+interface CatOption { value: string; label: string }
 
 export default function PublicationForm() {
   const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : new URLSearchParams();
+  const [categorias, setCategorias] = useState<CatOption[]>([]);
+
+  useEffect(() => {
+    fetch('/api/categorias')
+      .then(r => r.json())
+      .then(data => {
+        if (data.categorias?.length) {
+          setCategorias(data.categorias.map((c: any) => ({ value: c.slug, label: c.nombre })));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const [formData, setFormData] = useState({
     nombre: params.get('animal') || '',
-    categoria: 'bovino',
+    categoria: '',
     raza: params.get('raza') || '',
     peso: params.get('peso') || '',
     precio: '',
@@ -72,8 +67,10 @@ export default function PublicationForm() {
 
   const [photos, setPhotos] = useState<File[]>([]);
   const [video, setVideo] = useState<File | null>(null);
+  const [certificaciones, setCertificaciones] = useState<File[]>([]);
   const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
   const [videoPreview, setVideoPreview] = useState<string>('');
+  const [certPreviews, setCertPreviews] = useState<string[]>([]);
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -81,6 +78,7 @@ export default function PublicationForm() {
 
   const photoInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
+  const certInputRef = useRef<HTMLInputElement>(null);
 
   function handlePhotoSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || []);
@@ -115,6 +113,25 @@ export default function PublicationForm() {
     if (videoInputRef.current) videoInputRef.current.value = '';
   }
 
+  function handleCertSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files || []);
+    const total = certificaciones.length + files.length;
+    if (total > 5) {
+      setError('Máximo 5 certificaciones permitidas');
+      return;
+    }
+    setError('');
+    const newCerts = [...certificaciones, ...files].slice(0, 5);
+    setCertificaciones(newCerts);
+    setCertPreviews(newCerts.map((f) => f.name));
+  }
+
+  function removeCert(index: number) {
+    const newCerts = certificaciones.filter((_, i) => i !== index);
+    setCertificaciones(newCerts);
+    setCertPreviews(newCerts.map((f) => f.name));
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -123,6 +140,10 @@ export default function PublicationForm() {
     let uploadedPhotoUrls: string[] = [];
     let uploadedVideoUrl = '';
 
+    if (!formData.sexo) {
+      setError('El sexo es obligatorio');
+      return;
+    }
     if (!formData.finca || formData.finca.trim().length < 3 || formData.finca.trim().length > 80) {
       setError('El nombre de la finca es obligatorio y debe tener entre 3 y 80 caracteres');
       return;
@@ -136,17 +157,21 @@ export default function PublicationForm() {
       return;
     }
 
-    if (photos.length > 0 || video) {
+    let uploadedCertUrls: string[] = [];
+
+    if (photos.length > 0 || video || certificaciones.length > 0) {
       try {
         const uploadFormData = new FormData();
         photos.forEach((photo) => uploadFormData.append('photos', photo));
         if (video) uploadFormData.append('video', video);
+        certificaciones.forEach((cert) => uploadFormData.append('certificaciones', cert));
 
         const uploadRes = await fetch('/api/upload', { method: 'POST', body: uploadFormData });
         if (uploadRes.ok) {
           const uploadData = await uploadRes.json();
           uploadedPhotoUrls = uploadData.urls || [];
           uploadedVideoUrl = uploadData.videoUrl || '';
+          uploadedCertUrls = uploadData.certUrls || [];
         }
       } catch (uploadErr) {
         console.log('Error uploading files:', uploadErr);
@@ -169,8 +194,9 @@ export default function PublicationForm() {
       vereda: formData.vereda,
       referencia_ubicacion: formData.referencia_ubicacion,
       descripcion: formData.descripcion,
-      imagenes: uploadedPhotoUrls.length > 0 ? uploadedPhotoUrls : [getPlaceholderImagen(formData.categoria)],
+      imagenes: uploadedPhotoUrls.length > 0 ? uploadedPhotoUrls : ['/images/categories/bovino.webp'],
       video: uploadedVideoUrl,
+      certificaciones: uploadedCertUrls,
     };
 
     try {
@@ -237,7 +263,7 @@ export default function PublicationForm() {
   function resetForm() {
     setFormData({
       nombre: '',
-      categoria: 'bovino',
+      categoria: categorias[0]?.value || '',
       raza: '',
       peso: '',
       precio: '',
@@ -256,6 +282,8 @@ export default function PublicationForm() {
     setPhotoPreviews([]);
     setVideo(null);
     setVideoPreview('');
+    setCertificaciones([]);
+    setCertPreviews([]);
     setSuccess(false);
   }
 
@@ -313,7 +341,8 @@ export default function PublicationForm() {
             onChange={(e) => setFormData({ ...formData, categoria: e.target.value })}
             className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white"
           >
-            {categoriasDemo.map((cat) => (
+            {categorias.length === 0 && <option value="">Cargando...</option>}
+            {categorias.map((cat) => (
               <option key={cat.value} value={cat.value}>
                 {cat.label}
               </option>
@@ -344,8 +373,9 @@ export default function PublicationForm() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Sexo</label>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Sexo *</label>
           <select
+            required
             value={formData.sexo}
             onChange={(e) => setFormData({ ...formData, sexo: e.target.value })}
             className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-emerald-500"
@@ -603,10 +633,58 @@ export default function PublicationForm() {
         />
       </div>
 
+      {/* Certificaciones */}
+      <div>
+        <label className="block text-sm font-medium text-slate-700 mb-1">
+          Certificaciones (ICA, RUV, RFG y Registro genealógico) <span className="text-slate-400 font-normal">(opcional, máx. 5)</span>
+        </label>
+        {certificaciones.length < 5 && (
+          <div
+            onClick={() => certInputRef.current?.click()}
+            className="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/30 transition-colors"
+          >
+            <svg className="w-8 h-8 text-slate-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v4a2 2 0 002 2h4" />
+            </svg>
+            <p className="text-sm text-slate-500">Adjuntar PDFs de certificaciones</p>
+            <p className="text-xs text-slate-400 mt-1">{certificaciones.length}/5 seleccionados</p>
+          </div>
+        )}
+        {certPreviews.length > 0 && (
+          <div className="space-y-2 mt-2">
+            {certPreviews.map((name, i) => (
+              <div key={i} className="flex items-center gap-3 p-3 border border-slate-200 rounded-xl bg-slate-50">
+                <svg className="w-6 h-6 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span className="text-sm text-slate-700 flex-1 truncate">{name}</span>
+                <button
+                  type="button"
+                  onClick={() => removeCert(i)}
+                  className="w-6 h-6 bg-red-500 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-600 transition-colors shrink-0"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+        <input
+          ref={certInputRef}
+          type="file"
+          accept=".pdf,application/pdf"
+          multiple
+          onChange={handleCertSelect}
+          className="hidden"
+        />
+      </div>
+
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-3 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 disabled:bg-emerald-400 transition-colors"
+        className="w-full py-3 text-white font-semibold rounded-lg hover:opacity-90 disabled:opacity-60 transition-all"
+        style={{ backgroundColor: '#1b3928' }}
       >
         {loading ? 'Publicando...' : 'Publicar Animal'}
       </button>

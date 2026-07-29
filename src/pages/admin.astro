@@ -320,11 +320,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       const tbody = document.getElementById('usuarios-tbody');
       const isRootUser = currentUserRole === 'root';
 
-      tbody.innerHTML = usuarios.map(u => {
+      function formatearId(id) {
+        const letra = String.fromCharCode(65 + Math.floor((id - 1) / 999));
+        const num = String(((id - 1) % 999) + 1).padStart(3, '0');
+        return letra + num;
+      }
+
+      tbody.innerHTML = usuarios.map((u, i) => {
         const roleLabel = u.rol === 'root' ? 'Root' : u.rol === 'admin' ? 'Admin' : 'Usuario';
         return `
         <tr>
-          <td class="px-6 py-3 text-[#6B6B6B]">${u.id}</td>
+          <td class="px-6 py-3 text-[#6B6B6B] font-mono text-xs">${formatearId(i + 1)}</td>
           <td class="px-6 py-3 font-medium text-[#1A0E08]">${escapeHtml(u.nombre)}</td>
           <td class="px-6 py-3 text-[#6B6B6B]">${escapeHtml(u.email)}</td>
           <td class="px-6 py-3 text-[#6B6B6B]">${escapeHtml(u.celular)}</td>
@@ -395,10 +401,15 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       }
 
       const isRootUser = currentUserRole === 'root';
+
+      function iconoCategoria(slug) {
+        return '<img class="w-9 h-9 rounded-lg object-cover" src="/images/categories/' + slug + '.webp" alt="' + slug + '" onerror="this.src=\'/images/default.svg\';this.style.padding=\'4px\'" />';
+      }
+
       list.innerHTML = cats.map(c => `
         <div class="px-6 py-4 flex items-center justify-between hover:bg-[#F5F0E8]">
           <div class="flex items-center gap-3">
-            <span class="text-2xl">${c.icono}</span>
+            ${iconoCategoria(c.slug)}
             <div>
               <p class="font-medium text-[#1A0E08]">${escapeHtml(c.nombre)}</p>
               <p class="text-xs text-[#6B6B6B]">${c.color} · ${c.cantidad} productos</p>
@@ -488,6 +499,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       const data = await res.json();
       const p = data.producto || data;
 
+      const catsRes = await fetch('/api/categorias');
+      const catsData = await catsRes.json();
+      const cats = catsData.categorias || [];
+      const catOptions = cats.map(c => `<option value="${c.slug}" ${p.categoria === c.slug ? 'selected' : ''}>${escapeHtml(c.nombre)}</option>`).join('');
+
       container.innerHTML = `
         <form id="admin-edit-form" class="space-y-6">
           <div id="admin-edit-error" class="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-600 hidden"></div>
@@ -501,13 +517,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
             <div>
               <label class="block text-sm font-medium text-[#2D2D2D] mb-1">Categoría</label>
               <select id="ae-categoria" class="w-full px-3 py-2 border border-[#E8E0D8] rounded-lg text-sm bg-white">
-                <option value="bovino" ${p.categoria === 'bovino' ? 'selected' : ''}>Bovinos</option>
-                <option value="equino" ${p.categoria === 'equino' ? 'selected' : ''}>Equinos</option>
-                <option value="porcino" ${p.categoria === 'porcino' ? 'selected' : ''}>Porcinos</option>
-                <option value="ovino" ${p.categoria === 'ovino' ? 'selected' : ''}>Ovinos</option>
-                <option value="avicola" ${p.categoria === 'avicola' ? 'selected' : ''}>Avicolas</option>
-                <option value="cultivos" ${p.categoria === 'cultivos' ? 'selected' : ''}>Cultivos</option>
-                <option value="servicios" ${p.categoria === 'servicios' ? 'selected' : ''}>Servicios</option>
+                ${catOptions}
               </select>
             </div>
             <div>

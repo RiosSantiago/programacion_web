@@ -1,19 +1,9 @@
 ---
-const todasLasCategorias = [
-  { id: 1, nombre: 'Bovinos', icono: '🐄', color: 'bg-gold-100 text-gold-700', cantidad: 284 },
-  { id: 2, nombre: 'Equinos', icono: '🐴', color: 'bg-blue-100 text-blue-700', cantidad: 42 },
-  { id: 3, nombre: 'Porcinos', icono: '🐷', color: 'bg-coral-100 text-coral-700', cantidad: 156 },
-  { id: 4, nombre: 'Ovinos', icono: '🐑', color: 'bg-purple-100 text-purple-700', cantidad: 0 },
-  { id: 5, nombre: 'Avicolas', icono: '🐔', color: 'bg-orange-100 text-orange-700', cantidad: 89 },
-  { id: 6, nombre: 'Agricultura', icono: '🌱', color: 'bg-campo-100 text-campo-700', cantidad: 0 },
-  { id: 7, nombre: 'Insumos', icono: '🧰', color: 'bg-stone-100 text-stone-700', cantidad: 0 },
-];
+import { getCategorias } from '../lib/models/categorias';
 
-const slugMap: Record<string, string> = {
-  Bovinos: 'bovino', Equinos: 'equino', Porcinos: 'porcino', Ovinos: 'ovino', Avicolas: 'avicola',
-  Agricultura: 'agricultura', Insumos: 'insumos', Servicios: 'servicio', Cultivos: 'cultivo',
-};
+const categorias = await getCategorias();
 const current = Astro.url.searchParams.get('categoria') || null;
+
 const categoriaSVGs: Record<string, string> = {
   'Bovinos': `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 4c-1.5 0-3 1-3.5 2.5-.3 1-.1 2 .3 2.5.5.5.7 1.2.7 2s-.2 1.5-.7 2c-.4.5-.6 1.3-.3 2.5.5 1.5 2 2.5 3.5 2.5s3-1 3.5-2.5c.3-1.2.1-2-.3-2.5-.5-.5-.7-1.2-.7-2s.2-1.5.7-2c.4-.5.6-1.5.3-2.5C15 5 13.5 4 12 4z" stroke-linecap="round"/><circle cx="10" cy="9" r="1" fill="currentColor"/><circle cx="14" cy="9" r="1" fill="currentColor"/><path d="M8 13c.5-.5 1-.5 1.5-.3" stroke-linecap="round"/><path d="M16 13c-.5-.5-1-.5-1.5-.3" stroke-linecap="round"/><path d="M6 4.5c0-1.5 1.5-2 3-1.5" stroke-linecap="round"/><path d="M18 4.5c0-1.5-1.5-2-3-1.5" stroke-linecap="round"/></svg>`,
   'Equinos': `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19c0-4 2-7 4-8l1-1-1-2c0-2 2-4 5-4 1 0 2 .5 3 1.5 1-1 2-1.5 3-1.5 3 0 5 2 5 4v3" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 19l-3-6" stroke-linecap="round"/><path d="M16 10c1-1 2-1.5 3-2" stroke-linecap="round"/><path d="M4 19h3" stroke-linecap="round"/><circle cx="16" cy="6" r="1" fill="currentColor"/></svg>`,
@@ -25,6 +15,7 @@ const categoriaSVGs: Record<string, string> = {
   'Agricultura': `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22V12" stroke-linecap="round"/><path d="M12 12c-3-3-6-4-6-8 0-2 1-4 4-4 2 0 3 1 4 4 0-3 1-4 4-4 3 0 4 2 4 4 0 4-3 5-6 8" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 22h8" stroke-linecap="round"/></svg>`,
   'Insumos': `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
 };
+const totalProductos = categorias.reduce((acc, c) => acc + c.cantidad, 0);
 ---
 
 <section class="border-b border-[#E8E0D8] bg-white">
@@ -38,7 +29,7 @@ const categoriaSVGs: Record<string, string> = {
         </div>
         <div>
           <h2 class="text-sm font-bold text-[#2D2D2D]">Categorías</h2>
-          <p class="text-xs text-[#6B6B6B]">{todasLasCategorias.reduce((acc, c) => acc + c.cantidad, 0)} productos disponibles</p>
+          <p class="text-xs text-[#6B6B6B]">{totalProductos} productos disponibles</p>
         </div>
       </div>
     </div>
@@ -53,10 +44,10 @@ const categoriaSVGs: Record<string, string> = {
         </svg>
         Todos
       </a>
-      {todasLasCategorias.map((cat) => (
+      {categorias.map((cat) => (
 <a
-    href="/marketplace?categoria={slugMap[cat.nombre]}"
-    class:list={[`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200`, current === slugMap[cat.nombre] ? 'bg-campo-600 text-white shadow-md shadow-campo-200' : 'bg-white text-[#6B6B6B] border border-[#E8E0D8] hover:border-campo-400 hover:text-campo-600 hover:shadow-sm']}>
+    href="/marketplace?categoria={cat.slug}"
+    class:list={[`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200`, current === cat.slug ? 'bg-campo-600 text-white shadow-md shadow-campo-200' : 'bg-white text-[#6B6B6B] border border-[#E8E0D8] hover:border-campo-400 hover:text-campo-600 hover:shadow-sm']}>
     {cat.nombre}
   </a>
       ))}

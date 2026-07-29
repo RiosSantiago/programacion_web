@@ -30,6 +30,10 @@ export const POST: APIRoute = async ({ request }) => {
       } catch {}
     }
 
+    if (!data.sexo) {
+      return new Response(JSON.stringify({ error: 'El sexo es obligatorio.' }), { status: 400 });
+    }
+
     const finca     = (data.finca || data.nombre_finca || '').trim();
     const vereda    = (data.vereda || '').trim();
     const referencia = (data.referencia_ubicacion || data.referencia || '').trim();
@@ -49,8 +53,8 @@ export const POST: APIRoute = async ({ request }) => {
         nombre, categoria, raza, peso, peso_unitario, ubicacion, departamento,
         precio, precio_anterior, stock, vendedor_id, vendedor_rating,
         estado, salud, envio, destacado, oferta, trazabilidad, tipo_precio, descripcion, video, sexo,
-        finca, vereda, referencia_ubicacion
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        finca, vereda, referencia_ubicacion, ica_pdf
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         data.nombre,
         data.categoria,
@@ -73,10 +77,11 @@ export const POST: APIRoute = async ({ request }) => {
         data.tipoPrecio || 'fijo',
         (data.descripcion || '').slice(0, 500),
         data.video || '',
-        data.sexo || null,
+        data.sexo,
         finca,
         vereda,
         referencia.slice(0, 200),
+        data.certificaciones ? JSON.stringify(data.certificaciones) : '',
       ]
     );
 
