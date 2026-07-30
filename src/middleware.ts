@@ -1,5 +1,7 @@
 import { defineMiddleware } from 'astro/middleware';
-import { queryGet } from './lib/db';
+import { queryGet, inicializar } from './lib/db';
+
+let dbInicializada = false;
 
 function getUserFromToken(request: Request): { id: number; email: string } | null {
   const auth = request.headers.get('Authorization');
@@ -14,6 +16,16 @@ function getUserFromToken(request: Request): { id: number; email: string } | nul
 }
 
 export const onRequest = defineMiddleware(async (context, next) => {
+  if (!dbInicializada) {
+    dbInicializada = true;
+    try {
+      await inicializar();
+      console.log('[DB] Esquema PostgreSQL inicializado');
+    } catch (e) {
+      console.error('[DB] Error al inicializar esquema:', e);
+    }
+  }
+
   const url = new URL(context.request.url);
 
   const publicas  = ['/api/admin/root', '/api/admin/check'];

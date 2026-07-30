@@ -11,7 +11,7 @@ import fs from 'fs';
 
 const { Pool } = pg;
 
-const connectionString = process.env.DATABASE_URL || 'postgresql://postgres:postgrespassword@localhost:5432/agroup';
+const connectionString = (process.env.DATABASE_URL || 'postgresql://postgres:postgrespassword@localhost:5433/agroup').trim();
 
 // Instancia única (singleton) de pg.Pool — conexión TCP a PostgreSQL (Docker / Neon)
 export const pool = new Pool({
