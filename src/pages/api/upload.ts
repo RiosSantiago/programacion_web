@@ -10,8 +10,9 @@ export const POST: APIRoute = async ({ request }) => {
     const photoFiles = formData.getAll('photos') as File[];
     const videoFile = formData.get('video') as File | null;
     const certFiles = formData.getAll('certificaciones') as File[];
+    const categoria = (formData.get('categoria') as string || 'animales').replace(/[^a-z0-9_-]/g, '');
 
-    const uploadDir = path.join(cwd(), 'public', 'uploads', 'animales');
+    const uploadDir = path.join(cwd(), 'public', 'uploads', categoria);
     await mkdir(uploadDir, { recursive: true });
 
     const photoUrls: string[] = [];
@@ -21,7 +22,7 @@ export const POST: APIRoute = async ({ request }) => {
       const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.webp`;
       const webpBuffer = await sharp(buffer).webp({ quality: 85 }).toBuffer();
       await writeFile(path.join(uploadDir, filename), webpBuffer);
-      photoUrls.push(`/uploads/animales/${filename}`);
+      photoUrls.push(`/uploads/${categoria}/${filename}`);
     }
 
     let videoUrl = '';
@@ -30,7 +31,7 @@ export const POST: APIRoute = async ({ request }) => {
       const filename = `${Date.now()}-video${ext}`;
       const buffer = Buffer.from(await videoFile.arrayBuffer());
       await writeFile(path.join(uploadDir, filename), buffer);
-      videoUrl = `/uploads/animales/${filename}`;
+      videoUrl = `/uploads/${categoria}/${filename}`;
     }
 
     const certUrls: string[] = [];
@@ -40,7 +41,7 @@ export const POST: APIRoute = async ({ request }) => {
         const filename = `${Date.now()}-cert-${Math.random().toString(36).slice(2, 8)}${ext}`;
         const buffer = Buffer.from(await file.arrayBuffer());
         await writeFile(path.join(uploadDir, filename), buffer);
-        certUrls.push(`/uploads/animales/${filename}`);
+        certUrls.push(`/uploads/${categoria}/${filename}`);
       }
     }
 

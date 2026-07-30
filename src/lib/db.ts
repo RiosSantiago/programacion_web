@@ -49,7 +49,7 @@ export function buildQuery(sql: string, params: any[] | Record<string, any> = []
   const values: any[] = [];
 
   // Sintaxis SQLite incompatible con Postgres
-  text = text.replace(/\bINSERT\s+OR\s+IGNORE\b/gi, 'INSERT');
+  text = text.replace(/\bINSERT\s+OR\s+IGNORE\b/gi, 'INSERT ON CONFLICT DO NOTHING');
   text = text.replace(/\blast_insert_rowid\(\)/gi, 'lastval()');
   // Operadores booleanos en SQL (1 → true)
   text = text.replace(/\b(destacado|trazabilidad|envio|oferta|verificado)\s*=\s*1\b/gi, '$1 = true');
