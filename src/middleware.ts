@@ -7,9 +7,11 @@ function getUserFromToken(request: Request): { id: number; email: string } | nul
   const auth = request.headers.get('Authorization');
   if (!auth || !auth.startsWith('Bearer ')) return null;
   try {
-    const payload = JSON.parse(Buffer.from(auth.slice(7), 'base64').toString());
+    const raw = Buffer.from(auth.slice(7), 'base64').toString();
+    const payload = JSON.parse(raw);
+    if (!payload || typeof payload.id !== 'number') return null;
     if (payload.exp && Date.now() > payload.exp) return null;
-    return { id: payload.id, email: payload.email };
+    return { id: payload.id, email: String(payload.email || '') };
   } catch {
     return null;
   }
@@ -28,7 +30,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   const url = new URL(context.request.url);
 
-  const publicas  = ['/api/admin/root', '/api/admin/check'];
+  const publicas = ['/api/admin/root', '/api/admin/check'];
   const isAdminApi = url.pathname.startsWith('/api/admin/') && !publicas.includes(url.pathname);
 
   if (isAdminApi) {

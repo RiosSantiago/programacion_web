@@ -7,11 +7,11 @@ export default function PublicationSelector() {
 
   return (
     <>
-      <div class="flex gap-2 mb-6">
+      <div className="flex gap-2 mb-6">
         <button
           type="button"
           onClick={() => setTab('pecuario')}
-          class={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm transition-colors ${
+          className={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm transition-colors ${
             tab === 'pecuario'
               ? 'text-white shadow-sm'
               : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -23,7 +23,7 @@ export default function PublicationSelector() {
         <button
           type="button"
           onClick={() => setTab('agricola')}
-          class={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm transition-colors ${
+          className={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm transition-colors ${
             tab === 'agricola'
               ? 'text-white shadow-sm'
               : 'bg-slate-100 text-slate-600 hover:bg-slate-200'

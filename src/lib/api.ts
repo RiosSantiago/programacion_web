@@ -57,9 +57,9 @@ export async function getProductos(filters?: Record<string, string>): Promise<Pr
   }));
 }
 
-export async function getProducto(slug: string): Promise<Producto | undefined> {
-  const { getProductoById } = await import('./models/productos.js');
-  const r = await getProductoById(parseInt(slug));
+export async function getProductoByIdApi(id: number): Promise<Producto | undefined> {
+  const { getProductoById: dbGetProductoById } = await import('./models/productos.js');
+  const r = await dbGetProductoById(id);
   if (!r) return undefined;
   return {
     id: r.id,
