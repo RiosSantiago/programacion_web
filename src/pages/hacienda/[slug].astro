@@ -121,7 +121,7 @@ const categorias = [...new Set(haciendaProductos.map((p: any) => p.categoria).fi
                       </span>
                     )}
                   </div>
-                  <div class="flex flex-wrap items-center justify-center sm:justify-start gap-3 mt-2 text-sm text-[#6B6B6B]">
+                  <div class="flex flex-wrap items-center justify-center sm:justify-start gap-3 mt-2 text-sm text-muted">
                     <span class="flex items-center gap-1.5">
                       <svg class="w-4 h-4 text-campo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                       {hacienda.municipio}, {hacienda.departamento}
@@ -151,7 +151,7 @@ const categorias = [...new Set(haciendaProductos.map((p: any) => p.categoria).fi
 
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-      <nav class="flex items-center gap-2 text-sm text-[#6B6B6B]">
+      <nav class="flex items-center gap-2 text-sm text-muted">
         <a href="/" class="hover:text-campo-700 transition-colors font-medium">Marketplace</a>
         <svg class="w-4 h-4 text-[#C0B0A0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
         <span class="text-campo-700 font-semibold">{hacienda.nombre}</span>
@@ -163,28 +163,28 @@ const categorias = [...new Set(haciendaProductos.map((p: any) => p.categoria).fi
             <svg class="w-5 h-5 sm:w-6 sm:h-6 text-campo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
           </div>
           <p class="text-2xl sm:text-3xl font-display font-bold text-[#1A0E08]">{hacienda.publicacionesActivas}</p>
-          <p class="text-xs sm:text-sm text-[#6B6B6B] mt-1">Publicaciones</p>
+          <p class="text-xs sm:text-sm text-muted mt-1">Publicaciones</p>
         </div>
         <div class="bg-white rounded-2xl border border-[#E8E0D8] shadow-sm p-4 sm:p-5 text-center hover:shadow-md transition-shadow group">
           <div class="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 bg-gold-100 rounded-xl flex items-center justify-center group-hover:bg-gold-200 transition-colors">
             <svg class="w-5 h-5 sm:w-6 sm:h-6 text-gold-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           </div>
           <p class="text-2xl sm:text-3xl font-display font-bold text-[#1A0E08]">{hacienda.ventas}</p>
-          <p class="text-xs sm:text-sm text-[#6B6B6B] mt-1">Ventas verificadas</p>
+          <p class="text-xs sm:text-sm text-muted mt-1">Ventas verificadas</p>
         </div>
         <div class="bg-white rounded-2xl border border-[#E8E0D8] shadow-sm p-4 sm:p-5 text-center hover:shadow-md transition-shadow group">
           <div class="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 bg-gold-100 rounded-xl flex items-center justify-center group-hover:bg-gold-200 transition-colors">
             <svg class="w-5 h-5 sm:w-6 sm:h-6 text-gold-600" fill="currentColor" viewBox="0 0 24 24"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
           </div>
           <p class="text-2xl sm:text-3xl font-display font-bold text-[#1A0E08]">{hacienda.rating > 0 ? hacienda.rating : 'N/A'}</p>
-          <p class="text-xs sm:text-sm text-[#6B6B6B] mt-1">Calificación</p>
+          <p class="text-xs sm:text-sm text-muted mt-1">Calificación</p>
         </div>
         <div class="bg-white rounded-2xl border border-[#E8E0D8] shadow-sm p-4 sm:p-5 text-center hover:shadow-md transition-shadow group">
           <div class="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 bg-cielo-100 rounded-xl flex items-center justify-center group-hover:bg-cielo-200 transition-colors">
             <svg class="w-5 h-5 sm:w-6 sm:h-6 text-cielo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
           </div>
           <p class="text-2xl sm:text-3xl font-display font-bold text-[#1A0E08]">{hacienda.especies.length}</p>
-          <p class="text-xs sm:text-sm text-[#6B6B6B] mt-1">Especies</p>
+          <p class="text-xs sm:text-sm text-muted mt-1">Especies</p>
         </div>
       </section>
 
@@ -203,7 +203,7 @@ const categorias = [...new Set(haciendaProductos.map((p: any) => p.categoria).fi
               </div>
               <h2 class="text-lg font-display font-bold text-[#1A0E08]">Acerca de {hacienda.nombre}</h2>
             </div>
-            <p class="text-sm sm:text-base text-[#6B6B6B] leading-relaxed">{hacienda.descripcion}</p>
+            <p class="text-sm sm:text-base text-muted leading-relaxed">{hacienda.descripcion}</p>
 
             <div class="mt-6 pt-6 border-t border-[#E8E0D8]">
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -212,7 +212,7 @@ const categorias = [...new Set(haciendaProductos.map((p: any) => p.categoria).fi
                     <svg class="w-4 h-4 text-campo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                   </div>
                   <div>
-                    <p class="text-xs text-[#6B6B6B]">Ubicación</p>
+                    <p class="text-xs text-muted">Ubicación</p>
                     <p class="text-sm font-semibold text-[#1A0E08]">{hacienda.municipio}, {hacienda.departamento}</p>
                   </div>
                 </div>
@@ -221,7 +221,7 @@ const categorias = [...new Set(haciendaProductos.map((p: any) => p.categoria).fi
                     <svg class="w-4 h-4 text-gold-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                   </div>
                   <div>
-                    <p class="text-xs text-[#6B6B6B]">Miembro desde</p>
+                    <p class="text-xs text-muted">Miembro desde</p>
                     <p class="text-sm font-semibold text-[#1A0E08] capitalize">{hacienda.miembroDesde}</p>
                   </div>
                 </div>
@@ -230,7 +230,7 @@ const categorias = [...new Set(haciendaProductos.map((p: any) => p.categoria).fi
                     <svg class="w-4 h-4 text-cielo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                   </div>
                   <div>
-                    <p class="text-xs text-[#6B6B6B]">Verificación</p>
+                    <p class="text-xs text-muted">Verificación</p>
                     <p class="text-sm font-semibold text-[#1A0E08]">Vendedor verificado</p>
                   </div>
                 </div>
@@ -260,7 +260,7 @@ const categorias = [...new Set(haciendaProductos.map((p: any) => p.categoria).fi
                   </div>
                   <div>
                     <p class="text-sm font-semibold text-[#1A0E08]">{venta.comprador || 'Anónimo'}</p>
-                    <p class="text-xs text-[#6B6B6B]">{venta.fecha || ''}</p>
+                    <p class="text-xs text-muted">{venta.fecha || ''}</p>
                   </div>
                 </div>
                 <p class="text-sm text-[#2D2D2D] mb-3">Compró: <span class="font-medium">{venta.producto}</span></p>
@@ -281,19 +281,19 @@ const categorias = [...new Set(haciendaProductos.map((p: any) => p.categoria).fi
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
           <div>
             <h2 class="text-xl font-display font-bold text-[#1A0E08]">Publicaciones Activas</h2>
-            <p class="text-sm text-[#6B6B6B] mt-1">{hacienda.publicacionesActivas} productos disponibles en el marketplace</p>
+            <p class="text-sm text-muted mt-1">{hacienda.publicacionesActivas} productos disponibles en el marketplace</p>
           </div>
           <div class="flex items-center gap-2" id="filtro-categorias">
-            <button class="filtro-chip px-3 py-1.5 text-xs font-semibold rounded-lg border border-campo-300 bg-campo-600 text-white data-[active=false]:bg-white data-[active=false]:text-[#6B6B6B] data-[active=false]:border-[#E8E0D8]" data-categoria="todos" data-active="true">
+            <button class="filtro-chip px-3 py-1.5 text-xs font-semibold rounded-lg border border-campo-300 bg-campo-600 text-white data-[active=false]:bg-white data-[active=false]:text-muted data-[active=false]:border-[#E8E0D8]" data-categoria="todos" data-active="true">
               Todos
             </button>
             {categorias.map((cat: string) => (
-              <button class="filtro-chip px-3 py-1.5 text-xs font-semibold rounded-lg border border-campo-300 bg-campo-600 text-white data-[active=false]:bg-white data-[active=false]:text-[#6B6B6B] data-[active=false]:border-[#E8E0D8]" data-categoria={cat} data-active="false">
+              <button class="filtro-chip px-3 py-1.5 text-xs font-semibold rounded-lg border border-campo-300 bg-campo-600 text-white data-[active=false]:bg-white data-[active=false]:text-muted data-[active=false]:border-[#E8E0D8]" data-categoria={cat} data-active="false">
                 {cat}
               </button>
             ))}
             <span class="w-px h-5 bg-[#E8E0D8] mx-1 hidden sm:block"></span>
-            <button id="toggle-view-btn" class="p-2 rounded-lg border border-[#E8E0D8] bg-white text-[#6B6B6B] hover:text-[#1A0E08] hover:border-[#C0B0A0] transition-colors" title="Cambiar vista">
+            <button id="toggle-view-btn" class="p-2 rounded-lg border border-[#E8E0D8] bg-white text-muted hover:text-[#1A0E08] hover:border-[#C0B0A0] transition-colors" title="Cambiar vista">
               <svg id="icon-grid" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
               <svg id="icon-list" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
             </button>
@@ -313,7 +313,7 @@ const categorias = [...new Set(haciendaProductos.map((p: any) => p.categoria).fi
             <div class="w-16 h-16 bg-[#F5F0E8] rounded-2xl flex items-center justify-center mx-auto mb-4">
               <svg class="w-8 h-8 text-[#C0B0A0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
             </div>
-            <p class="text-[#6B6B6B] font-medium">Esta hacienda no tiene publicaciones activas</p>
+            <p class="text-muted font-medium">Esta hacienda no tiene publicaciones activas</p>
             <p class="text-sm text-[#C0B0A0] mt-1">Vuelve pronto para ver nuevos productos</p>
           </div>
         )}

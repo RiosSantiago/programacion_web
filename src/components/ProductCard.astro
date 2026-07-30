@@ -56,7 +56,7 @@ const categoriaIconos: Record<string, string> = {
 const iconoCategoria = categoriaIconos[producto.categoria?.toLowerCase() || 'bovino'] || '/images/categories/bovino.webp';
 
 const badgeInfo: Record<string, { label: string; class: string; icon: string }> = {
-  top: { label: 'Top', class: 'bg-amber-600 text-white', icon: '★' },
+  top: { label: 'Top', class: 'bg-gold-600 text-white', icon: '★' },
   verificado: { label: 'Verif.', class: 'bg-campo-600 text-white', icon: '✓' },
   nuevo: { label: 'Nuevo', class: 'bg-coral-500 text-white', icon: '◆' },
 };
@@ -72,7 +72,7 @@ const atributos = [
 ---
 
 <article
-  class="group bg-white rounded-2xl border border-[#E8DCCB] overflow-hidden cursor-pointer transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_30px_rgba(0,0,0,0.1)] hover:border-campo-400 active:scale-[0.99]"
+  class="group bg-white rounded-2xl border border-coffee-100 overflow-hidden cursor-pointer transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_30px_rgba(0,0,0,0.1)] hover:border-campo-400 active:scale-[0.99]"
   data-href={`/marketplace/${producto.id}`}
   data-imagenes={JSON.stringify(todasLasImagenes)}
   data-img-index="0"
@@ -167,7 +167,7 @@ const atributos = [
     )}
 
     <div class="absolute bottom-2 right-2">
-      <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-white/80 backdrop-blur-sm text-[#6B6B6B] shadow-sm">
+      <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-white/80 backdrop-blur-sm text-muted shadow-sm">
         {producto.stock || 1} {producto.stock === 1 ? 'ud.' : 'uds.'}
       </span>
     </div>
@@ -175,7 +175,7 @@ const atributos = [
 
   <div class="p-4 sm:p-5 space-y-3">
     <div class="min-w-0">
-      <h3 class="text-[17px] font-sans font-bold text-[#333333] leading-snug line-clamp-1 group-hover:text-campo-600 transition-colors">
+      <h3 class="text-[17px] font-display font-bold text-[#2D2D2D] leading-snug line-clamp-1 group-hover:text-campo-600 transition-colors">
         {producto.nombre}
       </h3>
     </div>
@@ -199,7 +199,7 @@ const atributos = [
           <p class="text-[11px] font-medium text-stone-500 leading-tight truncate">{producto.vendedor}</p>
           <div class="flex items-center gap-1.5">
             <div class="flex items-center gap-0.5">
-              <span class="text-[10px] font-bold text-amber-600">★</span>
+              <span class="text-[10px] font-bold text-gold-600">★</span>
               <span class="text-[10px] font-semibold text-stone-400">{producto.vendedorRating?.toFixed(1) || '4.5'}</span>
             </div>
             {vendedorBadge && badgeInfo[vendedorBadge] && (

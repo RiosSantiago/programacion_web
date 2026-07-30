@@ -31,7 +31,7 @@
         </svg>
       </div>
       <h4 class="text-lg font-display font-bold text-[#2D2D2D] mb-2">No tienes favoritos</h4>
-      <p class="text-sm text-[#6B6B6B] mb-6">Guarda productos que te interesen para compararlos después</p>
+      <p class="text-sm text-muted mb-6">Guarda productos que te interesen para compararlos después</p>
       <a href="/marketplace" onclick="cerrarFavoritos()" class="btn-primary">
         Explorar Productos
       </a>
@@ -39,4 +39,194 @@
   </div>
 </div>
 
+<script>
+  import { $favorites, toggleFavorite as toggleFavoriteStore, isFavorite } from '../stores/favorites';
+  import type { Favorite } from '../stores/favorites';
 
+  function formatearCOP(valor: number): string {
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(valor);
+  }
+
+  function abrirFavoritos() {
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (mobileMenu && !mobileMenu.classList.contains('translate-x-full')) {
+      document.getElementById('mobile-menu-overlay')?.classList.add('hidden');
+      mobileMenu.classList.add('translate-x-full');
+    }
+    const cartDrawer = document.getElementById('cart-drawer');
+    if (cartDrawer && !cartDrawer.classList.contains('translate-x-full')) {
+      document.getElementById('cart-overlay')?.classList.add('hidden');
+      cartDrawer.classList.add('translate-x-full');
+    }
+    document.getElementById('favoritos-overlay')?.classList.remove('hidden');
+    document.getElementById('favoritos-drawer')?.classList.remove('translate-x-full');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function cerrarFavoritos() {
+    document.getElementById('favoritos-overlay')?.classList.add('hidden');
+    document.getElementById('favoritos-drawer')?.classList.add('translate-x-full');
+    document.body.style.overflow = '';
+  }
+
+  function estaAbiertoFavoritos(): boolean {
+    const drawer = document.getElementById('favoritos-drawer');
+    return !!drawer && !drawer.classList.contains('translate-x-full');
+  }
+
+  async function toggleFavorito(id: number, nombre: string, precio: number, imagen: string, vendedor?: string, ubicacion?: string, categoria?: string) {
+    await toggleFavoriteStore({ id, nombre, precio, imagen: imagen || '/images/ganado.svg' });
+  }
+
+  async function eliminarFavorito(id: number) {
+    await toggleFavoriteStore({ id, nombre: '', precio: 0, imagen: '' });
+  }
+
+  function esFavoritoFunc(id: number): boolean {
+    return isFavorite(id);
+  }
+
+  function actualizarUI() {
+    const favorites = $favorites.get();
+    const container = document.getElementById('favoritos-items');
+    const countEl = document.getElementById('favoritos-count');
+    const navBadge = document.getElementById('nav-favoritos-count');
+    const items = Object.values(favorites);
+
+    if (countEl) countEl.textContent = `${items.length} producto${items.length !== 1 ? 's' : ''} guardado${items.length !== 1 ? 's' : ''}`;
+    if (navBadge) {
+      navBadge.textContent = String(items.length);
+      navBadge.classList.toggle('hidden', items.length === 0);
+    }
+
+    if (!container) return;
+
+    if (items.length === 0) {
+      container.innerHTML = `
+        <div id="favoritos-empty" class="flex flex-col items-center justify-center h-full text-center py-12">
+          <div class="w-24 h-24 bg-[#FFFDF7] rounded-2xl flex items-center justify-center mb-6 border border-[#E8E0D8]">
+            <svg class="w-12 h-12 text-[#C4B09C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+          </div>
+          <h4 class="text-lg font-display font-bold text-[#2D2D2D] mb-2">No tienes favoritos</h4>
+          <p class="text-sm text-muted mb-6">Guarda productos que te interesen para compararlos después</p>
+          <a href="/marketplace" onclick="cerrarFavoritos()" class="btn-primary">
+            Explorar Productos
+          </a>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = '';
+    items.forEach((item: Favorite) => {
+      const itemEl = document.createElement('div');
+      itemEl.className = 'flex gap-4 p-4 bg-white rounded-2xl border border-[#E8E0D8] shadow-sm hover:shadow-md transition-shadow';
+      itemEl.innerHTML = `
+        <a href="/marketplace/${item.id}" class="shrink-0">
+          <img src="${item.imagen}" alt="${item.nombre}" class="w-20 h-20 rounded-xl object-cover" onerror="this.src='/images/ganado.svg'" />
+        </a>
+        <div class="flex-1 min-w-0">
+          <a href="/marketplace/${item.id}" class="text-sm font-bold text-[#2D2D2D] line-clamp-2 hover:text-gold-700 transition-colors">${item.nombre}</a>
+          <p class="text-lg font-extrabold text-[#2D2D2D] mt-1">${formatearCOP(item.precio)}</p>
+          <div class="flex items-center justify-between mt-3">
+            <span class="text-xs text-muted">Guardado</span>
+            <button onclick="eliminarFavorito(${item.id})" class="text-xs text-coral-500 hover:text-coral-700 font-medium transition-colors flex items-center gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              Quitar
+            </button>
+          </div>
+        </div>
+      `;
+      container.appendChild(itemEl);
+    });
+  }
+
+  function actualizarBotonesFavoritos() {
+    const favorites = $favorites.get();
+    const ids = new Set(Object.keys(favorites).map(Number));
+    document.querySelectorAll('.btn-favorito').forEach((btn) => {
+      const id = parseInt(btn.getAttribute('data-id') || '0');
+      const esFav = ids.has(id);
+      btn.classList.toggle('activo', esFav);
+      const svg = btn.querySelector('svg');
+      if (svg) {
+        svg.setAttribute('fill', esFav ? '#f55a4e' : 'none');
+        svg.setAttribute('stroke', esFav ? '#f55a4e' : 'currentColor');
+      }
+    });
+  }
+
+  // Reactivity
+  $favorites.subscribe(() => {
+    actualizarUI();
+    actualizarBotonesFavoritos();
+    document.dispatchEvent(new CustomEvent('favoritos-changed', {
+      detail: { favoritos: Object.values($favorites.get()), ids: Object.keys($favorites.get()).map(Number) },
+    }));
+  });
+
+  // Expose global functions
+  (window as any).abrirFavoritos = abrirFavoritos;
+  (window as any).cerrarFavoritos = cerrarFavoritos;
+  (window as any).toggleFavorito = toggleFavorito;
+  (window as any).eliminarFavorito = eliminarFavorito;
+  (window as any).esFavorito = esFavoritoFunc;
+
+  // Initial render
+  actualizarUI();
+
+  // Re-render on navigation
+  window.addEventListener('pageshow', () => {
+    actualizarUI();
+    actualizarBotonesFavoritos();
+  });
+
+  // Delegation for .btn-favorito clicks
+  document.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('.btn-favorito');
+    if (!btn) return;
+    e.stopPropagation();
+    const id = parseInt(btn.getAttribute('data-id') || '0');
+    const nombre = btn.getAttribute('data-nombre') || '';
+    const precio = parseFloat(btn.getAttribute('data-precio') || '0');
+    const imagen = btn.getAttribute('data-imagen') || '';
+    const vendedor = btn.getAttribute('data-vendedor') || '';
+    const ubicacion = btn.getAttribute('data-ubicacion') || '';
+    const categoria = btn.getAttribute('data-categoria') || '';
+    toggleFavorito(id, nombre, precio, imagen, vendedor, ubicacion, categoria);
+  }, true);
+
+  // Open/close from nav button
+  document.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('[data-open-favoritos]');
+    if (btn) {
+      if (estaAbiertoFavoritos()) {
+        cerrarFavoritos();
+      } else {
+        abrirFavoritos();
+      }
+    }
+  });
+
+  // MutationObserver for dynamic buttons
+  const observer = new MutationObserver((mutations) => {
+    const hasNewButtons = mutations.some((m) =>
+      Array.from(m.addedNodes).some(
+        (n) =>
+          n instanceof HTMLElement &&
+          (n.classList?.contains('btn-favorito') || n.querySelector?.('.btn-favorito'))
+      )
+    );
+    if (hasNewButtons) actualizarBotonesFavoritos();
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+</script>

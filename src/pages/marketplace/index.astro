@@ -143,7 +143,7 @@ const sortLabel = sortLabelsMap[sortBy] || 'Más relevantes';
     </div>
 
     <!-- Panel de filtros colapsable -->
-    <div id="filters-panel" class="hidden mb-8 bg-[#D5CFC6] border border-[#BDB5A8] rounded-2xl shadow-sm overflow-hidden">
+    <div id="filters-panel" class="hidden mb-8 bg-coffee-100 border border-coffee-200 rounded-2xl shadow-sm overflow-hidden">
       <FilterPanel
         client:load
         initialCategoria={categoria}
@@ -172,7 +172,7 @@ const sortLabel = sortLabelsMap[sortBy] || 'Más relevantes';
           <nav class="flex items-center justify-between border-t border-[#E8DCCB] px-4 py-3 sm:px-6 mt-12 bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.02)]" aria-label="Pagination">
             <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
               <div>
-                <p class="text-sm text-stone-600 font-nunito">
+                <p class="text-sm text-stone-600 font-sans">
                   Mostrando <span class="font-bold text-campo-700">{startIdx + 1}</span> a <span class="font-bold text-campo-700">{Math.min(endIdx, totalProductosFiltrados)}</span> de{' '}
                   <span class="font-bold text-campo-700">{totalProductosFiltrados}</span> resultados
                 </p>
@@ -182,7 +182,7 @@ const sortLabel = sortLabelsMap[sortBy] || 'Más relevantes';
                   {page > 1 && (
                     <a
                       href={getPageUrl(page - 1)}
-                      class="relative inline-flex items-center rounded-xl px-3 py-2 text-stone-600 hover:text-campo-700 hover:bg-[#f0faf3] border border-[#E8DCCB] hover:border-campo-350 transition-all duration-200 text-sm font-semibold font-nunito"
+                      class="relative inline-flex items-center rounded-xl px-3 py-2 text-stone-600 hover:text-campo-700 hover:bg-[#f0faf3] border border-[#E8DCCB] hover:border-campo-350 transition-all duration-200 text-sm font-semibold font-sans"
                     >
                       <svg class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                         <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.83 10l3.94 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
@@ -196,7 +196,7 @@ const sortLabel = sortLabelsMap[sortBy] || 'Más relevantes';
                     return (
                       <a
                         href={getPageUrl(pageNum)}
-                        class={`relative inline-flex items-center rounded-xl px-3.5 py-2 text-sm font-bold transition-all duration-200 font-nunito ${
+                        class={`relative inline-flex items-center rounded-xl px-3.5 py-2 text-sm font-bold transition-all duration-200 font-sans ${
                           isCurrent
                             ? 'bg-campo-600 text-white shadow-md shadow-campo-600/15 border border-campo-600'
                             : 'text-stone-700 hover:text-campo-700 hover:bg-[#f0faf3] border border-[#E8DCCB] hover:border-campo-300'
@@ -210,7 +210,7 @@ const sortLabel = sortLabelsMap[sortBy] || 'Más relevantes';
                   {page < totalPages && (
                     <a
                       href={getPageUrl(page + 1)}
-                      class="relative inline-flex items-center rounded-xl px-3 py-2 text-stone-600 hover:text-campo-700 hover:bg-[#f0faf3] border border-[#E8DCCB] hover:border-campo-350 transition-all duration-200 text-sm font-semibold font-nunito"
+                      class="relative inline-flex items-center rounded-xl px-3 py-2 text-stone-600 hover:text-campo-700 hover:bg-[#f0faf3] border border-[#E8DCCB] hover:border-campo-350 transition-all duration-200 text-sm font-semibold font-sans"
                     >
                       Siguiente
                       <svg class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -223,7 +223,7 @@ const sortLabel = sortLabelsMap[sortBy] || 'Más relevantes';
             </div>
             
             {/* Mobile version */}
-            <div class="flex flex-1 justify-between sm:hidden items-center font-nunito">
+            <div class="flex flex-1 justify-between sm:hidden items-center font-sans">
               {page > 1 ? (
                 <a
                   href={getPageUrl(page - 1)}
@@ -427,7 +427,7 @@ const sortLabel = sortLabelsMap[sortBy] || 'Más relevantes';
         const pIndex = localProductos.indexOf(p);
         
         const card = document.createElement('article');
-        card.className = 'group bg-white rounded-2xl border border-[#E8DCCB] overflow-hidden cursor-pointer transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_30px_rgba(0,0,0,0.1)] hover:border-campo-400 active:scale-[0.99]';
+        card.className = 'group bg-white rounded-2xl border border-coffee-100 overflow-hidden cursor-pointer transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_30px_rgba(0,0,0,0.1)] hover:border-campo-400 active:scale-[0.99]';
         card.setAttribute('data-href', `/marketplace/${p.id}`);
         card.setAttribute('data-imagenes', JSON.stringify(allImgs));
         card.setAttribute('data-img-index', '0');
@@ -452,13 +452,13 @@ const sortLabel = sortLabelsMap[sortBy] || 'Más relevantes';
             </div>
             ` : ''}
             <div class="absolute bottom-2 right-2">
-              <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-white/80 backdrop-blur-sm text-[#6B6B6B] shadow-sm">
+              <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-white/80 backdrop-blur-sm text-muted shadow-sm">
                 ${p.stock || 1} ${p.stock === 1 ? 'ud.' : 'uds.'}
               </span>
             </div>
           </div>
           <div class="p-4 sm:p-5 space-y-3">
-            <h3 class="text-[17px] font-sans font-bold text-[#333333] leading-snug line-clamp-1 group-hover:text-campo-600 transition-colors">${p.nombre}</h3>
+            <h3 class="text-[17px] font-display font-bold text-[#2D2D2D] leading-snug line-clamp-1 group-hover:text-campo-600 transition-colors">${p.nombre}</h3>
             <p class="text-[18px] font-bold text-campo-600 leading-tight">$${parseInt(p.precio || 0).toLocaleString('es-CO')}</p>
             <div class="flex gap-2 pt-1">
               <button onclick="abrirLocalModal(${pIndex})" class="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-white text-campo-600 font-bold rounded-xl border-2 border-campo-600 hover:bg-campo-50 hover:border-campo-700 hover:text-campo-700 active:scale-[0.98] transition-all duration-200 text-[13px] cursor-pointer">
@@ -507,14 +507,6 @@ const sortLabel = sortLabelsMap[sortBy] || 'Más relevantes';
 </script>
 
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
-  
-  .font-nunito {
-    font-family: 'Nunito', sans-serif;
-  }
-
-
-
   .empty-state-btn {
     background-color: #2D6A4F;
     color: #ffffff;

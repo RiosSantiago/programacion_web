@@ -24,7 +24,7 @@ export default {
            400: '#5DAA6B',
            500: '#4A9B5D',
            600: '#3B7E4B',
-            700: '#008000',
+            700: '#2D6A3E',
            800: '#1F4628',
            850: '#193A21',
            900: '#132D1A',
@@ -77,6 +77,9 @@ export default {
           800: '#a62a23',
           900: '#8c201a',
         },
+        muted: {
+          DEFAULT: '#6B6B6B',
+        },
       },
       fontFamily: {
         display: ['Cormorant Garamond', 'Georgia', 'serif'],
@@ -86,11 +89,11 @@ export default {
   },
   safelist: [
     {
-      pattern: /^(bg|text|border|ring)-(gold|campo|cielo|coffee|coral)-(50|100|200|300|400|500|600|700|800|850|900)/,
+      pattern: /^(bg|text|border|ring)-(gold|campo|cielo|coffee|coral|muted)(-(50|100|200|300|400|500|600|700|800|850|900))?/,
       variants: ['hover', 'disabled', 'active'],
     },
     {
-      pattern: /^(from|via|to)-(gold|campo|cielo|coffee|coral)-(50|100|200|300|400|500|600|700|800|850|900)/,
+      pattern: /^(from|via|to)-(gold|campo|cielo|coffee|coral|muted)(-(50|100|200|300|400|500|600|700|800|850|900))?/,
     },
   ],
   plugins: [],
