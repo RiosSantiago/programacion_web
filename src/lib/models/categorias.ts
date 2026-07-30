@@ -28,7 +28,7 @@ function conSlug(row: any): Categoria {
 }
 
 export async function getCategorias(): Promise<Categoria[]> {
-  const rows = await queryAll<any>('SELECT id, nombre, icono, color, cantidad, slug FROM categorias ORDER BY cantidad DESC');
+  const rows = await queryAll<any>('SELECT id, nombre, icono, color, cantidad FROM categorias ORDER BY cantidad DESC');
   return rows.map(conSlug);
 }
 
@@ -43,8 +43,6 @@ export async function getCategoriaPorNombre(nombre: string): Promise<Categoria |
 }
 
 export async function getCategoriaPorSlug(slug: string): Promise<Categoria | undefined> {
-  const row = await queryGet<any>('SELECT * FROM categorias WHERE slug = ?', [slug]);
-  if (row) return conSlug(row);
   const rows = await queryAll<any>('SELECT * FROM categorias');
   return rows.map(conSlug).find(c => c.slug === slug);
 }

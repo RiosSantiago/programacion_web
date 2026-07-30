@@ -81,6 +81,7 @@ export default function AgricolaForm() {
     if (photos.length > 0) {
       try {
         const uploadFormData = new FormData();
+        uploadFormData.append('categoria', 'agricultura');
         photos.forEach((photo) => uploadFormData.append('photos', photo));
 
         const uploadRes = await fetch('/api/upload', { method: 'POST', body: uploadFormData });
