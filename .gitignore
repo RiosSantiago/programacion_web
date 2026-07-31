@@ -1,10 +1,9 @@
 node_modules
 dist
 .DS_Store
+.astro/
+database/*.db-shm
+database/*.db-wal
 .env
-.env.*
-*.db.bak*
-database/backup_*.sql
-database/agroup_pgdata/
-*.ts.tmp
-
+database/*.bak*
+database/*.sql

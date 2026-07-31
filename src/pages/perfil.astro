@@ -11,9 +11,8 @@ import PasswordForm from '../components/auth/PasswordForm';
 
         <!-- Fila superior: Mi Perfil + Contraseña (unificado) -->
         <div class="bg-white rounded-2xl border border-[#1b3928] shadow-sm overflow-hidden mb-6">
-          <div class="grid grid-cols-1 md:grid-cols-2">
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0">
 
-<<<<<<< Updated upstream
             <!-- Mi Perfil (izquierda) -->
             <div>
               <div class="px-6 py-4 bg-[#1b3928] border-b border-[#1b3928]">
@@ -30,23 +29,6 @@ import PasswordForm from '../components/auth/PasswordForm';
                       <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                       <span class="text-[10px] text-white font-medium">Cambiar foto</span>
                     </div>
-=======
-          <!-- Mi Perfil (izquierda) -->
-          <div class="bg-white rounded-2xl border border-[#1b3928] shadow-sm overflow-hidden">
-            <div class="px-6 py-4 bg-[#1b3928] border-b border-[#1b3928]">
-              <h1 class="text-xl font-bold text-white">Mi Perfil</h1>
-              <p class="text-sm text-white/70 mt-1">Tu información pública</p>
-            </div>
-            <div class="p-8 pt-12 text-center flex flex-col items-center justify-center min-h-[320px]">
-              <div id="user-role-badge" class="hidden mb-4"></div>
-              <div class="relative w-28 h-28 mx-auto" id="avatar-wrapper">
-                <div class="relative w-full h-full rounded-2xl flex items-center justify-center overflow-hidden group cursor-pointer border-4 border-white shadow-md bg-black" id="avatar-container">
-                  <span class="text-4xl font-bold text-white" id="user-avatar-initial">?</span>
-                  <img id="user-avatar-img" class="hidden w-full h-full object-cover" alt="Avatar" />
-                  <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1 rounded-2xl" id="avatar-overlay">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                    <span class="text-[10px] text-white font-medium">Cambiar foto</span>
->>>>>>> Stashed changes
                   </div>
                   <!-- Botón eliminar foto: verde -> rojo al hover -->
                   <button
@@ -63,7 +45,7 @@ import PasswordForm from '../components/auth/PasswordForm';
                 </div>
                 <input type="file" accept="image/*" id="avatar-file-input" class="hidden" />
                 <h2 class="text-2xl font-bold text-[#1A0E08] mt-5" id="user-name-display"></h2>
-                <p class="text-sm text-[#6B6B6B] mt-1" id="user-email-display"></p>
+                <p class="text-sm text-muted mt-1" id="user-email-display"></p>
               </div>
             </div>
 
@@ -122,14 +104,14 @@ import PasswordForm from '../components/auth/PasswordForm';
       <div class="relative w-64 h-64 mx-auto rounded-2xl overflow-hidden border-2 border-[#1b3928] bg-slate-900 cursor-grab active:cursor-grabbing" id="crop-viewport">
         <img id="crop-image" class="absolute select-none" alt="Recortar" draggable="false" />
       </div>
-      <p class="text-xs text-[#6B6B6B] text-center mt-3">Arrastra para mover, usa el deslizador para ajustar el tamaño</p>
+      <p class="text-xs text-muted text-center mt-3">Arrastra para mover, usa el deslizador para ajustar el tamaño</p>
       <div class="mt-4 flex items-center gap-3">
-        <svg class="w-4 h-4 text-[#6B6B6B] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"/></svg>
+        <svg class="w-4 h-4 text-muted shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"/></svg>
         <input type="range" id="crop-zoom" min="0.5" max="3" step="0.01" value="1" class="flex-1 accent-campo-600" />
-        <svg class="w-4 h-4 text-[#6B6B6B] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/></svg>
+        <svg class="w-4 h-4 text-muted shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/></svg>
       </div>
       <div class="flex gap-3 mt-5">
-        <button id="crop-cancel" class="flex-1 py-2.5 border border-[#1b3928] text-[#6B6B6B] font-semibold rounded-xl hover:bg-slate-50 transition-colors text-sm">Cancelar</button>
+        <button id="crop-cancel" class="flex-1 py-2.5 border border-[#1b3928] text-muted font-semibold rounded-xl hover:bg-slate-50 transition-colors text-sm">Cancelar</button>
         <button id="crop-apply" class="flex-1 py-2.5 bg-campo-600 text-white font-semibold rounded-xl hover:bg-campo-700 transition-colors text-sm">Aplicar</button>
       </div>
     </div>

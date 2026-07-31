@@ -7,7 +7,7 @@ export const GET: APIRoute = async ({ url }) => {
     const q = url.searchParams.get('q') || '';
 
     let sqlQuery = `
-      SELECT p.id, p.nombre, p.categoria, p.categoria_id AS "categoriaId", p.raza,
+      SELECT p.id, p.nombre, p.categoria_id AS "categoriaId", p.raza,
              p.peso, p.peso_unitario AS "pesoUnitario",
              p.ubicacion, p.departamento, p.precio, p.precio_anterior AS "precioAnterior",
              p.stock,
@@ -15,9 +15,12 @@ export const GET: APIRoute = async ({ url }) => {
              p.vendedor_rating AS "vendedorRating",
              p.estado, p.salud, p.envio, p.destacado, p.oferta, p.trazabilidad,
              p.descripcion, p.vendedor_id,
-             p.created_at AS "createdAt"
+             p.created_at AS "createdAt",
+             c.slug AS categoria,
+             c.nombre AS categoria_nombre
       FROM productos p
       LEFT JOIN usuarios u ON p.vendedor_id = u.id
+      LEFT JOIN categorias c ON p.categoria_id = c.id
     `;
     const params: any[] = [];
 
@@ -28,7 +31,7 @@ export const GET: APIRoute = async ({ url }) => {
         COALESCE(p.raza, '') ILIKE ? OR
         u.nombre ILIKE ? OR
         p.ubicacion ILIKE ? OR
-        p.categoria ILIKE ? OR
+        c.nombre ILIKE ? OR
         COALESCE(p.descripcion, '') ILIKE ?
       )`;
       params.push(searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm);

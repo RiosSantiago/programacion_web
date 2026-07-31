@@ -13,7 +13,7 @@ dotenv.config();
 
 const { Pool } = pg;
 
-const connectionString = (process.env.DATABASE_URL || 'postgresql://postgres:postgrespassword@127.0.0.1:4321/agroup?sslmode=disable').trim();
+const connectionString = (import.meta.env.DATABASE_URL || process.env.DATABASE_URL || 'postgresql://postgres:postgrespassword@127.0.0.1:4321/agroup?sslmode=disable').trim();
 
 // Instancia única (singleton) de pg.Pool — conexión TCP a PostgreSQL (Docker / Neon)
 export const pool = new Pool({
@@ -51,7 +51,7 @@ export function buildQuery(sql: string, params: any[] | Record<string, any> = []
   const values: any[] = [];
 
   // Sintaxis SQLite incompatible con Postgres
-  text = text.replace(/\bINSERT\s+OR\s+IGNORE\b/gi, 'INSERT');
+  text = text.replace(/\bINSERT\s+OR\s+IGNORE\b/gi, 'INSERT ON CONFLICT DO NOTHING');
   text = text.replace(/\blast_insert_rowid\(\)/gi, 'lastval()');
   // Operadores booleanos en SQL (1 → true)
   text = text.replace(/\b(destacado|trazabilidad|envio|oferta|verificado)\s*=\s*1\b/gi, '$1 = true');
@@ -115,7 +115,7 @@ export async function execSql(sql: string): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
-// INICIALIZACIÓN — crea el esquema si no existe
+// INICIALIZACIÓN — crea el esquema si no existe + corre migraciones
 // ---------------------------------------------------------------------------
 let _initialized = false;
 
@@ -126,6 +126,29 @@ export async function inicializar(): Promise<void> {
   if (fs.existsSync(ddlPath)) {
     const ddl = fs.readFileSync(ddlPath, 'utf8');
     await pool.query(ddl);
+  }
+
+  // Migraciones: tabla de control y ejecución pendiente
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS _migrations (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL UNIQUE,
+      applied_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  const migrationsDir = path.join(process.cwd(), 'database', 'migrations');
+  if (fs.existsSync(migrationsDir)) {
+    const files = fs.readdirSync(migrationsDir).filter(f => f.endsWith('.sql')).sort();
+    for (const file of files) {
+      const already = await pool.query('SELECT 1 FROM _migrations WHERE name = $1', [file]);
+      if (already.rowCount && already.rowCount > 0) continue;
+
+      const sql = fs.readFileSync(path.join(migrationsDir, file), 'utf8');
+      await pool.query(sql);
+      await pool.query('INSERT INTO _migrations (name) VALUES ($1)', [file]);
+      console.log(`[migración] aplicada: ${file}`);
+    }
   }
 }
 

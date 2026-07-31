@@ -90,7 +90,7 @@ export default function PasswordForm() {
         </div>
       )}
 
-      <p className="text-xs text-[#6B6B6B]">Debes ingresar tu contraseña actual para poder cambiarla.</p>
+      <p className="text-xs text-muted">Debes ingresar tu contraseña actual para poder cambiarla.</p>
 
       <div>
         <label className="block text-sm font-medium text-[#2D2D2D] mb-1.5">Contraseña actual</label>

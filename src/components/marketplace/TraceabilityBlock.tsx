@@ -33,8 +33,8 @@ export default function TraceabilityBlock({
   nombre = 'Este animal'
 }: TraceabilityBlockProps) {
   const verificacion = data?.verificacion || 'verificado';
-  const categoria = data?.categoria || 'bovino';
-  const esBovinoOEquino = categoria === 'bovino' || categoria === 'equino';
+  const categoria = data?.categoria || 'bovinos';
+  const esBovinoOEquino = categoria === 'bovinos' || categoria === 'equinos';
 
   const historialPeso = data?.historialPeso || [
     { fecha: 'Ene 26', peso: 320 },

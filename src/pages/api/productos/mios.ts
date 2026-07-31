@@ -17,9 +17,18 @@ export const GET: APIRoute = async ({ request }) => {
     }
 
     const rows = await queryAll(
-      `SELECT p.*, u.nombre AS vendedor
+      `SELECT p.id, p.nombre, p.categoria_id, p.raza, p.peso, p.peso_unitario,
+              p.ubicacion, p.departamento, p.precio, p.precio_anterior, p.stock,
+              p.vendedor_id, p.vendedor_rating, p.estado, p.salud, p.envio,
+              p.destacado, p.oferta, p.trazabilidad, p.tipo_precio, p.sexo,
+              p.fecha_nacimiento, p.descripcion, p.video, p.finca, p.vereda,
+              p.referencia_ubicacion, p.ica_pdf, p.created_at,
+              u.nombre AS vendedor,
+              c.slug AS categoria,
+              c.nombre AS categoria_nombre
        FROM productos p
        LEFT JOIN usuarios u ON p.vendedor_id = u.id
+       LEFT JOIN categorias c ON p.categoria_id = c.id
        WHERE p.vendedor_id = ?
        ORDER BY p.id DESC`,
       [payload.id]

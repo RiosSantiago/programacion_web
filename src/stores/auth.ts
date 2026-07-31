@@ -31,7 +31,7 @@ export function login(user: User) {
   if (typeof localStorage !== 'undefined') {
     localStorage.setItem('agroup_user', JSON.stringify(user));
   }
-  hydrateStores();
+  hydrateStores().catch(() => {});
 }
 
 export function logout() {
@@ -72,8 +72,8 @@ async function hydrateStores() {
 }
 
 function resetStores() {
-  import('./cart').then(m => m.clearCart());
-  import('./favorites').then(m => m.clearFavorites());
+  import('./cart').then(m => m.clearCart()).catch(() => {});
+  import('./favorites').then(m => m.clearFavorites()).catch(() => {});
 }
 
 if (typeof localStorage !== 'undefined') {
@@ -84,7 +84,7 @@ if (typeof localStorage !== 'undefined') {
       const user: User = JSON.parse(saved);
       $user.set(user);
       $isAuthenticated.set(true);
-      hydrateStores();
+      hydrateStores().catch(() => {});
     } catch (e) {
       localStorage.removeItem('agroup_user');
       localStorage.removeItem('agroup_token');

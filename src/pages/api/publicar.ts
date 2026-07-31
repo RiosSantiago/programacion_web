@@ -48,16 +48,22 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ error: 'La referencia no debe exceder 200 caracteres.' }), { status: 400 });
     }
 
+    const catSlug = (data.categoria || '').toLowerCase();
+    const catSlugMap: Record<string, number> = {};
+    const cats = await queryAll<{ id: number; slug: string }>('SELECT id, slug FROM categorias');
+    for (const c of cats) catSlugMap[c.slug] = c.id;
+    const categoriaId = catSlugMap[catSlug] || catSlugMap[catSlug.replace(/s$/, '')] || null;
+
     const { lastInsertRowid: newId } = await queryRun(
       `INSERT INTO productos (
-        nombre, categoria, raza, peso, peso_unitario, ubicacion, departamento,
+        nombre, categoria_id, raza, peso, peso_unitario, ubicacion, departamento,
         precio, precio_anterior, stock, vendedor_id, vendedor_rating,
         estado, salud, envio, destacado, oferta, trazabilidad, tipo_precio, descripcion, video, sexo,
         finca, vereda, referencia_ubicacion, ica_pdf
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         data.nombre,
-        data.categoria,
+        categoriaId,
         data.raza || null,
         data.peso ? parseFloat(data.peso) : null,
         null,

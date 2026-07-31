@@ -53,11 +53,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <div id="resumen-items" class="space-y-3 mb-4"></div>
           <div class="border-t border-[#E8E0D8] pt-4 space-y-2">
             <div class="flex justify-between text-sm">
-              <span class="text-[#6B6B6B]">Subtotal</span>
+              <span class="text-muted">Subtotal</span>
               <span id="subtotal" class="font-medium text-[#2D2D2D]"></span>
             </div>
             <div class="flex justify-between text-sm">
-              <span class="text-[#6B6B6B]">Envío</span>
+              <span class="text-muted">Envío</span>
               <span class="font-medium text-gold-700">Gratis</span>
             </div>
             <div class="flex justify-between text-lg font-bold pt-2 border-t border-[#E8E0D8]">
@@ -68,7 +68,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <button id="btn-pagar" class="w-full mt-6 py-3 bg-campo-600 text-white font-bold rounded-xl hover:bg-campo-700 transition-all duration-200 active:scale-[0.98] shadow-lg">
             Confirmar Pedido
           </button>
-          <p class="text-xs text-[#6B6B6B] text-center mt-3">
+          <p class="text-xs text-muted text-center mt-3">
             Al confirmar, aceptas nuestros <a href="/terminos" class="text-gold-700 hover:underline">términos</a>
           </p>
         </div>
@@ -113,7 +113,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         </div>
         <div class="flex-1 min-w-0">
           <p class="font-bold text-[#2D2D2D] text-sm">${m.nombre}</p>
-          <p class="text-xs text-[#6B6B6B]">${m.descripcion}</p>
+          <p class="text-xs text-muted">${m.descripcion}</p>
         </div>
       </label>
     `).join('');
@@ -148,7 +148,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <img src="${item.imagen}" alt="${item.nombre}" class="w-16 h-16 object-cover rounded-lg" />
         <div class="flex-1 min-w-0">
           <p class="text-sm font-bold text-[#2D2D2D] truncate">${item.nombre}</p>
-          <p class="text-xs text-[#6B6B6B]">Cantidad: ${item.cantidad}</p>
+          <p class="text-xs text-muted">Cantidad: ${item.cantidad}</p>
           <p class="text-sm font-bold text-gold-700">${formatCOP(item.precio * item.cantidad)}</p>
         </div>
       </div>
