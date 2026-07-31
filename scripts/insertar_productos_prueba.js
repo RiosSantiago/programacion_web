@@ -124,9 +124,9 @@ async function main() {
       {
         nombre: 'Café Orgánico Supremo x kg', imagen_idx: 0,
         descripcion: 'Café arábica de alta montaña, cultivado a 1800 msnm en finca certificada orgánica. Notas a caramelo y chocolate, tueste medio. Cosecha reciente.',
-        precio: 48000, precio_anterior: 55000, stock: 50,
+        precio: 48000, stock: 50,
         ubicacion: 'Manizales', departamento: 'Caldas',
-        oferta: true, destacado: true,
+        destacado: true,
         finca: 'Finca El Arrayán', vereda: 'Alto de San Daniel', peso: 1.0,
       },
       {
@@ -148,17 +148,17 @@ async function main() {
       {
         nombre: 'Café Tostado Molido 500g', imagen_idx: 3,
         descripcion: 'Café 100% arábica tostado y molido, empaque al vacío de 500g. Tueste medio, apto para cafetera de filtro, prensa francesa y espresso.',
-        precio: 28000, precio_anterior: 32000, stock: 80,
+        precio: 28000, stock: 80,
         ubicacion: 'Villamaría', departamento: 'Caldas',
-        oferta: true, destacado: false,
+        destacado: false,
         finca: 'Finca El Ocaso', vereda: 'La Florida', peso: 0.5,
       },
       {
         nombre: 'Aguacate Hass Premium x und', imagen_idx: 4,
         descripcion: 'Aguacate Hass de primera calidad, cosecha manual. Pulpa cremosa con alto contenido de aceite. Ideal para exportación y consumo nacional.',
-        precio: 8500, precio_anterior: 10000, stock: 200,
+        precio: 8500, stock: 200,
         ubicacion: 'Armenia', departamento: 'Quindío',
-        oferta: true, destacado: true,
+        destacado: true,
         finca: 'Finca El Bosque', vereda: 'Pueblo Tapado', peso: null,
       },
       {
@@ -180,9 +180,9 @@ async function main() {
       {
         nombre: 'Cacao Seco Fermentado x kg', imagen_idx: 7,
         descripcion: 'Cacao seco fermentado de alta calidad, granos bien fermentados con perfiles aromáticos a frutas y nueces.',
-        precio: 22000, precio_anterior: 25000, stock: 60,
+        precio: 22000, stock: 60,
         ubicacion: 'San José', departamento: 'Caldas',
-        oferta: true, destacado: true,
+        destacado: true,
         finca: 'Finca La Esperanza', vereda: 'San Lorenzo', peso: 1.0,
       },
       {
@@ -231,10 +231,10 @@ async function main() {
           ) RETURNING id
         `, [
           p.nombre, 'Agricultura', categoriaId, p.descripcion,
-          p.precio, p.precio_anterior ?? null, p.stock,
+          p.precio, null, p.stock,
           p.ubicacion, p.departamento,
           usuario.id, 4.8,
-          'disponible', 'Excelente', true, p.destacado ?? false, p.oferta ?? false, false,
+          'disponible', 'Excelente', true, p.destacado ?? false, false, false,
           'fijo',
           p.peso ?? null, p.peso ?? null,
           p.finca ?? '', p.vereda ?? '',

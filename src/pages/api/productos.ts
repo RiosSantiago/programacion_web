@@ -16,7 +16,7 @@ export const GET: APIRoute = async ({ url }) => {
              p.estado, p.salud, p.envio, p.destacado, p.oferta, p.trazabilidad,
              p.descripcion, p.vendedor_id,
              p.created_at AS "createdAt",
-             c.slug AS categoria,
+             COALESCE(c.slug, p.categoria) AS categoria,
              c.nombre AS categoria_nombre
       FROM productos p
       LEFT JOIN usuarios u ON p.vendedor_id = u.id

@@ -345,17 +345,17 @@ const campos = [
 
   function getPlaceholderImagen(categoria) {
     const imagenes = {
-      bovino: '/images/ganado.svg',
-      equino: '/images/caballo.svg',
-      porcino: '/images/cerdo.svg',
-      ovino: '/images/ganado.svg',
-      avicola: '/images/gallina.svg',
+      bovinos: '/images/ganado.svg',
+      equinos: '/images/caballo.svg',
+      porcinos: '/images/cerdo.svg',
+      ovinos: '/images/ganado.svg',
+      avicolas: '/images/gallina.svg',
       cultivos: '/images/cultivos.svg',
       servicios: '/images/default.svg',
       agricultura: '/images/cultivos.svg',
       insumos: '/images/default.svg',
     };
-    return imagenes[categoria] || '/images/default.svg';
+    return imagenes[String(categoria || '').toLowerCase()] || '/images/default.svg';
   }
 
   function mostrarDetalles(producto) {
