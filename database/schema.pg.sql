@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS productos (
     finca VARCHAR(255) DEFAULT '',
     vereda VARCHAR(255) DEFAULT '',
     referencia_ubicacion TEXT DEFAULT '',
-    ica_pdf TEXT DEFAULT '',
+    certificaciones TEXT DEFAULT '',
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
