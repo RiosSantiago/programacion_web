@@ -194,7 +194,7 @@ export default function PublicationForm() {
       vereda: formData.vereda,
       referencia_ubicacion: formData.referencia_ubicacion,
       descripcion: formData.descripcion,
-      imagenes: uploadedPhotoUrls.length > 0 ? uploadedPhotoUrls : ['/images/categories/bovino.webp'],
+      imagenes: uploadedPhotoUrls.length > 0 ? uploadedPhotoUrls : ['/images/categories/bovinos.webp'],
       video: uploadedVideoUrl,
       certificaciones: uploadedCertUrls,
     };

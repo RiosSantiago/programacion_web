@@ -4,3 +4,6 @@ dist
 .astro/
 database/*.db-shm
 database/*.db-wal
+.env
+database/*.bak*
+database/*.sql

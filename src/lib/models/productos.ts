@@ -40,15 +40,15 @@ export interface Producto {
 
 function getPlaceholderImagen(categoria: string): string {
   const imagenesCategoria: Record<string, string> = {
-    bovino:    '/images/ganado.svg',
-    equino:    '/images/caballo.svg',
-    porcino:   '/images/cerdo.svg',
-    ovino:     '/images/ganado.svg',
-    avicola:   '/images/gallina.svg',
-    cultivos:  '/images/cultivos.svg',
-    servicios: '/images/default.svg',
+    bovinos:    '/images/ganado.svg',
+    equinos:    '/images/caballo.svg',
+    porcinos:   '/images/cerdo.svg',
+    ovinos:     '/images/ganado.svg',
+    avicolas:   '/images/gallina.svg',
+    cultivos:   '/images/cultivos.svg',
+    servicios:  '/images/default.svg',
     agricultura: '/images/cultivos.svg',
-    insumos:    '/images/default.svg',
+    insumos:     '/images/default.svg',
   };
   return imagenesCategoria[categoria] || '/images/default.svg';
 }
@@ -78,7 +78,7 @@ export async function getImagenesByProductoId(productoId: number): Promise<strin
 function transformarProducto(row: any, imagenesTabulares?: string[]): Producto {
   try {
     const imagenes: string[] = (imagenesTabulares && imagenesTabulares.length > 0) ? imagenesTabulares : [];
-    const categoria = row.categoria || 'bovino';
+    const categoria = row.categoria || 'bovinos';
     const { ica_pdf, ...rest } = row;
     return {
       ...rest,
@@ -99,7 +99,7 @@ function transformarProducto(row: any, imagenesTabulares?: string[]): Producto {
       ...row,
       destacado: false, oferta: false, trazabilidad: false, envio: false,
       imagenes: [],
-      imagen: getPlaceholderImagen(row.categoria || 'bovino'),
+      imagen: getPlaceholderImagen(row.categoria || 'bovinos'),
       video: '',
       precioAnterior: row.precio_anterior ?? null,
       vendedorRating: row.vendedor_rating  ?? 4.5,
@@ -146,12 +146,21 @@ async function getMapSlugToId(): Promise<Record<string, number>> {
 // ---------------------------------------------------------------------------
 // LECTURAS
 // ---------------------------------------------------------------------------
+const PRODUCTO_COLS = `
+  p.id, p.nombre, p.categoria_id, p.raza, p.peso, p.peso_unitario,
+  p.ubicacion, p.departamento, p.precio, p.precio_anterior, p.stock,
+  p.vendedor_id, p.vendedor_rating, p.estado, p.salud, p.envio,
+  p.destacado, p.oferta, p.trazabilidad, p.tipo_precio, p.sexo,
+  p.fecha_nacimiento, p.descripcion, p.video, p.finca, p.vereda,
+  p.referencia_ubicacion, p.ica_pdf, p.created_at
+`;
+
 export async function getProductos(): Promise<Producto[]> {
-  // C3: vendedor proviene exclusivamente de usuarios.nombre via JOIN
   const rows = await queryAll(
-    `SELECT p.*, u.nombre AS vendedor
+    `SELECT ${PRODUCTO_COLS}, u.nombre AS vendedor, c.slug AS categoria, c.nombre AS categoria_nombre
      FROM productos p
      LEFT JOIN usuarios u ON p.vendedor_id = u.id
+     LEFT JOIN categorias c ON p.categoria_id = c.id
      ORDER BY p.id DESC`
   );
   return attachImagenes(rows);
@@ -160,11 +169,11 @@ export async function getProductos(): Promise<Producto[]> {
 
 
 export async function getProductosDestacados(limit: number = 6): Promise<Producto[]> {
-  // C3: vendedor proviene exclusivamente de usuarios.nombre via JOIN
   const rows = await queryAll(
-    `SELECT p.*, u.nombre AS vendedor
+    `SELECT ${PRODUCTO_COLS}, u.nombre AS vendedor, c.slug AS categoria, c.nombre AS categoria_nombre
      FROM productos p
      LEFT JOIN usuarios u ON p.vendedor_id = u.id
+     LEFT JOIN categorias c ON p.categoria_id = c.id
      WHERE p.destacado = true
      ORDER BY p.id DESC
      LIMIT ?`,
@@ -176,11 +185,11 @@ export async function getProductosDestacados(limit: number = 6): Promise<Product
 
 
 export async function getProductoById(id: number): Promise<Producto | undefined> {
-  // C3: vendedor proviene exclusivamente de usuarios.nombre via JOIN
   const row = await queryGet(
-    `SELECT p.*, u.nombre AS vendedor
+    `SELECT ${PRODUCTO_COLS}, u.nombre AS vendedor, c.slug AS categoria, c.nombre AS categoria_nombre
      FROM productos p
      LEFT JOIN usuarios u ON p.vendedor_id = u.id
+     LEFT JOIN categorias c ON p.categoria_id = c.id
      WHERE p.id = ?`,
     [id]
   );
@@ -197,11 +206,11 @@ export async function getTotalProductos(): Promise<number> {
 }
 
 export async function getProductosByVendedorId(vendedorId: number): Promise<Producto[]> {
-  // C3: vendedor proviene exclusivamente de usuarios.nombre via JOIN
   const rows = await queryAll(
-    `SELECT p.*, u.nombre AS vendedor
+    `SELECT ${PRODUCTO_COLS}, u.nombre AS vendedor, c.slug AS categoria, c.nombre AS categoria_nombre
      FROM productos p
      LEFT JOIN usuarios u ON p.vendedor_id = u.id
+     LEFT JOIN categorias c ON p.categoria_id = c.id
      WHERE p.vendedor_id = ?
      ORDER BY p.id DESC`,
     [vendedorId]
@@ -234,9 +243,10 @@ export async function filtrarProductos(options: {
   // La query se construye dinámicamente; aplicamos el JOIN en la base y prefijamos
   // todas las columnas de productos con alias para evitar ambigüedad.
   let baseQuery = `
-    SELECT p.*, u.nombre AS vendedor
+    SELECT ${PRODUCTO_COLS}, u.nombre AS vendedor, c.slug AS categoria, c.nombre AS categoria_nombre
     FROM productos p
     LEFT JOIN usuarios u ON p.vendedor_id = u.id
+    LEFT JOIN categorias c ON p.categoria_id = c.id
     WHERE 1=1
   `;
   let query = baseQuery;
@@ -254,10 +264,10 @@ export async function filtrarProductos(options: {
         if (mapped && !numericIds.includes(mapped)) numericIds.push(mapped);
       });
       if (numericIds.length > 0) {
-        query += ` AND (p.categoria_id IN (${numericIds.map(() => '?').join(',')}) OR p.categoria IN (${cats.map(() => '?').join(',')}))`;
-        params.push(...numericIds, ...cats);
+        query += ` AND p.categoria_id IN (${numericIds.map(() => '?').join(',')})`;
+        params.push(...numericIds);
       } else {
-        query += ` AND p.categoria IN (${cats.map(() => '?').join(',')})`;
+        query += ` AND c.slug IN (${cats.map(() => '?').join(',')})`;
         params.push(...cats);
       }
     }
@@ -321,13 +331,12 @@ export async function filtrarProductos(options: {
 
   if (options.busqueda) {
     const searchTerm = `%${options.busqueda.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')}%`;
-    // C3: búsqueda en u.nombre (JOIN) — sin referencia a la columna p.vendedor
     query += ` AND (
       p.nombre ILIKE ? OR
       COALESCE(p.raza, '') ILIKE ? OR
       u.nombre ILIKE ? OR
       p.ubicacion ILIKE ? OR
-      p.categoria ILIKE ? OR
+      c.nombre ILIKE ? OR
       COALESCE(p.descripcion, '') ILIKE ?
     )`;
     params.push(searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm);
@@ -388,19 +397,18 @@ export async function crearProducto(data: CrearProductoInput): Promise<number> {
 
   const { lastInsertRowid } = await queryRun(
     `INSERT INTO productos (
-      nombre, categoria, categoria_id, raza, peso, peso_unitario, ubicacion, departamento,
+      nombre, categoria_id, raza, peso, peso_unitario, ubicacion, departamento,
       precio, precio_anterior, stock, vendedor_id, vendedor_rating,
       estado, salud, envio, destacado, oferta, trazabilidad, tipo_precio,
       sexo, fecha_nacimiento, descripcion, video, finca, vereda, referencia_ubicacion, ica_pdf
     ) VALUES (
-      @nombre, @categoria, @categoria_id, @raza, @peso, @peso_unitario, @ubicacion, @departamento,
+      @nombre, @categoria_id, @raza, @peso, @peso_unitario, @ubicacion, @departamento,
       @precio, @precio_anterior, @stock, @vendedor_id, @vendedor_rating,
       @estado, @salud, @envio, @destacado, @oferta, @trazabilidad, @tipo_precio,
       @sexo, @fecha_nacimiento, @descripcion, @video, @finca, @vereda, @referencia_ubicacion, @certificaciones
     )`,
     {
       nombre: data.nombre,
-      categoria: data.categoria,
       categoria_id: catId,
       raza: data.raza || null,
       peso: data.peso || null,
@@ -442,13 +450,13 @@ export async function actualizarProducto(id: number, data: Partial<Producto>): P
   const fields: string[] = [];
   const params: any[]    = [];
 
-  if (data.categoria !== undefined && data.categoria_id === undefined) {
+  if (data.categoria_id === undefined && data.categoria) {
     const slugMap = await getMapSlugToId();
-    data.categoria_id = slugMap[data.categoria?.toLowerCase()] || null;
+    data.categoria_id = slugMap[data.categoria.toLowerCase()] || null;
   }
 
   const allowedFields = [
-    'nombre', 'categoria', 'categoria_id', 'raza', 'peso', 'ubicacion',
+    'nombre', 'categoria_id', 'raza', 'peso', 'ubicacion',
     'departamento', 'precio', 'stock', 'salud', 'estado', 'tipo_precio',
     'sexo', 'fecha_nacimiento', 'video', 'finca', 'vereda', 'referencia_ubicacion', 'certificaciones',
   ];

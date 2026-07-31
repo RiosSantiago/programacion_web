@@ -23,9 +23,18 @@ export const GET: APIRoute = async ({ params }) => {
     if (!id) return new Response(JSON.stringify({ error: 'ID inválido' }), { status: 400 });
 
     const product = await queryGet<any>(
-      `SELECT p.*, u.nombre AS vendedor
+      `SELECT p.id, p.nombre, p.categoria_id, p.raza, p.peso, p.peso_unitario,
+              p.ubicacion, p.departamento, p.precio, p.precio_anterior, p.stock,
+              p.vendedor_id, p.vendedor_rating, p.estado, p.salud, p.envio,
+              p.destacado, p.oferta, p.trazabilidad, p.tipo_precio, p.sexo,
+              p.fecha_nacimiento, p.descripcion, p.video, p.finca, p.vereda,
+              p.referencia_ubicacion, p.ica_pdf, p.created_at,
+              u.nombre AS vendedor,
+              c.slug AS categoria,
+              c.nombre AS categoria_nombre
        FROM productos p
        LEFT JOIN usuarios u ON p.vendedor_id = u.id
+       LEFT JOIN categorias c ON p.categoria_id = c.id
        WHERE p.id = ?`,
       [id]
     );
@@ -51,18 +60,21 @@ export const PUT: APIRoute = async ({ params, request }) => {
     if (!id) return new Response(JSON.stringify({ error: 'ID inválido' }), { status: 400 });
 
     const rol = await getUserRole(userId);
+    const SELECT_PROD = `SELECT p.id, p.nombre, p.categoria_id, p.raza, p.peso, p.peso_unitario,
+      p.ubicacion, p.departamento, p.precio, p.precio_anterior, p.stock,
+      p.vendedor_id, p.vendedor_rating, p.estado, p.salud, p.envio,
+      p.destacado, p.oferta, p.trazabilidad, p.tipo_precio, p.sexo,
+      p.fecha_nacimiento, p.descripcion, p.video, p.finca, p.vereda,
+      p.referencia_ubicacion, p.ica_pdf, p.created_at,
+      u.nombre AS vendedor,
+      c.slug AS categoria,
+      c.nombre AS categoria_nombre
+      FROM productos p LEFT JOIN usuarios u ON p.vendedor_id = u.id
+      LEFT JOIN categorias c ON p.categoria_id = c.id`;
     const canEditAny = rol === 'root' || rol === 'admin';
     const product = canEditAny
-      ? await queryGet<any>(
-          `SELECT p.*, u.nombre AS vendedor
-           FROM productos p LEFT JOIN usuarios u ON p.vendedor_id = u.id
-           WHERE p.id = ?`, [id]
-        )
-      : await queryGet<any>(
-          `SELECT p.*, u.nombre AS vendedor
-           FROM productos p LEFT JOIN usuarios u ON p.vendedor_id = u.id
-           WHERE p.id = ? AND (p.vendedor_id = ? OR p.vendedor_id IS NULL)`, [id, userId]
-        );
+      ? await queryGet<any>(`${SELECT_PROD} WHERE p.id = ?`, [id])
+      : await queryGet<any>(`${SELECT_PROD} WHERE p.id = ? AND (p.vendedor_id = ? OR p.vendedor_id IS NULL)`, [id, userId]);
 
     if (!product) return new Response(JSON.stringify({ error: 'Producto no encontrado o no autorizado' }), { status: 404 });
 
@@ -71,7 +83,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
     const paramsArr: any[] = [];
 
     const allowedFields = [
-      'nombre', 'categoria', 'raza', 'peso', 'ubicacion', 'departamento', 'precio', 'stock',
+      'nombre', 'raza', 'peso', 'ubicacion', 'departamento', 'precio', 'stock',
       'salud', 'estado', 'tipo_precio', 'sexo', 'fecha_nacimiento', 'descripcion', 'video',
       'finca', 'vereda', 'referencia_ubicacion', 'certificaciones',
     ];
@@ -102,9 +114,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
     }
 
     const updated = await queryGet<any>(
-      `SELECT p.*, u.nombre AS vendedor
-       FROM productos p LEFT JOIN usuarios u ON p.vendedor_id = u.id
-       WHERE p.id = ?`,
+      `${SELECT_PROD} WHERE p.id = ?`,
       [id]
     );
 
