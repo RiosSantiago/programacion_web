@@ -257,7 +257,8 @@ const { variant = 'dark' } = Astro.props;
   nav#main-nav.scrolled[data-variant="light"] .nav-search-icon { color: #2D2D2D !important; }
   nav#main-nav.scrolled[data-variant="dark"] .nav-search-wrapper button { color: #2D2D2D; }
   nav#main-nav.scrolled[data-variant="dark"] .nav-search-wrapper svg { stroke: #2D2D2D; }
-  nav#main-nav.scrolled[data-variant="dark"] #nav-cart-count { background: white; color: #2D2D2D; }
+  nav#main-nav.scrolled[data-variant="dark"] #nav-cart-count,
+  nav#main-nav.scrolled[data-variant="dark"] #nav-favoritos-count { background: white; color: #2D2D2D; }
 
   nav#main-nav.scrolled[data-variant="light"] { background: #1A3828; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border-bottom: none; }
   nav#main-nav.scrolled[data-variant="light"] * { color: white; }
@@ -268,7 +269,8 @@ const { variant = 'dark' } = Astro.props;
   nav#main-nav.scrolled[data-variant="light"] .nav-search-wrapper button { color: white; }
   nav#main-nav.scrolled[data-variant="light"] .nav-search-wrapper svg { stroke: white; }
   nav#main-nav.scrolled[data-variant="light"] .nav-search-icon { color: white !important; }
-  nav#main-nav.scrolled[data-variant="light"] #nav-cart-count { background: white; color: #1A3828; }
+  nav#main-nav.scrolled[data-variant="light"] #nav-cart-count,
+  nav#main-nav.scrolled[data-variant="light"] #nav-favoritos-count { background: white; color: #1A3828; }
   nav#main-nav.scrolled[data-variant="light"] #nav-publicar-btn { background: white; color: #1A3828; }
   nav#main-nav.scrolled[data-variant="light"] #nav-publicar-btn * { color: #1A3828; }
   nav#main-nav.scrolled[data-variant="light"] #nav-publicar-btn:hover { background: #F3F4F6; }
@@ -286,7 +288,8 @@ const { variant = 'dark' } = Astro.props;
   nav#main-nav[data-variant="market"] .nav-search-icon { color: white !important; }
   nav#main-nav[data-variant="market"] .nav-search-wrapper button { color: white; }
   nav#main-nav[data-variant="market"] .nav-search-wrapper svg { stroke: white; }
-  nav#main-nav[data-variant="market"] #nav-cart-count { background: white; color: #1A3828; }
+  nav#main-nav[data-variant="market"] #nav-cart-count,
+  nav#main-nav[data-variant="market"] #nav-favoritos-count { background: white; color: #1A3828; }
   nav#main-nav[data-variant="market"] a[href="/publicar"] { background: white; color: #1A3828; }
   nav#main-nav[data-variant="market"] a[href="/publicar"] * { color: #1A3828; }
   nav#main-nav[data-variant="market"] a[href="/publicar"]:hover { background: #F3F4F6; }
@@ -309,7 +312,8 @@ const { variant = 'dark' } = Astro.props;
   nav#main-nav[data-variant="publicar"] .nav-search-icon { color: white !important; }
   nav#main-nav[data-variant="publicar"] .nav-search-wrapper button { color: white; }
   nav#main-nav[data-variant="publicar"] .nav-search-wrapper svg { stroke: white; }
-  nav#main-nav[data-variant="publicar"] #nav-cart-count { background: white; color: #2D2D2D; }
+  nav#main-nav[data-variant="publicar"] #nav-cart-count,
+  nav#main-nav[data-variant="publicar"] #nav-favoritos-count { background: white; color: #2D2D2D; }
   nav#main-nav[data-variant="publicar"] a[href="/publicar"] { background: white; color: #2D2D2D; }
   nav#main-nav[data-variant="publicar"] a[href="/publicar"] * { color: #2D2D2D; }
   nav#main-nav[data-variant="publicar"] a[href="/publicar"]:hover { background: #f5f5f5; }
@@ -329,7 +333,8 @@ const { variant = 'dark' } = Astro.props;
   nav#main-nav[data-variant="perfil"] .nav-search-icon { color: white !important; }
   nav#main-nav[data-variant="perfil"] .nav-search-wrapper button { color: white; }
   nav#main-nav[data-variant="perfil"] .nav-search-wrapper svg { stroke: white; }
-  nav#main-nav[data-variant="perfil"] #nav-cart-count { background: white; color: #1b3928; }
+  nav#main-nav[data-variant="perfil"] #nav-cart-count,
+  nav#main-nav[data-variant="perfil"] #nav-favoritos-count { background: white; color: #1b3928; }
   nav#main-nav[data-variant="perfil"] #nav-publicar-btn { background: white; color: #1b3928; }
   nav#main-nav[data-variant="perfil"] #nav-publicar-btn * { color: #1b3928; }
   nav#main-nav[data-variant="perfil"] #nav-publicar-btn:hover { background: #F3F4F6; }

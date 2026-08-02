@@ -53,6 +53,21 @@ function getPlaceholderImagen(categoria: string): string {
   return imagenesCategoria[categoria] || '/images/default.svg';
 }
 
+const ALIASES_CATEGORIA: Record<string, string> = {
+  bovino: 'bovinos',
+  equino: 'equinos',
+  porcino: 'porcinos',
+  ovino: 'ovinos',
+  avicola: 'avicolas',
+};
+
+function normalizarSlugCategoria(val: unknown): string {
+  const raw = String(val ?? '').trim();
+  if (!raw) return '';
+  const base = raw.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return ALIASES_CATEGORIA[base] || base;
+}
+
 export async function getImagenesMap(productoIds: number[]): Promise<Record<number, string[]>> {
   if (!productoIds || productoIds.length === 0) return {};
   const rows = await queryAll<{ producto_id: number; url: string }>(
@@ -78,10 +93,11 @@ export async function getImagenesByProductoId(productoId: number): Promise<strin
 function transformarProducto(row: any, imagenesTabulares?: string[]): Producto {
   try {
     const imagenes: string[] = (imagenesTabulares && imagenesTabulares.length > 0) ? imagenesTabulares : [];
-    const categoria = row.categoria || 'bovinos';
+    const categoria = normalizarSlugCategoria(row.categoria) || 'bovinos';
     const { ica_pdf, ...rest } = row;
     return {
       ...rest,
+      categoria,
       destacado:    Boolean(row.destacado),
       oferta:       Boolean(row.oferta),
       trazabilidad: Boolean(row.trazabilidad),
@@ -97,9 +113,10 @@ function transformarProducto(row: any, imagenesTabulares?: string[]): Producto {
   } catch {
     return {
       ...row,
+      categoria: normalizarSlugCategoria(row.categoria) || 'bovinos',
       destacado: false, oferta: false, trazabilidad: false, envio: false,
       imagenes: [],
-      imagen: getPlaceholderImagen(row.categoria || 'bovinos'),
+      imagen: getPlaceholderImagen(normalizarSlugCategoria(row.categoria) || 'bovinos'),
       video: '',
       precioAnterior: row.precio_anterior ?? null,
       vendedorRating: row.vendedor_rating  ?? 4.5,
@@ -157,7 +174,7 @@ const PRODUCTO_COLS = `
 
 export async function getProductos(): Promise<Producto[]> {
   const rows = await queryAll(
-    `SELECT ${PRODUCTO_COLS}, u.nombre AS vendedor, c.slug AS categoria, c.nombre AS categoria_nombre
+    `SELECT ${PRODUCTO_COLS}, u.nombre AS vendedor, COALESCE(c.slug, p.categoria) AS categoria, c.nombre AS categoria_nombre
      FROM productos p
      LEFT JOIN usuarios u ON p.vendedor_id = u.id
      LEFT JOIN categorias c ON p.categoria_id = c.id
@@ -170,7 +187,7 @@ export async function getProductos(): Promise<Producto[]> {
 
 export async function getProductosDestacados(limit: number = 6): Promise<Producto[]> {
   const rows = await queryAll(
-    `SELECT ${PRODUCTO_COLS}, u.nombre AS vendedor, c.slug AS categoria, c.nombre AS categoria_nombre
+    `SELECT ${PRODUCTO_COLS}, u.nombre AS vendedor, COALESCE(c.slug, p.categoria) AS categoria, c.nombre AS categoria_nombre
      FROM productos p
      LEFT JOIN usuarios u ON p.vendedor_id = u.id
      LEFT JOIN categorias c ON p.categoria_id = c.id
@@ -186,7 +203,7 @@ export async function getProductosDestacados(limit: number = 6): Promise<Product
 
 export async function getProductoById(id: number): Promise<Producto | undefined> {
   const row = await queryGet(
-    `SELECT ${PRODUCTO_COLS}, u.nombre AS vendedor, c.slug AS categoria, c.nombre AS categoria_nombre
+    `SELECT ${PRODUCTO_COLS}, u.nombre AS vendedor, COALESCE(c.slug, p.categoria) AS categoria, c.nombre AS categoria_nombre
      FROM productos p
      LEFT JOIN usuarios u ON p.vendedor_id = u.id
      LEFT JOIN categorias c ON p.categoria_id = c.id
@@ -207,7 +224,7 @@ export async function getTotalProductos(): Promise<number> {
 
 export async function getProductosByVendedorId(vendedorId: number): Promise<Producto[]> {
   const rows = await queryAll(
-    `SELECT ${PRODUCTO_COLS}, u.nombre AS vendedor, c.slug AS categoria, c.nombre AS categoria_nombre
+    `SELECT ${PRODUCTO_COLS}, u.nombre AS vendedor, COALESCE(c.slug, p.categoria) AS categoria, c.nombre AS categoria_nombre
      FROM productos p
      LEFT JOIN usuarios u ON p.vendedor_id = u.id
      LEFT JOIN categorias c ON p.categoria_id = c.id
@@ -243,7 +260,7 @@ export async function filtrarProductos(options: {
   // La query se construye dinámicamente; aplicamos el JOIN en la base y prefijamos
   // todas las columnas de productos con alias para evitar ambigüedad.
   let baseQuery = `
-    SELECT ${PRODUCTO_COLS}, u.nombre AS vendedor, c.slug AS categoria, c.nombre AS categoria_nombre
+    SELECT ${PRODUCTO_COLS}, u.nombre AS vendedor, COALESCE(c.slug, p.categoria) AS categoria, c.nombre AS categoria_nombre
     FROM productos p
     LEFT JOIN usuarios u ON p.vendedor_id = u.id
     LEFT JOIN categorias c ON p.categoria_id = c.id

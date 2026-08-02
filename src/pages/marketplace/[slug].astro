@@ -31,6 +31,28 @@ const badgeInfo: Record<string, { label: string; class: string; icon: string }> 
 };
 
 const catLower = producto?.categoria?.toLowerCase() || 'bovinos';
+
+const categoriaLabels: Record<string, string> = {
+  bovinos: 'Bovinos',
+  equinos: 'Equinos',
+  porcinos: 'Porcinos',
+  ovinos: 'Ovinos',
+  avicolas: 'Avícolas',
+  agricultura: 'Agricultura',
+  insumos: 'Insumos',
+};
+const categoriaLabel = categoriaLabels[catLower] || producto?.categoria || 'Bovino';
+
+const esAgricola = ['agricultura', 'insumos'].includes(catLower);
+const tipsSeguridad = esAgricola ? [
+  { titulo: 'Verificación del Producto', texto: 'Solicita fotos o video recientes y verifica la fecha de cosecha o procesamiento y el estado del empaque antes de cerrar la compra.' },
+  { titulo: 'Calidad y Trazabilidad', texto: 'Pregunta por certificaciones de origen, registros sanitarios y análisis de calidad del café, cacao o aguacate antes del pago.' },
+  { titulo: 'Condiciones de Pago y Entrega', texto: 'Acuerda el método de envío y prefiere el pago contra entrega; evita consignaciones completas por adelantado.' },
+] : [
+  { titulo: 'Verificación de Finca', texto: 'Visita el predio o solicita una videollamada para comprobar el estado real del animal.' },
+  { titulo: 'Guías de Movilización', texto: 'Asegúrate de revisar los registros de vacunación, guías sanitarias e ICA oficiales antes del traslado.' },
+  { titulo: 'Condiciones de Pago', texto: 'No realices transacciones completas hasta pactar la entrega física del ganado.' },
+];
 ---
 
 <BaseLayout navVariant="market">
@@ -155,7 +177,7 @@ const catLower = producto?.categoria?.toLowerCase() || 'bovinos';
                 </svg>
               )}
 
-              {producto.categoria}
+              {categoriaLabel}
             </span>
 
             <!-- Destacado -->
@@ -553,29 +575,15 @@ const catLower = producto?.categoria?.toLowerCase() || 'bovinos';
               </div>
               
               <div class="space-y-3">
-                <div class="flex items-start gap-2.5">
-                  <div class="w-2 h-2 rounded-full bg-[#8B6545] shrink-0 mt-2"></div>
-                  <div>
-                    <p class="text-xs font-bold text-[#1A3828]">Verificación de Finca</p>
-                    <p class="text-[11px] text-[#5C3A1E] mt-0.5">Visita el predio o solicita una videollamada para comprobar el estado real del animal.</p>
+                {tipsSeguridad.map((tip) => (
+                  <div class="flex items-start gap-2.5">
+                    <div class="w-2 h-2 rounded-full bg-[#8B6545] shrink-0 mt-2"></div>
+                    <div>
+                      <p class="text-xs font-bold text-[#1A3828]">{tip.titulo}</p>
+                      <p class="text-[11px] text-[#5C3A1E] mt-0.5">{tip.texto}</p>
+                    </div>
                   </div>
-                </div>
-
-                <div class="flex items-start gap-2.5">
-                  <div class="w-2 h-2 rounded-full bg-[#8B6545] shrink-0 mt-2"></div>
-                  <div>
-                    <p class="text-xs font-bold text-[#1A3828]">Guías de Movilización</p>
-                    <p class="text-[11px] text-[#5C3A1E] mt-0.5">Asegúrate de revisar los registros de vacunación e ICA oficiales antes del traslado.</p>
-                  </div>
-                </div>
-
-                <div class="flex items-start gap-2.5">
-                  <div class="w-2 h-2 rounded-full bg-[#8B6545] shrink-0 mt-2"></div>
-                  <div>
-                    <p class="text-xs font-bold text-[#1A3828]">Condiciones de Pago</p>
-                    <p class="text-[11px] text-[#5C3A1E] mt-0.5">No realices transacciones completas hasta pactar la entrega física del ganado.</p>
-                  </div>
-                </div>
+                ))}
               </div>
 
               <div class="pt-3 border-t border-[#C8DCC8] text-center">
