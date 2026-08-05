@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { queryGet, queryRun } from '../../lib/db';
+import { queryAll, queryGet, queryRun } from '../../lib/db';
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -30,15 +30,28 @@ export const POST: APIRoute = async ({ request }) => {
       } catch {}
     }
 
-    if (!data.sexo) {
-      return new Response(JSON.stringify({ error: 'El sexo es obligatorio.' }), { status: 400 });
-    }
+    const sexo = ((data.sexo || '').trim().toLowerCase()) || null;
 
     const finca     = (data.finca || data.nombre_finca || '').trim();
     const vereda    = (data.vereda || '').trim();
     const referencia = (data.referencia_ubicacion || data.referencia || '').trim();
 
-    if (!finca || finca.length < 3 || finca.length > 80) {
+    const catSlug = (data.categoria || '').toLowerCase();
+    const catSlugMap: Record<string, number> = {};
+    const cats = await queryAll<{ id: number; slug: string }>('SELECT id, slug FROM categorias');
+    for (const c of cats) catSlugMap[c.slug] = c.id;
+    const categoriaId = catSlugMap[catSlug] || catSlugMap[catSlug.replace(/s$/, '')] || null;
+    const esAgricola = ['agricultura', 'cultivos'].includes(catSlug.replace(/s$/, ''));
+
+    let categoriaCol = 'bovino';
+    if (categoriaId) {
+      const cat = await queryGet<{ slug: string }>('SELECT slug FROM categorias WHERE id = ?', [categoriaId]);
+      if (cat) categoriaCol = cat.slug;
+    } else {
+      categoriaCol = (catSlug.replace(/s$/, '') || 'bovino');
+    }
+
+    if (!esAgricola && (!finca || finca.length < 3 || finca.length > 80)) {
       return new Response(JSON.stringify({ error: 'El nombre de la finca es obligatorio y debe tener entre 3 y 80 caracteres.' }), { status: 400 });
     }
     if (vereda.length > 80) {
@@ -48,21 +61,16 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ error: 'La referencia no debe exceder 200 caracteres.' }), { status: 400 });
     }
 
-    const catSlug = (data.categoria || '').toLowerCase();
-    const catSlugMap: Record<string, number> = {};
-    const cats = await queryAll<{ id: number; slug: string }>('SELECT id, slug FROM categorias');
-    for (const c of cats) catSlugMap[c.slug] = c.id;
-    const categoriaId = catSlugMap[catSlug] || catSlugMap[catSlug.replace(/s$/, '')] || null;
-
     const { lastInsertRowid: newId } = await queryRun(
       `INSERT INTO productos (
-        nombre, categoria_id, raza, peso, peso_unitario, ubicacion, departamento,
+        nombre, categoria, categoria_id, raza, peso, peso_unitario, ubicacion, departamento,
         precio, precio_anterior, stock, vendedor_id, vendedor_rating,
         estado, salud, envio, destacado, oferta, trazabilidad, tipo_precio, descripcion, video, sexo,
-        finca, vereda, referencia_ubicacion, ica_pdf
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        finca, vereda, referencia_ubicacion, ica_pdf, transporte
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         data.nombre,
+        categoriaCol,
         categoriaId,
         data.raza || null,
         data.peso ? parseFloat(data.peso) : null,
@@ -83,11 +91,12 @@ export const POST: APIRoute = async ({ request }) => {
         data.tipoPrecio || 'fijo',
         (data.descripcion || '').slice(0, 500),
         data.video || '',
-        data.sexo,
+        sexo,
         finca,
         vereda,
         referencia.slice(0, 200),
         data.certificaciones ? JSON.stringify(data.certificaciones) : '',
+        data.transporte === 'agroup' ? 'agroup' : 'propio',
       ]
     );
 

@@ -17,6 +17,7 @@
     "@tanstack/react-query": "^5.100.9",
     "astro": "^6.3.1",
     "bcryptjs": "^2.4.3",
+    "dotenv": "^17.4.2",
     "framer-motion": "^12.40.0",
     "leaflet": "^1.9.4",
     "nanostores": "^1.3.0",
