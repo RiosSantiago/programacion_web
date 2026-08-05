@@ -77,6 +77,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
             <button id="tab-btn-usuarios" class="tab-btn active text-gold-700 border-b-2 border-gold-700 pb-3 text-sm font-semibold whitespace-nowrap" data-tab="usuarios">Usuarios</button>
             <button id="tab-btn-categorias" class="tab-btn text-[#6B6B6B] hover:text-[#2D2D2D] pb-3 text-sm font-medium whitespace-nowrap" data-tab="categorias">Categorías</button>
             <button id="tab-btn-productos" class="tab-btn text-[#6B6B6B] hover:text-[#2D2D2D] pb-3 text-sm font-medium whitespace-nowrap" data-tab="productos">Productos</button>
+            <button id="tab-btn-transporte" class="tab-btn text-[#6B6B6B] hover:text-[#2D2D2D] pb-3 text-sm font-medium whitespace-nowrap" data-tab="transporte">Transporte</button>
           </nav>
         </div>
 
@@ -163,6 +164,39 @@ import BaseLayout from '../layouts/BaseLayout.astro';
             </div>
           </div>
         </div>
+        <div id="tab-transporte" class="tab-content hidden">
+          <div class="bg-white rounded-xl border border-[#E8E0D8] overflow-hidden">
+            <div class="px-6 py-4 border-b border-[#1b3928] flex items-center justify-between" style="background-color: #1b3928;">
+              <h3 class="font-semibold text-white">Productos que transportará AgroUp</h3>
+              <div class="flex items-center gap-3">
+                <button id="exportar-transporte-btn" class="text-xs bg-white/10 hover:bg-white/20 text-white font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
+                  </svg>
+                  Exportar CSV
+                </button>
+                <span id="transporte-count" class="text-xs text-white/70 bg-white/10 px-2 py-1 rounded-full"></span>
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead style="background-color: #152e1f;">
+                  <tr>
+                    <th class="text-left px-6 py-3 font-medium text-white/80">ID</th>
+                    <th class="text-left px-6 py-3 font-medium text-white/80">Producto</th>
+                    <th class="text-left px-6 py-3 font-medium text-white/80">Vendedor</th>
+                    <th class="text-left px-6 py-3 font-medium text-white/80">Categoría</th>
+                    <th class="text-left px-6 py-3 font-medium text-white/80">Ubicación</th>
+                    <th class="text-left px-6 py-3 font-medium text-white/80">Precio</th>
+                    <th class="text-left px-6 py-3 font-medium text-white/80">Estado</th>
+                    <th class="text-left px-6 py-3 font-medium text-white/80">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="transporte-tbody" class="divide-y divide-[#E8E0D8]"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -214,8 +248,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         if (currentUserRole !== 'root') {
           const btnUsuarios = getEl('tab-btn-usuarios');
           const btnCategorias = getEl('tab-btn-categorias');
+          const btnTransporte = getEl('tab-btn-transporte');
           if (btnUsuarios) btnUsuarios.classList.add('hidden');
           if (btnCategorias) btnCategorias.classList.add('hidden');
+          if (btnTransporte) btnTransporte.classList.add('hidden');
         } else {
           const thPw = getEl('th-contrasena');
           if (thPw) thPw.classList.remove('hidden');
@@ -223,8 +259,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         if (currentUserRole !== 'root') {
           const tabUsuarios = getEl('tab-usuarios');
           const tabCategorias = getEl('tab-categorias');
+          const tabTransporte = getEl('tab-transporte');
           if (tabUsuarios) tabUsuarios.classList.add('hidden');
           if (tabCategorias) tabCategorias.classList.add('hidden');
+          if (tabTransporte) tabTransporte.classList.add('hidden');
           const tabProductos = getEl('tab-productos');
           if (tabProductos) tabProductos.classList.remove('hidden');
           document.querySelectorAll('.tab-btn').forEach(b => {
@@ -254,7 +292,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   async function cargarAdminPanel() {
     if (currentUserRole === 'root') {
-      await Promise.all([cargarStats(), cargarUsuarios(), cargarCategorias(), cargarProductos()]);
+      await Promise.all([cargarStats(), cargarUsuarios(), cargarCategorias(), cargarProductos(), cargarTransporte()]);
     } else {
       await cargarProductos();
     }
@@ -486,6 +524,64 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
     } catch {}
   }
+
+  let productosTransporte = [];
+
+  async function cargarTransporte() {
+    try {
+      const res = await fetch('/api/productos');
+      const data = await res.json();
+      const productos = data.productos || [];
+      productosTransporte = productos.filter(p => p.transporte === 'agroup');
+
+      document.getElementById('transporte-count').textContent = `${productosTransporte.length} productos`;
+      const tbody = document.getElementById('transporte-tbody');
+
+      if (productosTransporte.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-10 text-[#6B6B6B]">No hay productos que AgroUp deba transportar</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = productosTransporte.map(p => `
+        <tr>
+          <td class="px-6 py-3 text-[#6B6B6B]">${p.id}</td>
+          <td class="px-6 py-3 font-medium text-[#1A0E08]">${escapeHtml(p.nombre)}</td>
+          <td class="px-6 py-3 text-[#6B6B6B]">${escapeHtml(p.vendedor)}</td>
+          <td class="px-6 py-3 text-[#6B6B6B] capitalize">${escapeHtml(p.categoria)}</td>
+          <td class="px-6 py-3 text-[#6B6B6B]">${escapeHtml([p.ubicacion, p.departamento].filter(Boolean).join(', ') || '—')}</td>
+          <td class="px-6 py-3 text-[#1A0E08] font-medium">$${(p.precio || 0).toLocaleString('es-CO')}</td>
+          <td class="px-6 py-3">
+            <span class="capitalize text-xs ${p.estado === 'disponible' ? 'bg-campo-100 text-campo-700' : p.estado === 'vendido' ? 'bg-[#F5F0E8] text-[#6B6B6B]' : 'bg-gold-100 text-gold-800'} px-2 py-0.5 rounded-full">${p.estado || 'disponible'}</span>
+          </td>
+          <td class="px-6 py-3">
+            <a href="/marketplace/${p.id}" class="text-gold-700 hover:underline text-xs">Ver</a>
+          </td>
+        </tr>
+      `).join('');
+    } catch {}
+  }
+
+  function exportarTransporteCSV() {
+    if (productosTransporte.length === 0) return;
+    const enc = (v) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+    const header = ['ID', 'Producto', 'Vendedor', 'Categoría', 'Ubicación', 'Departamento', 'Precio', 'Estado', 'Enlace'].join(';');
+    const rows = productosTransporte.map(p => [
+      p.id, p.nombre, p.vendedor, p.categoria,
+      p.ubicacion || '', p.departamento || '', p.precio || 0, p.estado || 'disponible',
+      `https://agroup.app/marketplace/${p.id}`
+    ].map(enc).join(';'));
+    const csv = '\uFEFF' + [header, ...rows].join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `agroup-transporte-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+  document.getElementById('exportar-transporte-btn').addEventListener('click', exportarTransporteCSV);
 
   let adminEditandoId = null;
 

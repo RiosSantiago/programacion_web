@@ -15,6 +15,7 @@ export default function AgricolaForm() {
   const [peso, setPeso] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [ubicacion, setUbicacion] = useState('');
+  const [transporte, setTransporte] = useState('propio');
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
   const [error, setError] = useState('');
@@ -96,6 +97,7 @@ export default function AgricolaForm() {
 
     const payload = {
       tipo: 'agricola',
+      categoria: 'agricultura',
       nombre: nombre.trim(),
       unidad_peso: unidadPeso,
       peso: parseFloat(peso),
@@ -103,6 +105,7 @@ export default function AgricolaForm() {
       ubicacion,
       departamento: 'Caldas',
       imagenes: uploadedPhotoUrls.length > 0 ? uploadedPhotoUrls : ['/images/categories/cultivos.webp'],
+      transporte,
     };
 
     try {
@@ -240,6 +243,44 @@ export default function AgricolaForm() {
             tabIndex={-1}
             className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-500 cursor-not-allowed select-none"
           />
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-slate-700 mb-2">
+          Transporte <span className="text-slate-400 font-normal">(selecciona una opción)</span>
+        </label>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <label className={`flex-1 flex items-center gap-3 px-4 py-3 rounded-xl border-2 cursor-pointer transition-all ${
+            transporte === 'agroup'
+              ? 'border-emerald-600 bg-emerald-50 text-emerald-800'
+              : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+          }`}>
+            <input
+              type="radio"
+              name="transporte"
+              value="agroup"
+              checked={transporte === 'agroup'}
+              onChange={() => setTransporte('agroup')}
+              className="accent-emerald-600"
+            />
+            <span className="text-sm font-semibold">Transporte por medio de AgroUp</span>
+          </label>
+          <label className={`flex-1 flex items-center gap-3 px-4 py-3 rounded-xl border-2 cursor-pointer transition-all ${
+            transporte === 'propio'
+              ? 'border-emerald-600 bg-emerald-50 text-emerald-800'
+              : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+          }`}>
+            <input
+              type="radio"
+              name="transporte"
+              value="propio"
+              checked={transporte === 'propio'}
+              onChange={() => setTransporte('propio')}
+              className="accent-emerald-600"
+            />
+            <span className="text-sm font-semibold">Transporte por medios propios</span>
+          </label>
         </div>
       </div>
 

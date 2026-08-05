@@ -15,6 +15,7 @@ export const GET: APIRoute = async ({ url }) => {
              p.vendedor_rating AS "vendedorRating",
              p.estado, p.salud, p.envio, p.destacado, p.oferta, p.trazabilidad,
              p.descripcion, p.vendedor_id,
+             p.transporte,
              p.created_at AS "createdAt",
              COALESCE(c.slug, p.categoria) AS categoria,
              c.nombre AS categoria_nombre

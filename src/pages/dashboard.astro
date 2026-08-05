@@ -316,6 +316,29 @@ const campos = [
               </button>
               <input type="file" id="edit-video-input" accept="video/*" class="hidden" />
             </div>
+            <div>
+              <label class="block text-[10px] font-semibold tracking-widest mb-2" style="color: #9CA3AF;">CERTIFICADOS (ICA, RUV, RFG, REGISTRO GENEALÓGICO)</label>
+              <div id="edit-certificados-grid" class="space-y-2"></div>
+              <button type="button" id="btn-agregar-certificados" class="mt-3 w-full py-2.5 text-sm font-medium rounded-lg border-2 border-dashed transition-colors" style="border-color: #E8E0D8; color: #6B6B6B;" onmouseover="this.style.borderColor='#1b3928'; this.style.color='#1b3928'" onmouseout="this.style.borderColor='#E8E0D8'; this.style.color='#6B6B6B'">
+                + Agregar certificados
+              </button>
+              <input type="file" id="edit-certificados-input" accept=".pdf,application/pdf" multiple class="hidden" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-semibold tracking-widest mb-2" style="color: #9CA3AF;">TRANSPORTE</label>
+              <div class="space-y-2">
+                <label id="edit-transporte-agroup" class="flex items-center gap-3 px-4 py-3 rounded-xl border-2 cursor-pointer transition-colors" style="border-color: #E8E0D8; background-color: #FDFBF7;">
+                  <input type="radio" name="edit-transporte" value="agroup" class="hidden" />
+                  <span id="edit-transporte-agroup-dot" class="w-4 h-4 rounded-full border-2 shrink-0" style="border-color: #D5CBB8;"></span>
+                  <span class="text-sm font-medium" style="color: #2D2D2D;">Transporte por medio de AgroUp</span>
+                </label>
+                <label id="edit-transporte-propio" class="flex items-center gap-3 px-4 py-3 rounded-xl border-2 cursor-pointer transition-colors" style="border-color: #E8E0D8; background-color: #FDFBF7;">
+                  <input type="radio" name="edit-transporte" value="propio" class="hidden" />
+                  <span id="edit-transporte-propio-dot" class="w-4 h-4 rounded-full border-2 shrink-0" style="border-color: #D5CBB8;"></span>
+                  <span class="text-sm font-medium" style="color: #2D2D2D;">Transporte por medios propios</span>
+                </label>
+              </div>
+            </div>
             <div id="edit-error" class="hidden text-sm font-medium" style="color: #E53935;"></div>
             <div class="flex gap-3 pt-2">
               <button type="button" id="btn-cancelar-editar" class="flex-1 px-4 py-2.5 rounded-lg font-medium transition-colors" style="border: 1px solid #E8E0D8; color: #2D2D2D;" onmouseover="this.style.backgroundColor='#F5F0E8'" onmouseout="this.style.backgroundColor='transparent'">Cancelar</button>
@@ -453,6 +476,8 @@ const campos = [
   let productoAEditar = null;
   let editImages = [];
   let editVideo = '';
+  let editCertificaciones: string[] = [];
+  let editTransporte: string = 'propio';
 
   function renderEditImagenes() {
     const grid = document.getElementById('edit-imagenes-grid');
@@ -497,8 +522,12 @@ const campos = [
     document.getElementById('edit-estado').value = producto.estado || 'disponible';
     document.getElementById('edit-descripcion').value = producto.descripcion || '';
     document.getElementById('edit-error').classList.add('hidden');
+    editCertificaciones = parseCertificacionesProducto(producto);
+    editTransporte = producto.transporte === 'agroup' ? 'agroup' : 'propio';
     renderEditImagenes();
     renderEditVideo();
+    renderEditCertificaciones();
+    renderEditTransporte();
     document.getElementById('editar-modal').classList.remove('hidden');
   }
 
@@ -515,6 +544,74 @@ const campos = [
       preview.classList.add('hidden');
       btnAdd.classList.remove('hidden');
     }
+  }
+
+  function parseCertificacionesProducto(producto: any) {
+    if (Array.isArray(producto.certificaciones)) return [...producto.certificaciones];
+    if (producto.ica_pdf) {
+      try {
+        const parsed = JSON.parse(producto.ica_pdf);
+        if (Array.isArray(parsed)) return parsed;
+      } catch {}
+    }
+    return [];
+  }
+
+  function renderEditCertificaciones() {
+    const grid = document.getElementById('edit-certificados-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    if (editCertificaciones.length === 0) {
+      const vacio = document.createElement('p');
+      vacio.className = 'text-sm';
+      vacio.style.color = '#9CA3AF';
+      vacio.textContent = 'No hay certificados asociados a esta publicación.';
+      grid.appendChild(vacio);
+      return;
+    }
+    editCertificaciones.forEach((url, i) => {
+      const filename = url.split('/').pop() || `certificado-${i + 1}`;
+      const wrapper = document.createElement('div');
+      wrapper.className = 'flex items-center gap-3 p-3 rounded-xl';
+      wrapper.style.cssText = 'border: 1px solid #E8E0D8; background-color: #FDFBF7;';
+      wrapper.innerHTML = `
+        <svg class="w-5 h-5 shrink-0" style="color: #1b3928;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        <span class="text-sm font-medium flex-1 min-w-0 truncate" style="color: #2D2D2D;" title="${url}">${filename}</span>
+        <a href="${url}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1.5 text-xs font-semibold rounded-lg transition-colors shrink-0" style="background-color: #E8F5E9; color: #1b3928;" onmouseover="this.style.backgroundColor='#C8E6C9'" onmouseout="this.style.backgroundColor='#E8F5E9'">Ver</a>
+        <button type="button" class="btn-delete-cert w-7 h-7 rounded-full flex items-center justify-center text-white transition-all cursor-pointer hover:scale-110 shrink-0" style="background-color: #E53935;" data-index="${i}" title="Eliminar certificado">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      `;
+      grid.appendChild(wrapper);
+    });
+    grid.querySelectorAll('.btn-delete-cert').forEach(btn => {
+      btn.addEventListener('click', () => {
+        editCertificaciones.splice(parseInt(btn.dataset.index), 1);
+        renderEditCertificaciones();
+      });
+    });
+  }
+
+  function renderEditTransporte() {
+    const opciones = [
+      { val: 'agroup', el: document.getElementById('edit-transporte-agroup'), dot: document.getElementById('edit-transporte-agroup-dot') },
+      { val: 'propio', el: document.getElementById('edit-transporte-propio'), dot: document.getElementById('edit-transporte-propio-dot') },
+    ];
+    opciones.forEach(({ val, el, dot }) => {
+      if (!el) return;
+      const activo = editTransporte === val;
+      el.style.borderColor = activo ? '#1b3928' : '#E8E0D8';
+      el.style.backgroundColor = activo ? '#E8F5E9' : '#FDFBF7';
+      if (dot) {
+        dot.style.borderColor = activo ? '#1b3928' : '#D5CBB8';
+        dot.style.backgroundColor = activo ? '#1b3928' : 'transparent';
+      }
+    });
+  }
+
+  function setEditTransporte(val: string) {
+    editTransporte = val;
+    renderEditTransporte();
   }
 
   function cerrarEditar() {
@@ -614,6 +711,36 @@ const campos = [
     renderEditVideo();
   });
 
+  document.getElementById('btn-agregar-certificados').addEventListener('click', () => {
+    document.getElementById('edit-certificados-input').click();
+  });
+
+  document.getElementById('edit-transporte-agroup').addEventListener('click', () => setEditTransporte('agroup'));
+  document.getElementById('edit-transporte-propio').addEventListener('click', () => setEditTransporte('propio'));
+
+  document.getElementById('edit-certificados-input').addEventListener('change', async (e) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    const formData = new FormData();
+    for (const file of files) {
+      formData.append('certificaciones', file);
+    }
+    try {
+      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+      if (!res.ok) throw new Error('Error al subir certificado');
+      const data = await res.json();
+      if (data.certUrls) {
+        editCertificaciones.push(...data.certUrls);
+        renderEditCertificaciones();
+      }
+    } catch (err) {
+      const errorEl = document.getElementById('edit-error');
+      errorEl.textContent = err.message;
+      errorEl.classList.remove('hidden');
+    }
+    e.target.value = '';
+  });
+
   document.getElementById('form-editar').addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!productoAEditar) return;
@@ -637,6 +764,8 @@ const campos = [
       descripcion: document.getElementById('edit-descripcion').value.trim(),
       imagenes: editImages,
       video: editVideo,
+      certificaciones: editCertificaciones,
+      transporte: editTransporte,
     };
 
     if (!body.finca || body.finca.length < 3 || body.finca.length > 80) {
@@ -916,7 +1045,7 @@ const campos = [
       }
     } catch (err) {
       console.error('Error al cargar publicaciones:', err);
-      productos = JSON.parse(localStorage.getItem('agroup_productos') || '[]');
+      productos = [];
     }
 
     todosLosProductos = [...productos].reverse();
@@ -965,7 +1094,7 @@ const campos = [
         publicaciones = data.productos || [];
       }
     } catch {
-      publicaciones = JSON.parse(localStorage.getItem('agroup_productos') || '[]');
+      publicaciones = [];
     }
 
     const statPublicaciones = document.getElementById('stat-publicaciones');
