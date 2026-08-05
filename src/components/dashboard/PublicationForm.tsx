@@ -68,6 +68,7 @@ export default function PublicationForm() {
   const [photos, setPhotos] = useState<File[]>([]);
   const [video, setVideo] = useState<File | null>(null);
   const [certificaciones, setCertificaciones] = useState<File[]>([]);
+  const [transporte, setTransporte] = useState('propio');
   const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
   const [videoPreview, setVideoPreview] = useState<string>('');
   const [certPreviews, setCertPreviews] = useState<string[]>([]);
@@ -197,59 +198,36 @@ export default function PublicationForm() {
       imagenes: uploadedPhotoUrls.length > 0 ? uploadedPhotoUrls : ['/images/categories/bovinos.webp'],
       video: uploadedVideoUrl,
       certificaciones: uploadedCertUrls,
+      transporte,
     };
 
     try {
-      let apiSuccess = false;
-      try {
-        const token = localStorage.getItem('agroup_token');
-        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-        if (token) headers['Authorization'] = `Bearer ${token}`;
+      const token = localStorage.getItem('agroup_token');
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
 
-        const res = await fetch('/api/publicar', {
-          method: 'POST',
-          headers,
-          body: JSON.stringify(payload),
-        });
+      const res = await fetch('/api/publicar', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(payload),
+      });
 
-        if (res.ok) {
-          const text = await res.text();
-          const result = JSON.parse(text || '{}');
-          if (result.success) {
-            apiSuccess = true;
-          }
-        }
-      } catch (apiError) {
-        console.log('API falló, usando localStorage');
+      if (!res.ok) {
+        const text = await res.text();
+        let errMsg = 'Error al publicar. Intenta de nuevo.';
+        try {
+          const errData = JSON.parse(text || '{}');
+          if (errData.error) errMsg = errData.error;
+        } catch {}
+        setError(errMsg);
+        return;
       }
 
-      if (!apiSuccess) {
-        const productos = JSON.parse(localStorage.getItem('agroup_productos') || '[]');
-        const nuevoProducto = {
-          ...payload,
-          id: Date.now().toString(),
-          created_at: new Date().toISOString(),
-          estado: 'disponible',
-          vendedor: 'Mi Hacienda',
-          vendedor_rating: 4.5,
-          envio: 1,
-          destacado: 0,
-          oferta: 0,
-          trazabilidad: 0,
-        };
-
-        const historialPrecios = JSON.parse(localStorage.getItem('agroup_precios_historial') || '[]');
-        historialPrecios.push({
-          productoId: nuevoProducto.id,
-          precio: parseFloat(formData.precio),
-          tipo: formData.tipoPrecio,
-          fecha: new Date().toISOString(),
-          motivo: 'Publicacion inicial',
-        });
-        localStorage.setItem('agroup_precios_historial', JSON.stringify(historialPrecios));
-
-        productos.push(nuevoProducto);
-        localStorage.setItem('agroup_productos', JSON.stringify(productos));
+      const text = await res.text();
+      const result = JSON.parse(text || '{}');
+      if (!result.success) {
+        setError('Error al publicar. Intenta de nuevo.');
+        return;
       }
 
       setSuccess(true);
@@ -538,6 +516,44 @@ export default function PublicationForm() {
             <option value="Regular">Regular</option>
             <option value="Excelente">Excelente</option>
           </select>
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-slate-700 mb-2">
+          Transporte <span className="text-slate-400 font-normal">(selecciona una opción)</span>
+        </label>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <label className={`flex-1 flex items-center gap-3 px-4 py-3 rounded-xl border-2 cursor-pointer transition-all ${
+            transporte === 'agroup'
+              ? 'border-emerald-600 bg-emerald-50 text-emerald-800'
+              : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+          }`}>
+            <input
+              type="radio"
+              name="transporte"
+              value="agroup"
+              checked={transporte === 'agroup'}
+              onChange={() => setTransporte('agroup')}
+              className="accent-emerald-600"
+            />
+            <span className="text-sm font-semibold">Transporte por medio de AgroUp</span>
+          </label>
+          <label className={`flex-1 flex items-center gap-3 px-4 py-3 rounded-xl border-2 cursor-pointer transition-all ${
+            transporte === 'propio'
+              ? 'border-emerald-600 bg-emerald-50 text-emerald-800'
+              : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+          }`}>
+            <input
+              type="radio"
+              name="transporte"
+              value="propio"
+              checked={transporte === 'propio'}
+              onChange={() => setTransporte('propio')}
+              className="accent-emerald-600"
+            />
+            <span className="text-sm font-semibold">Transporte por medios propios</span>
+          </label>
         </div>
       </div>
 

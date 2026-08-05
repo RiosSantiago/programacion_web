@@ -17,10 +17,14 @@ async function getUserRole(userId: number): Promise<string | null> {
   return row?.rol || null;
 }
 
+function idValido(id: number | null): boolean {
+  return Number.isSafeInteger(id) && (id as number) >= 1 && (id as number) <= 2147483647;
+}
+
 export const GET: APIRoute = async ({ params }) => {
   try {
     const id = parseInt(params.id || '');
-    if (!id) return new Response(JSON.stringify({ error: 'ID inválido' }), { status: 400 });
+    if (!idValido(id)) return new Response(JSON.stringify({ error: 'ID inválido' }), { status: 400 });
 
     const product = await queryGet<any>(
       `SELECT p.id, p.nombre, p.categoria_id, p.raza, p.peso, p.peso_unitario,
@@ -28,7 +32,7 @@ export const GET: APIRoute = async ({ params }) => {
               p.vendedor_id, p.vendedor_rating, p.estado, p.salud, p.envio,
               p.destacado, p.oferta, p.trazabilidad, p.tipo_precio, p.sexo,
               p.fecha_nacimiento, p.descripcion, p.video, p.finca, p.vereda,
-              p.referencia_ubicacion, p.ica_pdf, p.created_at,
+              p.referencia_ubicacion, p.ica_pdf, p.transporte, p.created_at,
               u.nombre AS vendedor,
               c.slug AS categoria,
               c.nombre AS categoria_nombre
@@ -57,7 +61,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
     if (!userId) return new Response(JSON.stringify({ error: 'No autorizado' }), { status: 401 });
 
     const id = parseInt(params.id || '');
-    if (!id) return new Response(JSON.stringify({ error: 'ID inválido' }), { status: 400 });
+    if (!idValido(id)) return new Response(JSON.stringify({ error: 'ID inválido' }), { status: 400 });
 
     const rol = await getUserRole(userId);
     const SELECT_PROD = `SELECT p.id, p.nombre, p.categoria_id, p.raza, p.peso, p.peso_unitario,
@@ -65,7 +69,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
       p.vendedor_id, p.vendedor_rating, p.estado, p.salud, p.envio,
       p.destacado, p.oferta, p.trazabilidad, p.tipo_precio, p.sexo,
       p.fecha_nacimiento, p.descripcion, p.video, p.finca, p.vereda,
-      p.referencia_ubicacion, p.ica_pdf, p.created_at,
+      p.referencia_ubicacion, p.ica_pdf, p.transporte, p.created_at,
       u.nombre AS vendedor,
       c.slug AS categoria,
       c.nombre AS categoria_nombre
@@ -85,7 +89,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
     const allowedFields = [
       'nombre', 'raza', 'peso', 'ubicacion', 'departamento', 'precio', 'stock',
       'salud', 'estado', 'tipo_precio', 'sexo', 'fecha_nacimiento', 'descripcion', 'video',
-      'finca', 'vereda', 'referencia_ubicacion', 'certificaciones',
+      'finca', 'vereda', 'referencia_ubicacion', 'certificaciones', 'transporte',
     ];
 
     if (data.nombre_finca !== undefined && data.finca === undefined)           data.finca = data.nombre_finca;
@@ -136,7 +140,7 @@ export const DELETE: APIRoute = async ({ params, request }) => {
     if (!userId) return new Response(JSON.stringify({ error: 'No autorizado' }), { status: 401 });
 
     const id = parseInt(params.id || '');
-    if (!id) return new Response(JSON.stringify({ error: 'ID inválido' }), { status: 400 });
+    if (!idValido(id)) return new Response(JSON.stringify({ error: 'ID inválido' }), { status: 400 });
 
     const rol = await getUserRole(userId);
     const product = rol === 'root'

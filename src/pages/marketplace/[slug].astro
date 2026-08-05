@@ -452,6 +452,19 @@ const catLower = producto?.categoria?.toLowerCase() || 'bovinos';
                   <span class="font-bold text-base ml-auto" style="color: #2D5A3D;">Disponible</span>
                 </div>
               )}
+
+              <!-- Transporte -->
+              <div class="flex items-center gap-3.5 px-5 py-4 group hover:bg-[#F5FBF5] transition-colors">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background: #EAF4EA; border: 1px solid #C8DCC8;">
+                  <svg class="w-5 h-5" fill="none" stroke="#2D5A3D" viewBox="0 0 24 24" stroke-width="1.8">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0zM14.5 8V5a1 1 0 00-1-1H3a1 1 0 00-1 1v9a1 1 0 001 1h2.05M14.5 8h3.55a1 1 0 01.95.68l1.32 3.95a1 1 0 01.05.32V17a1 1 0 01-1 1h-1.4M14.5 8v9m0 0H9.95"/>
+                  </svg>
+                </div>
+                <span class="text-sm font-bold w-16 shrink-0" style="color: #4A7C5A;">Transporte</span>
+                <span class="font-bold text-base ml-auto" style="color: #2D5A3D;">
+                  {producto.transporte === 'agroup' ? 'AgroUp lo transporta' : 'El vendedor lo transporta'}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -762,47 +775,16 @@ const catLower = producto?.categoria?.toLowerCase() || 'bovinos';
 
   ) : (
 
-  <!-- ══ FALLBACK / 404 ══ -->
-  <div id="fallback-container" data-slug="{slug}" class="max-w-4xl mx-auto px-4 py-16 text-center">
-    <div id="fallback-loading" class="animate-pulse">
-      <div class="w-16 h-16 rounded-full mx-auto mb-4" style="background: #D1EDCF;"></div>
-      <div class="h-4 rounded w-48 mx-auto mb-2" style="background: #D1EDCF;"></div>
-      <div class="h-3 rounded w-64 mx-auto" style="background: #D1EDCF;"></div>
-    </div>
-    <div id="fallback-content" class="hidden text-left max-w-2xl mx-auto">
-      <div class="flex items-center gap-2 text-sm mb-6" style="color: #4A7C5A;">
-        <a href="/" class="hover:text-[#1A3828]">Marketplace</a>
-        <span>/</span>
-        <a href="/marketplace" class="hover:text-[#1A3828]">Productos</a>
-        <span>/</span>
-        <span id="fb-nombre" class="font-semibold" style="color: #1A3828;"></span>
-      </div>
-      <div class="bg-white rounded-2xl p-6 space-y-4" style="border: 1.5px solid #C8DCC8; box-shadow: 0 2px 8px rgba(26,56,40,0.07);">
-        <video id="fb-video" class="hidden w-full rounded-lg max-h-64 object-cover" controls playsinline></video>
-        <div class="flex gap-4">
-          <div class="w-32 h-32 rounded-xl flex items-center justify-center shrink-0" style="background: #EAF4EA;" id="fb-img-container">
-            <img id="fb-img" class="w-full h-full object-contain" src="/images/ganado.svg" alt="" />
-          </div>
-          <div class="flex-1">
-            <h1 id="fb-nombre-lg" class="text-2xl font-bold" style="color: #1A3828;"></h1>
-            <p id="fb-categoria" class="text-sm capitalize mt-1" style="color: #4A7C5A;"></p>
-            <p id="fb-precio" class="text-3xl font-extrabold mt-3" style="color: #C9A84C;"></p>
-            <div class="flex gap-2 mt-4">
-              <a href="/marketplace" class="px-4 py-2 rounded-lg text-sm font-semibold" style="background: #EAF4EA; color: #1A3828;">Volver al Marketplace</a>
-              <button id="fb-contactar" class="px-4 py-2 rounded-lg text-sm font-semibold text-white" style="background: #2D5A3D;">Contactar por WhatsApp</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div id="fallback-404" class="hidden">
-      <svg class="w-16 h-16 mx-auto mb-4" fill="none" stroke="#A8C4A8" viewBox="0 0 24 24">
+  <!-- ══ PRODUCTO NO ENCONTRADO ══ -->
+  <div class="max-w-4xl mx-auto px-4 py-16 text-center">
+    <div class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style="background: #D1EDCF;">
+      <svg class="w-8 h-8" fill="none" stroke="#4A7C5A" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
       </svg>
-      <h2 class="text-xl font-bold mb-2" style="color: #1A3828;">Producto no encontrado</h2>
-      <p class="mb-6" style="color: #4A7C5A;">Este producto no está disponible en el marketplace.</p>
-      <a href="/marketplace" class="inline-flex items-center px-4 py-2 rounded-lg font-semibold text-white" style="background: #2D5A3D;">Explorar Marketplace</a>
     </div>
+    <h2 class="text-xl font-bold mb-2" style="color: #1A3828;">Producto no encontrado</h2>
+    <p class="mb-6" style="color: #4A7C5A;">Este producto no está disponible en el marketplace.</p>
+    <a href="/marketplace" class="inline-flex items-center px-4 py-2 rounded-lg font-semibold text-white" style="background: #2D5A3D;">Explorar Marketplace</a>
   </div>
 
   )}
@@ -827,45 +809,6 @@ const catLower = producto?.categoria?.toLowerCase() || 'bovinos';
         body: JSON.stringify({ vendedor_id: vendedorId, producto_id: productoId }),
       }).catch(() => {});
     }
-  })();
-
-  // ── Fallback localStorage ──
-  (function() {
-    try {
-      const fbContainer = document.getElementById('fallback-container');
-      if (!fbContainer) return;
-      const slug = fbContainer.getAttribute('data-slug');
-      if (!slug) return;
-      const localProductos = JSON.parse(localStorage.getItem('agroup_productos') || '[]');
-      const p = localProductos.find(item => String(item.id) === slug);
-      if (p) {
-        const fbLoading = document.getElementById('fallback-loading');
-        const fbContent = document.getElementById('fallback-content');
-        if (fbLoading) fbLoading.classList.add('hidden');
-        if (fbContent) {
-          fbContent.classList.remove('hidden');
-          const img = p.imagenes?.[0] || '/images/ganado.svg';
-          const setText = (id: string, txt: string) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
-          setText('fb-nombre', p.nombre || '');
-          setText('fb-nombre-lg', p.nombre || '');
-          setText('fb-categoria', p.categoria || '');
-          setText('fb-precio', '$' + (parseInt(p.precio || 0).toLocaleString('es-CO')));
-          if (p.video) {
-            const videoEl = document.getElementById('fb-video') as HTMLVideoElement;
-            if (videoEl) { videoEl.src = p.video; videoEl.classList.remove('hidden'); }
-          }
-          const imgEl = document.getElementById('fb-img') as HTMLImageElement;
-          if (imgEl) imgEl.src = img;
-          const contactar = document.getElementById('fb-contactar');
-          if (contactar) contactar.onclick = () => window.open('https://wa.me/573001234567?text=' + encodeURIComponent('Hola, me interesa: ' + (p.nombre || '')), '_blank');
-        }
-        return;
-      }
-    } catch(e) {}
-    const fbLoading = document.getElementById('fallback-loading');
-    if (fbLoading) fbLoading.classList.add('hidden');
-    const fb404 = document.getElementById('fallback-404');
-    if (fb404) fb404.classList.remove('hidden');
   })();
 
   // ── Calificación de estrellas ──

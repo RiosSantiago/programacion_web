@@ -36,6 +36,7 @@ export interface Producto {
   vereda?: string;
   referencia_ubicacion?: string;
   certificaciones?: string[];
+  transporte?: string;
 }
 
 function getPlaceholderImagen(categoria: string): string {
@@ -152,7 +153,7 @@ const PRODUCTO_COLS = `
   p.vendedor_id, p.vendedor_rating, p.estado, p.salud, p.envio,
   p.destacado, p.oferta, p.trazabilidad, p.tipo_precio, p.sexo,
   p.fecha_nacimiento, p.descripcion, p.video, p.finca, p.vereda,
-  p.referencia_ubicacion, p.ica_pdf, p.created_at
+  p.referencia_ubicacion, p.ica_pdf, p.transporte, p.created_at
 `;
 
 export async function getProductos(): Promise<Producto[]> {
@@ -185,6 +186,7 @@ export async function getProductosDestacados(limit: number = 6): Promise<Product
 
 
 export async function getProductoById(id: number): Promise<Producto | undefined> {
+  if (!Number.isSafeInteger(id) || id < 1 || id > 2147483647) return undefined;
   const row = await queryGet(
     `SELECT ${PRODUCTO_COLS}, u.nombre AS vendedor, c.slug AS categoria, c.nombre AS categoria_nombre
      FROM productos p
@@ -388,6 +390,7 @@ export interface CrearProductoInput {
   vereda?:      string;
   referencia_ubicacion?: string;
   certificaciones?: string[];
+  transporte?: string;
 }
 
 export async function crearProducto(data: CrearProductoInput): Promise<number> {
@@ -400,12 +403,12 @@ export async function crearProducto(data: CrearProductoInput): Promise<number> {
       nombre, categoria_id, raza, peso, peso_unitario, ubicacion, departamento,
       precio, precio_anterior, stock, vendedor_id, vendedor_rating,
       estado, salud, envio, destacado, oferta, trazabilidad, tipo_precio,
-      sexo, fecha_nacimiento, descripcion, video, finca, vereda, referencia_ubicacion, ica_pdf
+      sexo, fecha_nacimiento, descripcion, video, finca, vereda, referencia_ubicacion, ica_pdf, transporte
     ) VALUES (
       @nombre, @categoria_id, @raza, @peso, @peso_unitario, @ubicacion, @departamento,
       @precio, @precio_anterior, @stock, @vendedor_id, @vendedor_rating,
       @estado, @salud, @envio, @destacado, @oferta, @trazabilidad, @tipo_precio,
-      @sexo, @fecha_nacimiento, @descripcion, @video, @finca, @vereda, @referencia_ubicacion, @certificaciones
+      @sexo, @fecha_nacimiento, @descripcion, @video, @finca, @vereda, @referencia_ubicacion, @certificaciones, @transporte
     )`,
     {
       nombre: data.nombre,
@@ -435,6 +438,7 @@ export async function crearProducto(data: CrearProductoInput): Promise<number> {
       vereda: data.vereda || '',
       referencia_ubicacion: data.referencia_ubicacion || '',
       certificaciones: data.certificaciones ? JSON.stringify(data.certificaciones) : '',
+      transporte: data.transporte === 'agroup' ? 'agroup' : 'propio',
     }
   );
 
@@ -458,7 +462,7 @@ export async function actualizarProducto(id: number, data: Partial<Producto>): P
   const allowedFields = [
     'nombre', 'categoria_id', 'raza', 'peso', 'ubicacion',
     'departamento', 'precio', 'stock', 'salud', 'estado', 'tipo_precio',
-    'sexo', 'fecha_nacimiento', 'video', 'finca', 'vereda', 'referencia_ubicacion', 'certificaciones',
+    'sexo', 'fecha_nacimiento', 'video', 'finca', 'vereda', 'referencia_ubicacion', 'certificaciones', 'transporte',
   ];
 
   for (const field of allowedFields) {

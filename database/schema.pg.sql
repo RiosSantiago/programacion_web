@@ -71,6 +71,7 @@ CREATE TABLE IF NOT EXISTS productos (
     vereda VARCHAR(255) DEFAULT '',
     referencia_ubicacion TEXT DEFAULT '',
     certificaciones TEXT DEFAULT '',
+    transporte VARCHAR(50) DEFAULT 'propio',
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
