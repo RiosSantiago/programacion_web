@@ -199,6 +199,19 @@ export async function getProductosDestacados(limit: number = 6): Promise<Product
   return attachImagenes(rows);
 }
 
+export async function getProductosRecientes(limit: number = 4): Promise<Producto[]> {
+  const rows = await queryAll(
+    `SELECT ${PRODUCTO_COLS}, u.nombre AS vendedor, COALESCE(c.slug, p.categoria) AS categoria, c.nombre AS categoria_nombre
+     FROM productos p
+     LEFT JOIN usuarios u ON p.vendedor_id = u.id
+     LEFT JOIN categorias c ON p.categoria_id = c.id
+     ORDER BY p.created_at DESC NULLS LAST, p.id DESC
+     LIMIT ?`,
+    [limit]
+  );
+  return attachImagenes(rows);
+}
+
 
 
 export async function getProductoById(id: number): Promise<Producto | undefined> {
