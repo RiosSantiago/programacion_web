@@ -143,8 +143,9 @@ const sortLabel = sortLabelsMap[sortBy] || 'Más relevantes';
     </div>
 
     <!-- Panel de filtros colapsable -->
-    <div id="filters-panel" class="hidden mb-8 bg-coffee-100 border border-coffee-200 rounded-2xl shadow-sm overflow-hidden">
-      <FilterPanel
+    <div id="filters-panel" class="hidden mb-8">
+      <div class="bg-coffee-100 border border-coffee-200 rounded-2xl shadow-sm overflow-visible">
+        <FilterPanel
         client:load
         initialCategoria={categoria}
         initialMunicipio={municipio}
@@ -157,6 +158,7 @@ const sortLabel = sortLabelsMap[sortBy] || 'Más relevantes';
         initialFechaPublicacion={fechaPublicacion}
         initialDestacados={destacados}
       />
+      </div>
     </div>
 
     <!-- Grid de productos -->
