@@ -3,12 +3,12 @@ import { getCategorias } from '../lib/models/categorias';
 const currentYear = new Date().getFullYear();
 const categorias = await getCategorias();
 
-const categAnimales = ['bovinos', 'equinos', 'porcinos', 'ovinos', 'avicolas', 'animales', 'ganado', 'pecuario', 'pecuaria'];
+const categMostradas = ['bovinos', 'equinos', 'porcinos', 'ovinos', 'avicolas', 'animales', 'ganado', 'pecuario', 'pecuaria', 'agricultura'];
 const links = {
   marketplace: [
     { href: '/marketplace', label: 'Ver todos' },
     ...categorias
-      .filter(c => categAnimales.includes(c.slug) || categAnimales.includes(c.nombre.toLowerCase()))
+      .filter(c => categMostradas.includes(c.slug) || categMostradas.includes(c.nombre.toLowerCase()))
       .map(c => ({ href: `/marketplace?categoria=${c.slug}`, label: c.nombre })),
   ],
   vendedores: [

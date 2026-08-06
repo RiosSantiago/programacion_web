@@ -1,4 +1,5 @@
 import { queryAll, queryGet, queryRun } from '../db';
+import { generarSlug, getCategorias } from './categorias';
 
 export interface Producto {
   id: number;
@@ -61,6 +62,11 @@ const ALIASES_CATEGORIA: Record<string, string> = {
   ovino: 'ovinos',
   avicola: 'avicolas',
 };
+
+const REVERSE_ALIASES: Record<string, string> = {};
+for (const [singular, plural] of Object.entries(ALIASES_CATEGORIA)) {
+  REVERSE_ALIASES[plural] = singular;
+}
 
 function normalizarSlugCategoria(val: unknown): string {
   const raw = String(val ?? '').trim();
@@ -152,11 +158,15 @@ let _slugMap: Record<string, number> | null = null;
 
 async function getMapSlugToId(): Promise<Record<string, number>> {
   if (_slugMap) return _slugMap;
-  const rows = await queryAll<{ slug: string; id: number }>('SELECT slug, id FROM categorias');
+  const rows = await queryAll<{ slug: string; nombre: string; id: number }>('SELECT slug, nombre, id FROM categorias');
   _slugMap = {};
   for (const r of rows) {
-    _slugMap[r.slug] = r.id;
-    _slugMap[r.slug.replace(/-/g, '')] = r.id;
+    const slugs = new Set<string>([r.slug, generarSlug(r.nombre)]);
+    for (const slug of slugs) {
+      if (!slug) continue;
+      _slugMap[slug] = r.id;
+      _slugMap[slug.replace(/-/g, '')] = r.id;
+    }
   }
   return _slugMap;
 }
@@ -287,20 +297,41 @@ export async function filtrarProductos(options: {
   if (options.categoria && options.categoria !== 'todos') {
     const cats = options.categoria.split(',').map(s => s.trim()).filter(Boolean);
     if (cats.length > 0) {
-      const slugMap = await getMapSlugToId();
+      const categorias = await getCategorias();
+      const slugTargets = cats.map(c => c.toLowerCase().replace(/-/g, ''));
       const numericIds: number[] = [];
-      cats.forEach(c => {
-        const num = Number(c);
-        if (!isNaN(num)) numericIds.push(num);
-        const mapped = slugMap[c.toLowerCase()];
-        if (mapped && !numericIds.includes(mapped)) numericIds.push(mapped);
+      const matches = categorias.filter(c => {
+        const slugC = (c.slug || generarSlug(c.nombre)).toLowerCase().replace(/-/g, '');
+        const nombreC = (c.nombre || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        return slugTargets.includes(slugC) || slugTargets.includes(nombreC);
       });
+      matches.forEach(m => numericIds.push(m.id));
+      const nameVariants: string[] = [];
+      matches.forEach(m => {
+        const lower = (m.nombre || '').toLowerCase();
+        const plain = lower.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        if (!nameVariants.includes(lower)) nameVariants.push(lower);
+        if (!nameVariants.includes(plain)) nameVariants.push(plain);
+        const singular = REVERSE_ALIASES[plain] || REVERSE_ALIASES[lower];
+        if (singular && !nameVariants.includes(singular)) nameVariants.push(singular);
+      });
+      const clauses: string[] = [];
+      const clauseParams: any[] = [];
       if (numericIds.length > 0) {
-        query += ` AND p.categoria_id IN (${numericIds.map(() => '?').join(',')})`;
-        params.push(...numericIds);
+        clauses.push(`p.categoria_id IN (${numericIds.map(() => '?').join(',')})`);
+        clauseParams.push(...numericIds);
+      }
+      if (nameVariants.length > 0) {
+        clauses.push(`LOWER(p.categoria) IN (${nameVariants.map(() => '?').join(',')})`);
+        clauseParams.push(...nameVariants);
+        clauses.push(`LOWER(c.nombre) IN (${nameVariants.map(() => '?').join(',')})`);
+        clauseParams.push(...nameVariants);
+      }
+      if (clauses.length > 0) {
+        query += ` AND (${clauses.join(' OR ')})`;
+        params.push(...clauseParams);
       } else {
-        query += ` AND c.slug IN (${cats.map(() => '?').join(',')})`;
-        params.push(...cats);
+        query += ' AND 1 = 0';
       }
     }
   }

@@ -87,6 +87,7 @@ const sortLabel = sortLabelsMap[sortBy] || 'Más relevantes';
 ---
 
 <BaseLayout navVariant="market">
+  <div class="min-h-screen bg-stone-100">
   <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Header con título y controles -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
@@ -271,6 +272,7 @@ const sortLabel = sortLabelsMap[sortBy] || 'Más relevantes';
         </div>
     </div>
   </section>
+  </div>
 </BaseLayout>
 
 <script is:inline>
@@ -311,13 +313,6 @@ const sortLabel = sortLabelsMap[sortBy] || 'Más relevantes';
       var arrow = document.getElementById('sort-dropdown-arrow');
       if (menu) menu.style.display = 'none';
       if (arrow) arrow.style.transform = '';
-    }
-    var btn = document.getElementById('btn-toggle-filters');
-    var panel = document.getElementById('filters-panel');
-    if (panel && !panel.classList.contains('hidden') && btn && !btn.contains(e.target) && !panel.contains(e.target)) {
-      panel.classList.add('hidden');
-      var fArrow = document.getElementById('filters-arrow');
-      if (fArrow) fArrow.style.transform = '';
     }
   });
 </script>

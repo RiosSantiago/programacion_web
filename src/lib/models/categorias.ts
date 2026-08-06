@@ -28,7 +28,7 @@ function conSlug(row: any): Categoria {
 }
 
 export async function getCategorias(): Promise<Categoria[]> {
-  const rows = await queryAll<any>('SELECT id, nombre, icono, color, cantidad FROM categorias ORDER BY cantidad DESC');
+  const rows = await queryAll<any>('SELECT id, nombre, icono, color, cantidad, slug FROM categorias ORDER BY cantidad DESC');
   return rows.map(conSlug);
 }
 
