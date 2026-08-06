@@ -95,35 +95,9 @@ const productosConReputacion = productos.map(p => {
       <div class="absolute -top-40 -left-40 w-[480px] h-[480px] rounded-full bg-gold-400/10 blur-3xl"></div>
       <div class="absolute -bottom-40 -right-40 w-[520px] h-[520px] rounded-full bg-cielo-400/10 blur-3xl"></div>
 
-      <!-- Silueta de cabeza de vaca -->
-      <svg class="absolute top-1/4 right-1/4 w-28 h-28 text-white/10" viewBox="0 0 64 64" fill="currentColor" aria-hidden="true">
-        <ellipse cx="13" cy="21" rx="7" ry="4" transform="rotate(-20 13 21)"/>
-        <ellipse cx="51" cy="21" rx="7" ry="4" transform="rotate(20 51 21)"/>
-        <path d="M21 19 L15 4 L29 14 Z"/>
-        <path d="M43 19 L49 4 L35 14 Z"/>
-        <path d="M32 15c12 0 19 9 19 17S44 48 32 48 13 41 13 32s7-17 19-17z"/>
-        <circle cx="27" cy="39" r="2.5"/>
-        <circle cx="37" cy="39" r="2.5"/>
-      </svg>
-
-      <!-- Grano de café suelto -->
-      <svg class="absolute bottom-1/4 left-1/4 w-24 h-24 text-gold-300/20 -rotate-12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M12 2c4.8 0 8 5.4 8 10s-3.2 10-8 10-8-5.4-8-10S7.2 2 12 2zm0 2.6c-2.6 3-2.6 13.8 0 16.8 1.2-1.4 1.9-3.6 1.9-6.2 0-4-1.3-7.5-1.9-10.6z"/>
-      </svg>
-
-      <!-- Granos de café esparcidos -->
-      <svg class="absolute top-12 left-12 w-28 h-28 text-gold-300/15" viewBox="0 0 100 100" fill="currentColor" aria-hidden="true">
-        <path transform="translate(2 2) scale(1.7)" d="M12 2c4.8 0 8 5.4 8 10s-3.2 10-8 10-8-5.4-8-10S7.2 2 12 2zm0 2.6c-2.6 3-2.6 13.8 0 16.8 1.2-1.4 1.9-3.6 1.9-6.2 0-4-1.3-7.5-1.9-10.6z"/>
-        <path transform="translate(52 0) scale(1.4) rotate(30)" d="M12 2c4.8 0 8 5.4 8 10s-3.2 10-8 10-8-5.4-8-10S7.2 2 12 2zm0 2.6c-2.6 3-2.6 13.8 0 16.8 1.2-1.4 1.9-3.6 1.9-6.2 0-4-1.3-7.5-1.9-10.6z"/>
-        <path transform="translate(0 52) scale(1.5) rotate(-20)" d="M12 2c4.8 0 8 5.4 8 10s-3.2 10-8 10-8-5.4-8-10S7.2 2 12 2zm0 2.6c-2.6 3-2.6 13.8 0 16.8 1.2-1.4 1.9-3.6 1.9-6.2 0-4-1.3-7.5-1.9-10.6z"/>
-        <path transform="translate(60 48) scale(1.5) rotate(70)" d="M12 2c4.8 0 8 5.4 8 10s-3.2 10-8 10-8-5.4-8-10S7.2 2 12 2zm0 2.6c-2.6 3-2.6 13.8 0 16.8 1.2-1.4 1.9-3.6 1.9-6.2 0-4-1.3-7.5-1.9-10.6z"/>
-        <path transform="translate(34 26) scale(1.1) rotate(15)" d="M12 2c4.8 0 8 5.4 8 10s-3.2 10-8 10-8-5.4-8-10S7.2 2 12 2zm0 2.6c-2.6 3-2.6 13.8 0 16.8 1.2-1.4 1.9-3.6 1.9-6.2 0-4-1.3-7.5-1.9-10.6z"/>
-        <path transform="translate(30 68) scale(1.2) rotate(-45)" d="M12 2c4.8 0 8 5.4 8 10s-3.2 10-8 10-8-5.4-8-10S7.2 2 12 2zm0 2.6c-2.6 3-2.6 13.8 0 16.8 1.2-1.4 1.9-3.6 1.9-6.2 0-4-1.3-7.5-1.9-10.6z"/>
-      </svg>
-
-      <!-- Hoja de cosecha -->
-      <svg class="absolute bottom-16 right-16 w-32 h-32 text-campo-300/10 rotate-12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M21 3c-8 0-14 4-16 10-1 3 0 7 1 7 1 0 2-2 3-4 3 3 7 4 10 2 3-2 4-7 2-15z"/>
+      <!-- Silueta de Granero/Finca (centro, detrás de las tarjetas) -->
+      <svg class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 text-white/10 pointer-events-none z-0" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true">
+        <path d="M256 23.38L89.844 89.845l-64.9 162.254l14.85 5.943q30.467-76.15 60.93-152.304l1.432-3.58L256 40.616l153.844 61.54l1.43 3.58l60.93 152.305l14.853-5.942l-64.9-162.254zm0 36.624l-139.996 55.998L72.8 224h.2v263h78V329h-39v-18h297v176h30V224h.2l-43.204-107.998zM151 135h210v114H151zm23.563 18L199 201.873V153zM313 153v48.873L337.438 153zm-144 29.127V231h24.438zm174 0L318.562 231H343zm-98.73 18.69c-1.207-.02-2.31.02-3.288.128c-2.823.31-10.76 3.708-16.86 7.3a147 147 0 0 0-7.122 4.484V231h78v-16.97a282 282 0 0 0-17.578-6.368c-11.206-3.63-24.71-6.71-33.152-6.846zM160 263h192v18H160zm15.16 66L208 389.205L240.84 329zm144 0L352 389.205L384.84 329zM169 355.295v105.41L197.748 408zm78 0L218.252 408L247 460.705zm66 0v105.41L341.748 408zm78 0L362.252 408L391 460.705zm-183 71.5L175.16 487h65.68zm144 0L319.16 487h65.68z"/>
       </svg>
     </div>
 
@@ -252,15 +226,11 @@ const productosConReputacion = productos.map(p => {
   </section>
 
   <!-- ══ Features Section — Why Choose Agroup ══ -->
-  <section class="reveal bg-white border-y border-[#E8E0D8] relative z-[31] overflow-hidden">
+  <section class="reveal bg-white border-y border-[#E8E0D8] relative z-[31]">
     <!-- Background decorative blobs -->
     <div class="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
       <div class="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-campo-50/60 blur-3xl"></div>
       <div class="absolute -bottom-32 -left-32 w-80 h-80 rounded-full bg-orange-50/50 blur-3xl"></div>
-      <div class="absolute top-1/3 left-1/4 w-16 h-16 border-2 border-campo-100/40 rounded-full"></div>
-      <div class="absolute bottom-1/4 right-1/4 w-10 h-10 border-2 border-orange-100/40 rounded-full"></div>
-      <div class="absolute top-1/2 right-1/3 w-2 h-2 bg-campo-200/30 rounded-full"></div>
-      <div class="absolute bottom-1/3 left-1/3 w-3 h-3 bg-orange-200/30 rounded-full"></div>
       <svg class="absolute top-10 left-10 w-24 h-24 text-campo-100/20" viewBox="0 0 100 100" fill="currentColor">
         <circle cx="10" cy="10" r="2"/><circle cx="30" cy="10" r="2"/><circle cx="50" cy="10" r="2"/>
         <circle cx="10" cy="30" r="2"/><circle cx="30" cy="30" r="2"/><circle cx="50" cy="30" r="2"/>
@@ -296,158 +266,116 @@ const productosConReputacion = productos.map(p => {
       </div>
 
       <!-- Cards Grid -->
-      <div class="scroll-cards-wrapper">
-        <div class="scroll-cards-sticky">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8 max-w-4xl mx-auto" id="feature-cards">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8 max-w-4xl mx-auto" id="feature-cards">
         <!-- Card 01: Compra Segura -->
-        <div class="card-slot" data-side="left">
-          <div class="card-reveal-image bg-campo-600">
-            <svg class="w-14 h-14 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
-            </svg>
-            <span class="text-white font-bold text-sm mt-2">Verificado</span>
-          </div>
-          <div class="feature-card group relative bg-white rounded-2xl p-6 md:p-7 shadow-md hover:shadow-xl transition-all duration-300 border-2 border-campo-400 hover:-translate-y-1" data-card-index="0">
-            <div class="absolute -top-4 -left-4 z-10">
-              <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold tracking-wider shadow-sm border border-amber-200">
-                <svg class="w-3 h-3 text-amber-600" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                ★ más popular
-              </span>
-            </div>
+        <div class="feature-card group relative bg-campo-600 hover:bg-campo-500 p-6 md:p-7 shadow-md hover:shadow-xl transition-all duration-300 border-2 border-campo-700 rounded-2xl hover:-translate-y-1" data-card-index="0">
             <div class="flex flex-col sm:flex-row gap-4 sm:gap-6">
               <div class="flex flex-row sm:flex-col items-center sm:items-start gap-3 sm:gap-1 shrink-0">
-                <div class="w-14 h-14 md:w-16 md:h-16 bg-campo-100 rounded-full flex items-center justify-center">
-                  <svg class="w-7 h-7 md:w-8 md:h-8 text-campo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-14 h-14 md:w-16 md:h-16 bg-white/10 rounded-full flex items-center justify-center">
+                  <svg class="w-7 h-7 md:w-8 md:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 00-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
                 </div>
                 <div class="flex items-center gap-2 sm:flex-col sm:items-start sm:gap-0">
-                  <span class="text-2xl md:text-3xl font-black text-campo-100/50 select-none leading-none">01</span>
-                  <h4 class="font-bold text-lg text-[#2D2D2D]">Compra Segura</h4>
+                  <span class="text-2xl md:text-3xl font-black text-white select-none leading-none">01</span>
+                  <h4 class="font-bold text-lg text-white">Compra Segura</h4>
                 </div>
               </div>
-              <div class="flex-1 min-w-0">
-                <p class="text-sm text-muted leading-relaxed">Trazabilidad verificada en cada producto. Todos nuestros animales cuentan con registros sanitarios actualizados.</p>
+              <div class="flex-1 min-w-0 flex items-center justify-center text-center">
+                <p class="text-sm text-white/80 leading-relaxed">Lotes con registros sanitarios al día e historial verificado. Compra con total tranquilidad para tu predio.</p>
               </div>
             </div>
-            <span class="block w-10 h-0.5 rounded-full bg-campo-400 mt-4"></span>
-            <div class="mt-4 pt-4 border-t border-campo-100/50">
-              <div class="flex items-center gap-2 text-xs font-semibold text-campo-700">
+            <span class="block w-10 h-0.5 rounded-full bg-campo-200 mt-4"></span>
+            <div class="mt-4 pt-4 border-t border-white/15">
+              <div class="flex items-center justify-center gap-2 text-xs font-semibold text-white">
                 <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                100% Confiable
+                Garantía y Trazabilidad
               </div>
             </div>
           </div>
-        </div>
 
         <!-- Card 02: Sin Intermediarios -->
-        <div class="card-slot" data-side="right">
-          <div class="card-reveal-image bg-orange-500">
-            <svg class="w-14 h-14 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h8m-8 4h5m6-10.5V18a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h7.5L20 9.5z" />
-            </svg>
-            <span class="text-white font-bold text-sm mt-2">Trato directo</span>
-          </div>
-          <div class="feature-card group relative bg-white rounded-2xl p-6 md:p-7 shadow-md hover:shadow-xl transition-all duration-300 border border-coffee-100 hover:-translate-y-1" data-card-index="1">
+        <div class="feature-card group relative bg-orange-500 hover:bg-orange-400 p-6 md:p-7 shadow-md hover:shadow-xl transition-all duration-300 border-2 border-orange-600 rounded-2xl hover:-translate-y-1" data-card-index="1">
             <div class="flex flex-col sm:flex-row gap-4 sm:gap-6">
               <div class="flex flex-row sm:flex-col items-center sm:items-start gap-3 sm:gap-1 shrink-0">
-                <div class="w-14 h-14 md:w-16 md:h-16 bg-orange-100 rounded-full flex items-center justify-center">
-                  <svg class="w-7 h-7 md:w-8 md:h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-14 h-14 md:w-16 md:h-16 bg-white/10 rounded-full flex items-center justify-center">
+                  <svg class="w-7 h-7 md:w-8 md:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
                 </div>
                 <div class="flex items-center gap-2 sm:flex-col sm:items-start sm:gap-0">
-                  <span class="text-2xl md:text-3xl font-black text-orange-100/50 select-none leading-none">02</span>
-                  <h4 class="font-bold text-lg text-[#2D2D2D]">Sin Intermediarios</h4>
+                  <span class="text-2xl md:text-3xl font-black text-white select-none leading-none">02</span>
+                  <h4 class="font-bold text-lg text-white">Sin Intermediarios</h4>
                 </div>
               </div>
-              <div class="flex-1 min-w-0">
-                <p class="text-sm text-muted leading-relaxed">Contacta directo al vendedor sin comisiones ni terceros. El trato es entre tú y el productor.</p>
+              <div class="flex-1 min-w-0 flex items-center justify-center text-center">
+                <p class="text-sm text-white/80 leading-relaxed">Sin comisiones ni terceros. La negociación y el margen se quedan entre tú y el productor.</p>
               </div>
             </div>
-            <span class="block w-10 h-0.5 rounded-full bg-orange-400 mt-4"></span>
-            <div class="mt-4 pt-4 border-t border-orange-100/50">
-              <div class="flex items-center gap-2 text-xs font-semibold text-orange-700">
+            <span class="block w-10 h-0.5 rounded-full bg-orange-200 mt-4"></span>
+            <div class="mt-4 pt-4 border-t border-white/15">
+              <div class="flex items-center justify-center gap-2 text-xs font-semibold text-white">
                 <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                 Trato Directo
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Card 03: Manizales -->
-        <div class="card-slot" data-side="left">
-          <div class="card-reveal-image bg-campo-600">
-            <svg class="w-14 h-14 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" />
-            </svg>
-            <span class="text-white font-bold text-sm mt-2">Manizales, Caldas</span>
-          </div>
-          <div class="feature-card group relative bg-white rounded-2xl p-6 md:p-7 shadow-md hover:shadow-xl transition-all duration-300 border border-coffee-100 hover:-translate-y-1" data-card-index="2">
+        <!-- Card 03: WhatsApp -->
+        <div class="feature-card group relative bg-campo-600 hover:bg-campo-500 p-6 md:p-7 shadow-md hover:shadow-xl transition-all duration-300 border-2 border-campo-700 rounded-2xl hover:-translate-y-1" data-card-index="2">
             <div class="flex flex-col sm:flex-row gap-4 sm:gap-6">
               <div class="flex flex-row sm:flex-col items-center sm:items-start gap-3 sm:gap-1 shrink-0">
-                <div class="w-14 h-14 md:w-16 md:h-16 bg-campo-100 rounded-full flex items-center justify-center">
-                  <svg class="w-7 h-7 md:w-8 md:h-8 text-campo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-14 h-14 md:w-16 md:h-16 bg-white/10 rounded-full flex items-center justify-center">
+                  <svg class="w-7 h-7 md:w-8 md:h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                  </svg>
+                </div>
+                <div class="flex items-center gap-2 sm:flex-col sm:items-start sm:gap-0">
+                  <span class="text-2xl md:text-3xl font-black text-white select-none leading-none">03</span>
+                  <h4 class="font-bold text-lg text-white">WhatsApp</h4>
+                </div>
+              </div>
+              <div class="flex-1 min-w-0 flex items-center justify-center text-center">
+                <p class="text-sm text-white/80 leading-relaxed">Resuelve dudas, acuerda la logística y cierra tratos directamente por chat sin rodeos.</p>
+              </div>
+            </div>
+            <span class="block w-10 h-0.5 rounded-full bg-campo-200 mt-4"></span>
+            <div class="mt-4 pt-4 border-t border-white/15">
+              <div class="flex items-center justify-center gap-2 text-xs font-semibold text-white">
+                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                Agilidad al Instante
+              </div>
+            </div>
+          </div>
+
+        <!-- Card 04: Raíces Ganaderas -->
+        <div class="feature-card group relative bg-orange-500 hover:bg-orange-400 p-6 md:p-7 shadow-md hover:shadow-xl transition-all duration-300 border-2 border-orange-600 rounded-2xl hover:-translate-y-1" data-card-index="3">
+            <div class="flex flex-col sm:flex-row gap-4 sm:gap-6">
+              <div class="flex flex-row sm:flex-col items-center sm:items-start gap-3 sm:gap-1 shrink-0">
+                <div class="w-14 h-14 md:w-16 md:h-16 bg-white/10 rounded-full flex items-center justify-center">
+                  <svg class="w-7 h-7 md:w-8 md:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                 </div>
                 <div class="flex items-center gap-2 sm:flex-col sm:items-start sm:gap-0">
-                  <span class="text-2xl md:text-3xl font-black text-campo-100/50 select-none leading-none">03</span>
-                  <h4 class="font-bold text-lg text-[#2D2D2D]">Manizales</h4>
+                  <span class="text-2xl md:text-3xl font-black text-white select-none leading-none">04</span>
+                  <h4 class="font-bold text-lg text-white">Raíces Ganaderas</h4>
                 </div>
               </div>
-              <div class="flex-1 min-w-0">
-                <p class="text-sm text-muted leading-relaxed">El corazón ganadero de Colombia. Conectamos compradores con los mejores productores de la región.</p>
+              <div class="flex-1 min-w-0 flex items-center justify-center text-center">
+                <p class="text-sm text-white/80 leading-relaxed">Nacemos en el corazón del campo para conectar a los mejores productores con compradores de confianza.</p>
               </div>
             </div>
-            <span class="block w-10 h-0.5 rounded-full bg-campo-400 mt-4"></span>
-            <div class="mt-4 pt-4 border-t border-campo-100/50">
-              <div class="flex items-center gap-2 text-xs font-semibold text-campo-700">
+            <span class="block w-10 h-0.5 rounded-full bg-orange-200 mt-4"></span>
+            <div class="mt-4 pt-4 border-t border-white/15">
+              <div class="flex items-center justify-center gap-2 text-xs font-semibold text-white">
                 <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 21h18M3 10h18M3 7l9-4 9 4M3 14h18"/></svg>
-                Apoyamos lo nuestro
+                Respaldo Local
               </div>
             </div>
           </div>
-        </div>
-
-        <!-- Card 04: WhatsApp -->
-        <div class="card-slot" data-side="right">
-          <div class="card-reveal-image bg-orange-500">
-            <svg class="w-14 h-14 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347" />
-            </svg>
-            <span class="text-white font-bold text-sm mt-2">Respuesta inmediata</span>
-          </div>
-          <div class="feature-card group relative bg-white rounded-2xl p-6 md:p-7 shadow-md hover:shadow-xl transition-all duration-300 border border-coffee-100 hover:-translate-y-1" data-card-index="3">
-            <div class="flex flex-col sm:flex-row gap-4 sm:gap-6">
-              <div class="flex flex-row sm:flex-col items-center sm:items-start gap-3 sm:gap-1 shrink-0">
-                <div class="w-14 h-14 md:w-16 md:h-16 bg-orange-100 rounded-full flex items-center justify-center">
-                  <svg class="w-7 h-7 md:w-8 md:h-8 text-orange-700" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-                  </svg>
-                </div>
-                <div class="flex items-center gap-2 sm:flex-col sm:items-start sm:gap-0">
-                  <span class="text-2xl md:text-3xl font-black text-orange-100/50 select-none leading-none">04</span>
-                  <h4 class="font-bold text-lg text-[#2D2D2D]">WhatsApp</h4>
-                </div>
-              </div>
-              <div class="flex-1 min-w-0">
-                <p class="text-sm text-muted leading-relaxed">Negocia directo por chat. Coordina pagos, resuelve dudas y cierra tratos en minutos.</p>
-              </div>
-            </div>
-            <span class="block w-10 h-0.5 rounded-full bg-orange-400 mt-4"></span>
-            <div class="mt-4 pt-4 border-t border-orange-100/50">
-              <div class="flex items-center gap-2 text-xs font-semibold text-orange-700">
-                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-                Respuesta Inmediata
-              </div>
-            </div>
-          </div>
-        </div>
-          </div><!-- cierra #feature-cards -->
-        </div><!-- cierra .scroll-cards-sticky -->
-      </div><!-- cierra .scroll-cards-wrapper — AQUÍ estaba el bug: antes cerraba después del Social Proof Bar -->
+      </div><!-- cierra #feature-cards -->
 
       <!-- ══ Social Proof Bar ══ -->
       <div class="bg-gradient-to-r from-campo-50 via-white to-orange-50 rounded-2xl border border-campo-100/50 p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm mt-8 md:mt-12">
@@ -487,128 +415,21 @@ const productosConReputacion = productos.map(p => {
     opacity: 1;
     transform: none;
   }
-  .scroll-cards-wrapper {
-    position: relative;
-    height: 320vh;
-  }
 
-  .scroll-cards-sticky {
-    position: sticky;
-    top: 12vh;
-    padding: 4vh 0;
-  }
-
-  .feature-card {
-    opacity: 0.4;
-    transform: scale(0.94);
-    filter: grayscale(40%);
-  }
-
-  .feature-card.is-active {
-    opacity: 1;
-    transform: scale(1);
-    filter: grayscale(0%);
-    box-shadow: 0 20px 40px -20px rgba(0,0,0,0.25);
-  }
-  
-
-  @media (prefers-reduced-motion: reduce) {
-    .feature-card { transition: none; }
-  }
-
-  @media (max-width: 640px) {
-    .scroll-cards-wrapper { height: 260vh; }
-  }
-
-  .card-slot {
-    position: relative;
-  }
-
-  .card-reveal-image {
-    position: absolute;
-    top: 8%;
-    bottom: 8%;
-    width: 65%;
-    border-radius: 1.25rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 1rem;
-    z-index: 0;
-    opacity: 0;
-    box-shadow: 0 20px 40px -15px rgba(0,0,0,0.35);
-    transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
-    pointer-events: none;
-  }
-
-  .card-slot[data-side="left"] .card-reveal-image {
-    left: 0;
-    transform: translateX(0%);
-  }
-  .card-slot[data-side="right"] .card-reveal-image {
-    right: 0;
-    transform: translateX(0%);
-  }
-
-  .card-slot .feature-card {
-    position: relative;
-    z-index: 1;
-  }
-
-  .card-slot.is-active .card-reveal-image {
-    opacity: 1;
-  }
-  .card-slot[data-side="left"].is-active .card-reveal-image {
-    transform: translateX(-80%);
-  }
-  .card-slot[data-side="right"].is-active .card-reveal-image {
-    transform: translateX(80%);
-  }
-
-  @media (max-width: 640px) {
-    .card-reveal-image { display: none; }
-  }
 </style>
 
 <script is:inline>
   document.addEventListener('DOMContentLoaded', function () {
-    var observer = new IntersectionObserver(function (entries) {
+    var revealObserver = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (entry.isIntersecting) {
           entry.target.classList.add('is-visible');
-          observer.unobserve(entry.target);
+          revealObserver.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.25 });
-
+    }, { threshold: 0.1 });
     document.querySelectorAll('.reveal').forEach(function (el) {
-      observer.observe(el);
+      revealObserver.observe(el);
     });
-  });
-</script>
-<script is:inline>
-  document.addEventListener('DOMContentLoaded', function () {
-    const wrapper = document.querySelector('.scroll-cards-wrapper');
-    const cards = document.querySelectorAll('.feature-card');
-    if (!wrapper || !cards.length) return;
-
-    function onScroll() {
-      const rect = wrapper.getBoundingClientRect();
-      const scrollable = wrapper.offsetHeight - window.innerHeight;
-      const scrolled = -rect.top;
-      const progress = Math.min(Math.max(scrolled / scrollable, 0), 1);
-      const activeIndex = Math.min(cards.length - 1, Math.floor(progress * cards.length));
-
-      cards.forEach((card, i) => {
-        const active = i === activeIndex;
-        card.classList.toggle('is-active', active);
-        card.closest('.card-slot')?.classList.toggle('is-active', active);
-      });
-    }
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
   });
 </script>

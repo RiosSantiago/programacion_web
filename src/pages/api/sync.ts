@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { queryRun } from '../../lib/db';
+import { queryAll, queryRun } from '../../lib/db';
 
 export const POST: APIRoute = async ({ request }) => {
   try {

@@ -7,6 +7,8 @@ interface SearchResult {
   precio: number;
   vendedor: string;
   ubicacion: string;
+  imagen?: string;
+  imagenes?: string[];
 }
 
 interface SearchAutocompleteProps {
@@ -134,11 +136,12 @@ export default function SearchAutocomplete({ placeholder = 'Buscar ganado, razas
                 onClick={() => handleSelect(result)}
                 className="w-full flex items-center gap-4 p-4 hover:bg-campo-50 transition-colors text-left search-dropdown-item"
               >
-                <div className="w-12 h-12 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center shrink-0 p-1.5 search-item-icon-wrapper overflow-hidden">
+                <div className="w-12 h-12 bg-slate-50 border border-slate-100 rounded-xl shrink-0 search-item-icon-wrapper overflow-hidden">
                   <img 
-                    src={getCategoryIcon(result.categoria)} 
-                    alt={result.categoria}
-                    className="w-full h-full object-contain search-item-icon"
+                    src={result.imagen || result.imagenes?.[0] || getCategoryIcon(result.categoria)} 
+                    alt={result.nombre}
+                    className="w-full h-full object-cover search-item-icon"
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = getCategoryIcon(result.categoria); }}
                   />
                 </div>
                 <div className="flex-1 min-w-0">
