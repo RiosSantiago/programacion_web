@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS productos (
     departamento VARCHAR(255) NOT NULL,
     precio NUMERIC(12, 2) NOT NULL,
     precio_anterior NUMERIC(12, 2),
-    stock INTEGER NOT NULL,
+    stock INTEGER NOT NULL CHECK (stock >= 0),
     vendedor_id INTEGER REFERENCES usuarios(id) ON DELETE RESTRICT, -- ON DELETE RESTRICT por regla de borrado lógico
     vendedor_rating NUMERIC(3, 2),
     estado VARCHAR(50) DEFAULT 'disponible' CHECK (estado IN ('disponible', 'inactivo', 'vendido')),

@@ -11,7 +11,7 @@ import fs from 'fs';
 
 const { Pool } = pg;
 
-const connectionString = (import.meta.env.DATABASE_URL || process.env.DATABASE_URL || 'postgresql://postgres:postgrespassword@127.0.0.1:4322/agroup?sslmode=disable').trim();
+const connectionString = (import.meta.env.DATABASE_URL || process.env.DATABASE_URL || 'postgresql://postgres:postgrespassword@127.0.0.1:5432/agroup?sslmode=disable').trim();
 
 // Instancia única (singleton) de pg.Pool — conexión TCP a PostgreSQL (Docker / Neon)
 export const pool = new Pool({
@@ -110,6 +110,54 @@ export async function queryRun(sql: string, params: any[] | Record<string, any> 
 /** Ejecuta DDL o scripts multi-statement */
 export async function execSql(sql: string): Promise<void> {
   await pool.query(sql);
+}
+
+/** Ejecuta un bloque de operaciones dentro de una transacción con BEGIN / COMMIT / ROLLBACK */
+export async function withTransaction<T>(
+  callback: (tx: {
+    queryAll: <R = any>(sql: string, params?: any[] | Record<string, any>) => Promise<R[]>;
+    queryGet: <R = any>(sql: string, params?: any[] | Record<string, any>) => Promise<R | undefined>;
+    queryRun: (sql: string, params?: any[] | Record<string, any>) => Promise<{ changes: number; lastInsertRowid: number }>;
+  }) => Promise<T>
+): Promise<T> {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    const txQueryAll = async <R = any>(sql: string, params: any[] | Record<string, any> = []): Promise<R[]> => {
+      const { text, values } = buildQuery(sql, params);
+      const res = await client.query<R>(text, values);
+      return parseNumericFields(res.rows as any[]) as R[];
+    };
+
+    const txQueryGet = async <R = any>(sql: string, params: any[] | Record<string, any> = []): Promise<R | undefined> => {
+      const rows = await txQueryAll<R>(sql, params);
+      return rows[0];
+    };
+
+    const txQueryRun = async (sql: string, params: any[] | Record<string, any> = []): Promise<{ changes: number; lastInsertRowid: number }> => {
+      let { text, values } = buildQuery(sql, params);
+      const isInsert = /^\s*INSERT\s+/i.test(text);
+      if (isInsert && !/RETURNING\s+id\b/i.test(text)) {
+        text += ' RETURNING id';
+      }
+      const res = await client.query(text, values);
+      const lastInsertRowid = isInsert && res.rows?.length ? Number((res.rows[0] as any).id) : 0;
+      return {
+        changes: res.rowCount ?? res.rows?.length ?? 0,
+        lastInsertRowid,
+      };
+    };
+
+    const result = await callback({ queryAll: txQueryAll, queryGet: txQueryGet, queryRun: txQueryRun });
+    await client.query('COMMIT');
+    return result;
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
+  }
 }
 
 // ---------------------------------------------------------------------------

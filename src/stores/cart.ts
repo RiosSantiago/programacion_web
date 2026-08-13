@@ -9,6 +9,7 @@ export interface CartItem {
   imagen: string;
   vendedor: string;
   vendedor_id?: number;
+  stock?: number;
 }
 
 export const $cart = atom<CartItem[]>([]);
@@ -29,6 +30,7 @@ interface ApiItem {
   imagen: string | null;
   vendedor: string;
   vendedor_id: number;
+  stock?: number;
 }
 
 function mapApiItem(item: ApiItem): CartItem {
@@ -40,6 +42,7 @@ function mapApiItem(item: ApiItem): CartItem {
     imagen: item.imagen || '/images/ganado.svg',
     vendedor: item.vendedor || '',
     vendedor_id: item.vendedor_id,
+    stock: item.stock !== undefined && item.stock !== null ? Number(item.stock) : 999999,
   };
 }
 
@@ -76,8 +79,9 @@ export async function addToCart(item: { id: number; nombre: string; precio: numb
       await fetchCart();
       return true;
     }
-    const text = await res.text().catch(() => '');
-    (window as any).__addToast?.(`Error al agregar: ${res.status} ${text.slice(0, 100)}`, 'error');
+    const data = await res.json().catch(() => ({}));
+    const msg = data.error || `Error al agregar (${res.status})`;
+    (window as any).__addToast?.(msg, 'error');
   } catch (e) {
     console.error('Error adding to cart:', e);
     (window as any).__addToast?.('Error de red al agregar al carrito', 'error');
@@ -121,6 +125,9 @@ export async function updateQuantity(id: number, cantidad: number): Promise<bool
       await fetchCart();
       return true;
     }
+    const data = await res.json().catch(() => ({}));
+    const msg = data.error || `Error al actualizar cantidad (${res.status})`;
+    (window as any).__addToast?.(msg, 'error');
   } catch (e) {
     console.error('Error updating quantity:', e);
   }

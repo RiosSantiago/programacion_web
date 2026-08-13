@@ -595,13 +595,18 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     }
 
     try {
+      const token = localStorage.getItem('agroup_token') || '';
       const endpoint = metodoPago === 'efectivo' ? '/api/pedidos/crear' : '/api/wompi/crear';
       const res = await fetch(endpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ items, total, metodoPago, nombre, telefono, direccion, notas: notasCompletas }),
       });
       const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || `Error ${res.status} al procesar el pedido`);
+      }
 
       if (data.urlPago) {
         clearCart();

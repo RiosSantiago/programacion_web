@@ -53,12 +53,23 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ error: 'producto_id requerido' }), { status: 400 });
     }
 
+    const existing = await queryGet<any>('SELECT cantidad FROM carrito WHERE usuario_id = $1 AND producto_id = $2', [user.id, producto_id]);
+    const totalDeseado = existing ? existing.cantidad + cantidad : cantidad;
+    const prod = await queryGet<any>('SELECT stock, nombre FROM productos WHERE id = $1', [producto_id]);
+
+    if (prod && prod.stock !== undefined && prod.stock !== null && totalDeseado > prod.stock) {
+      return new Response(
+        JSON.stringify({ error: `Stock máximo disponible para "${prod.nombre}": ${prod.stock}` }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
     await queryRun(
       `INSERT INTO carrito (usuario_id, producto_id, cantidad)
        VALUES ($1, $2, $3)
        ON CONFLICT (usuario_id, producto_id)
        DO UPDATE SET cantidad = EXCLUDED.cantidad`,
-      [user.id, producto_id, cantidad]
+      [user.id, producto_id, totalDeseado]
     );
 
     const item = await queryGet<any>(

@@ -78,8 +78,29 @@ async function cambiarCantidad(id: number, delta: number) {
   const items = $cart.get();
   const item = items.find((i) => i.id === id);
   if (item) {
-    await updateQuantity(id, item.cantidad + delta);
+    const nuevaCantidad = item.cantidad + delta;
+    if (delta > 0 && item.stock !== undefined && nuevaCantidad > item.stock) {
+      addToast(`Stock máximo disponible: ${item.stock}`, 'error');
+      return;
+    }
+    await updateQuantity(id, nuevaCantidad);
   }
+}
+
+async function setCantidadManual(id: number, valStr: string) {
+  const items = $cart.get();
+  const item = items.find((i) => i.id === id);
+  if (!item) return;
+
+  let val = parseInt(valStr, 10);
+  if (isNaN(val) || val < 1) {
+    val = 1;
+  }
+  if (item.stock !== undefined && val > item.stock) {
+    val = item.stock;
+    addToast(`Stock máximo disponible: ${item.stock}`, 'error');
+  }
+  await updateQuantity(id, val);
 }
 
 async function vaciarCarrito() {
@@ -136,17 +157,20 @@ function actualizarCarritoUI() {
   items.forEach((item) => {
     const itemEl = document.createElement('div');
     itemEl.className = 'flex gap-4 p-4 bg-white rounded-2xl border border-[#E8E0D8] shadow-sm hover:shadow-md transition-shadow';
+    const maxAlcanzado = item.stock !== undefined && item.cantidad >= item.stock;
+    const stockMax = item.stock ?? 999999;
     itemEl.innerHTML = `
       <img src="${item.imagen}" alt="${item.nombre}" class="w-20 h-20 rounded-xl object-cover flex-shrink-0" />
       <div class="flex-1 min-w-0">
         <h4 class="text-sm font-bold text-[#2D2D2D] truncate">${item.nombre}</h4>
         <p class="text-xs text-[#6B6B6B] mt-0.5">${item.vendedor}</p>
         <p class="text-lg font-extrabold text-[#2D2D2D] mt-1">${formatearCOP(item.precio)}</p>
+        ${item.stock !== undefined ? `<p class="text-[11px] font-medium ${maxAlcanzado ? 'text-coral-500 font-bold' : 'text-[#6B6B6B]'} mt-0.5">Stock disponible: ${item.stock}${maxAlcanzado ? ' (Máximo alcanzado)' : ''}</p>` : ''}
         <div class="flex items-center justify-between mt-3">
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-1.5">
             <button onclick="cambiarCantidad(${item.id}, -1)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-[#FFFDF7] text-[#6B6B6B] hover:bg-gold-50 hover:text-gold-700 transition-colors text-sm font-bold border border-[#E8E0D8]">-</button>
-            <span class="w-10 text-center text-sm font-semibold text-[#2D2D2D]">${item.cantidad}</span>
-            <button onclick="cambiarCantidad(${item.id}, 1)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-[#FFFDF7] text-[#6B6B6B] hover:bg-gold-50 hover:text-gold-700 transition-colors text-sm font-bold border border-[#E8E0D8]">+</button>
+            <input type="number" min="1" max="${stockMax}" value="${item.cantidad}" onchange="setCantidadManual(${item.id}, this.value)" class="w-12 h-8 text-center text-sm font-semibold text-[#2D2D2D] border border-[#E8E0D8] rounded-lg bg-white focus:outline-none focus:border-campo-600 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+            <button onclick="cambiarCantidad(${item.id}, 1)" ${maxAlcanzado ? 'disabled title="Stock máximo alcanzado"' : ''} class="w-8 h-8 flex items-center justify-center rounded-lg ${maxAlcanzado ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' : 'bg-[#FFFDF7] text-[#6B6B6B] hover:bg-gold-50 hover:text-gold-700 border-[#E8E0D8]'} transition-colors text-sm font-bold border">+</button>
           </div>
           <button onclick="eliminarDelCarrito(${item.id})" class="text-xs text-coral-500 hover:text-coral-700 font-medium transition-colors">Eliminar</button>
         </div>
@@ -264,6 +288,7 @@ function init() {
   (window as any).agregarAlCarrito = agregarAlCarrito;
   (window as any).eliminarDelCarrito = eliminarDelCarrito;
   (window as any).cambiarCantidad = cambiarCantidad;
+  (window as any).setCantidadManual = setCantidadManual;
   (window as any).vaciarCarrito = vaciarCarrito;
   (window as any).abrirCarrito = abrirCarrito;
   (window as any).cerrarCarrito = cerrarCarrito;

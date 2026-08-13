@@ -27,6 +27,14 @@ export const PATCH: APIRoute = async ({ request, params }) => {
       return new Response(JSON.stringify({ error: 'cantidad debe ser mayor a 0' }), { status: 400 });
     }
 
+    const prod = await queryGet<any>('SELECT stock, nombre FROM productos WHERE id = $1', [producto_id]);
+    if (prod && prod.stock !== undefined && prod.stock !== null && cantidad > prod.stock) {
+      return new Response(
+        JSON.stringify({ error: `Stock máximo disponible para "${prod.nombre}": ${prod.stock}` }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
     await queryRun(
       'UPDATE carrito SET cantidad = $1 WHERE usuario_id = $2 AND producto_id = $3',
       [cantidad, user.id, producto_id]
