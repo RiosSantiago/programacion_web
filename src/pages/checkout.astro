@@ -2,83 +2,396 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="Finalizar Compra - Agroup">
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <h1 class="text-2xl md:text-3xl font-display font-bold text-[#2D2D2D] mb-6">Finalizar Compra</h1>
+<BaseLayout title="Finalizar Compra - Agroup" navVariant="market">
+  <div class="relative overflow-hidden bg-stone-100">
 
-    <div class="grid lg:grid-cols-3 gap-6">
-      <div class="lg:col-span-2 space-y-6">
-        <div class="bg-white rounded-2xl border border-[#E8E0D8] shadow-sm p-6">
-          <h2 class="text-lg font-display font-bold text-[#2D2D2D] mb-4 flex items-center gap-2">
-            <svg class="w-5 h-5 text-gold-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            </svg>
-            Información de entrega
-          </h2>
-          <div class="grid md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-[#2D2D2D] mb-1.5">Nombre completo</label>
-              <input type="text" id="nombre" placeholder="Tu nombre" class="w-full px-4 py-2.5 border border-[#E8E0D8] rounded-xl text-sm focus:ring-2 focus:ring-gold-500 focus:border-gold-500" />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-[#2D2D2D] mb-1.5">Teléfono</label>
-              <input type="tel" id="telefono" placeholder="3001234567" class="w-full px-4 py-2.5 border border-[#E8E0D8] rounded-xl text-sm focus:ring-2 focus:ring-gold-500 focus:border-gold-500" />
-            </div>
-            <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-[#2D2D2D] mb-1.5">Dirección de entrega</label>
-              <input type="text" id="direccion" placeholder="Dirección completa en Manizales" class="w-full px-4 py-2.5 border border-[#E8E0D8] rounded-xl text-sm focus:ring-2 focus:ring-gold-500 focus:border-gold-500" />
-            </div>
-            <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-[#2D2D2D] mb-1.5">Notas adicionales (opcional)</label>
-              <textarea id="notas" rows="2" placeholder="Indicaciones especiales para la entrega" class="w-full px-4 py-2.5 border border-[#E8E0D8] rounded-xl text-sm focus:ring-2 focus:ring-gold-500 focus:border-gold-500"></textarea>
-            </div>
+    <div class="grain-overlay"></div>
+
+    <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
+      <header class="reveal d1 flex flex-col items-center text-center">
+        <a href="/marketplace" class="inline-flex items-center gap-1.5 text-sm font-semibold text-campo-800 hover:text-gold-700 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+          </svg>
+          Volver al marketplace
+        </a>
+
+        <h1 class="mt-5 font-display font-bold text-campo-900 leading-[1.05] text-[2.6rem] sm:text-5xl lg:text-6xl">
+          Finalizar
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-campo-400 via-campo-500 to-campo-600">compra</span>
+        </h1>
+
+        <p class="mt-3 max-w-xl text-muted text-sm sm:text-base leading-relaxed">
+          Completa tus datos de entrega y elige cómo prefieres pagar. Nuestro equipo se encarga del resto para que tu compra llegue a la puerta de tu finca.
+        </p>
+
+        <nav aria-label="Progreso de compra" class="mt-7 flex flex-wrap items-center gap-2 sm:gap-3">
+          <div class="step-pill done">
+            <span class="step-num">1</span>
+            <span>Carrito</span>
           </div>
+          <span class="step-line"></span>
+          <div class="step-pill active">
+            <span class="step-num">2</span>
+            <span>Datos y pago</span>
+          </div>
+          <span class="step-line"></span>
+          <div class="step-pill">
+            <span class="step-num">3</span>
+            <span>Confirmación</span>
+          </div>
+        </nav>
+      </header>
+
+      <div class="mt-10 grid lg:grid-cols-3 gap-6 lg:gap-8 items-start">
+        <div class="lg:col-span-2 space-y-6">
+          <section class="reveal d2 relative bg-white/80 backdrop-blur-sm rounded-3xl border border-[#E8E0D8] shadow-[0_8px_40px_-18px_rgba(44,26,16,0.25)] p-6 sm:p-8 card-lift">
+            
+            <h2 class="text-xl sm:text-2xl font-display font-bold text-campo-900 flex items-center gap-3 justify-center text-center">
+              <span class="w-9 h-9 rounded-xl bg-gradient-to-br from-campo-700 to-campo-900 text-white flex items-center justify-center shadow-lg shadow-campo-900/20">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </span>
+              Información de entrega
+              <span class="hidden sm:inline text-[11px] font-sans font-semibold text-muted uppercase tracking-wider bg-[#F0E8DB] px-2.5 py-1 rounded-full">Solo Caldas</span>
+            </h2>
+
+            <div class="mt-7 grid md:grid-cols-2 gap-5">
+              <div class="field-group">
+                <label class="block text-sm font-semibold text-campo-900 mb-2" for="nombre">Nombre completo <span class="text-gold-600">*</span></label>
+                <input type="text" id="nombre" placeholder="Tu nombre" class="input-checkout" autocomplete="name" />
+              </div>
+              <div class="field-group">
+                <label class="block text-sm font-semibold text-campo-900 mb-2" for="telefono">Teléfono <span class="text-gold-600">*</span></label>
+                <input type="tel" id="telefono" placeholder="3001234567" class="input-checkout" autocomplete="tel" />
+              </div>
+              <div class="field-group">
+                <label class="block text-sm font-semibold text-campo-900 mb-2" for="municipio">Municipio <span class="text-gold-600">*</span></label>
+                <input type="text" id="municipio" placeholder="Manizales" class="input-checkout" autocomplete="address-level2" value="Manizales" />
+              </div>
+              <div class="field-group">
+                <label class="block text-sm font-semibold text-campo-900 mb-2" for="departamento">Departamento <span class="text-gold-600">*</span></label>
+                <input type="text" id="departamento" placeholder="Caldas" class="input-checkout" autocomplete="address-level1" value="Caldas" />
+              </div>
+              <div class="md:col-span-2 field-group">
+                <label class="block text-sm font-semibold text-campo-900 mb-2" for="direccion">Dirección de entrega <span class="text-gold-600">*</span></label>
+                <input type="text" id="direccion" placeholder="Dirección completa en Manizales" class="input-checkout" autocomplete="street-address" />
+              </div>
+              <div class="field-group">
+                <label class="block text-sm font-semibold text-campo-900 mb-2" for="barrio">Barrio / Vereda / Corregimiento</label>
+                <input type="text" id="barrio" placeholder="Ej. Palermo, La Enea, Corregimiento de Colombia" class="input-checkout" />
+              </div>
+              <div class="field-group">
+                <label class="block text-sm font-semibold text-campo-900 mb-2" for="tipo_entrega">Tipo de entrega</label>
+                <select id="tipo_entrega" class="input-checkout">
+                  <option value="finca">Finca</option>
+                  <option value="casa" selected>Casa</option>
+                  <option value="oficina">Oficina</option>
+                  <option value="otro">Otro</option>
+                </select>
+              </div>
+              <div class="md:col-span-2 field-group">
+                <label class="block text-sm font-semibold text-campo-900 mb-2" for="referencia">Punto de referencia</label>
+                <input type="text" id="referencia" placeholder="Ej. Frente a la iglesia, al lado del CAI..." class="input-checkout" />
+              </div>
+              <div class="field-group">
+                <label class="block text-sm font-semibold text-campo-900 mb-2" for="horario">Horario preferido de entrega</label>
+                <select id="horario" class="input-checkout">
+                  <option value="manana">En la mañana (8am – 12m)</option>
+                  <option value="tarde">En la tarde (2pm – 6pm)</option>
+                  <option value="cualquiera" selected>Sin preferencia</option>
+                </select>
+              </div>
+              <div class="md:col-span-2 field-group">
+                <label class="block text-sm font-semibold text-campo-900 mb-2" for="notas">Notas adicionales <span class="text-muted font-normal">(opcional)</span></label>
+                <textarea id="notas" rows="2" placeholder="Indicaciones especiales para la entrega" class="input-checkout resize-none"></textarea>
+              </div>
+            </div>
+          </section>
+
+          <section class="reveal d3 relative bg-white/80 backdrop-blur-sm rounded-3xl border border-[#E8E0D8] shadow-[0_8px_40px_-18px_rgba(44,26,16,0.25)] p-6 sm:p-8 card-lift">
+            
+            <h2 class="text-xl sm:text-2xl font-display font-bold text-campo-900 flex items-center gap-3 justify-center text-center">
+              <span class="w-9 h-9 rounded-xl bg-gradient-to-br from-campo-700 to-campo-900 text-white flex items-center justify-center shadow-lg shadow-campo-900/20">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                </svg>
+              </span>
+              Método de pago
+              <span class="hidden sm:inline text-[11px] font-sans font-semibold text-muted uppercase tracking-wider bg-[#F0E8DB] px-2.5 py-1 rounded-full">Pago seguro</span>
+            </h2>
+
+            <div id="error-pago" class="hidden mt-5 flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 rounded-xl px-4 py-3 text-sm"></div>
+
+            <div class="mt-6 grid md:grid-cols-2 gap-3" id="metodos-pago"></div>
+          </section>
         </div>
 
-        <div class="bg-white rounded-2xl border border-[#E8E0D8] shadow-sm p-6">
-          <h2 class="text-lg font-display font-bold text-[#2D2D2D] mb-4 flex items-center gap-2">
-            <svg class="w-5 h-5 text-gold-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-            </svg>
-            Método de pago
-          </h2>
-          <div id="error-pago" class="hidden bg-red-50 border border-red-200 text-red-600 rounded-lg p-3 mb-4 text-sm"></div>
-          <div class="grid md:grid-cols-2 gap-3" id="metodos-pago"></div>
+        <div class="lg:col-span-1">
+          <aside class="reveal d4 relative lg:sticky lg:top-24 rounded-3xl bg-gradient-to-br from-campo-850 via-campo-900 to-[#0B1D11] border border-campo-800/60 shadow-[0_30px_70px_-25px_rgba(6,20,10,0.9)] p-6 sm:p-7 overflow-hidden">
+            <div class="pointer-events-none absolute -top-16 -right-16 w-56 h-56 rounded-full bg-gold-500/15 blur-2xl"></div>
+            <div class="pointer-events-none absolute -bottom-20 -left-16 w-56 h-56 rounded-full bg-campo-500/20 blur-2xl"></div>
+
+            <div class="relative flex items-center justify-between">
+              <h2 class="text-lg font-display font-bold text-white">Resumen del pedido</h2>
+              <span id="resumen-count" class="text-[11px] font-bold uppercase tracking-wider text-gold-300 bg-white/10 border border-white/10 px-2.5 py-1 rounded-full">Cargando</span>
+            </div>
+
+            <div id="resumen-items" class="relative mt-5 space-y-3 max-h-[22rem] overflow-y-auto pr-1 scrollbar-thin"></div>
+
+            <div class="relative mt-5 pt-5 border-t border-dashed border-white/15 space-y-3">
+              <div class="flex justify-between text-sm">
+                <span class="text-white/60">Subtotal</span>
+                <span id="subtotal" class="font-semibold text-white">$0</span>
+              </div>
+              <div class="flex justify-between text-sm items-center">
+                <span class="text-white/60">Envío</span>
+                <span class="font-bold text-gold-300 bg-gold-500/10 border border-gold-500/30 px-2.5 py-0.5 rounded-full text-[11px] uppercase tracking-wider">Gratis</span>
+              </div>
+              <div class="flex justify-between items-end pt-3 border-t border-white/15">
+                <span class="text-white/70 text-sm font-medium">Total a pagar</span>
+                <span id="total" class="text-[1.75rem] leading-none font-sans font-extrabold tracking-tight tabular-nums text-gold-300"></span>
+              </div>
+            </div>
+
+            <button id="btn-pagar" class="btn-shimmer relative w-full mt-7 py-4 rounded-2xl bg-gradient-to-r from-gold-500 via-gold-400 to-gold-600 text-campo-900 font-bold text-base tracking-wide shadow-[0_15px_40px_-12px_rgba(230,168,0,0.7)] hover:shadow-[0_20px_50px_-12px_rgba(230,168,0,0.85)] transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] flex items-center justify-center gap-2.5">
+              Confirmar Pedido
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </button>
+
+            <p class="relative text-xs text-white/45 text-center mt-4 leading-relaxed">
+              Al confirmar, aceptas nuestros
+              <a href="/terminos" class="text-gold-400 hover:text-gold-300 underline underline-offset-2 transition-colors">términos</a>
+              y la política de privacidad.
+            </p>
+
+            <div class="relative mt-6 pt-5 border-t border-white/10 grid grid-cols-3 gap-2 text-center">
+              <div class="flex flex-col items-center gap-1.5">
+                <svg class="w-5 h-5 text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                <span class="text-[10px] uppercase tracking-wider text-white/50 font-semibold">Pago seguro</span>
+              </div>
+              <div class="flex flex-col items-center gap-1.5">
+                <svg class="w-5 h-5 text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0zM13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                </svg>
+                <span class="text-[10px] uppercase tracking-wider text-white/50 font-semibold">Envío gratis</span>
+              </div>
+              <div class="flex flex-col items-center gap-1.5">
+                <svg class="w-5 h-5 text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m-12.728 0a9 9 0 010-12.728m9.9 2.829a5 5 0 010 7.07M7.464 7.464a5 5 0 010 7.072M12 12h.01" />
+                </svg>
+                <span class="text-[10px] uppercase tracking-wider text-white/50 font-semibold">Soporte real</span>
+              </div>
+            </div>
+          </aside>
         </div>
       </div>
 
-      <div class="lg:col-span-1">
-        <div class="bg-white rounded-2xl border border-[#E8E0D8] shadow-sm p-6 sticky top-24">
-          <h2 class="text-lg font-display font-bold text-[#2D2D2D] mb-4">Resumen del pedido</h2>
-          <div id="resumen-items" class="space-y-3 mb-4"></div>
-          <div class="border-t border-[#E8E0D8] pt-4 space-y-2">
-            <div class="flex justify-between text-sm">
-              <span class="text-muted">Subtotal</span>
-              <span id="subtotal" class="font-medium text-[#2D2D2D]"></span>
-            </div>
-            <div class="flex justify-between text-sm">
-              <span class="text-muted">Envío</span>
-              <span class="font-medium text-gold-700">Gratis</span>
-            </div>
-            <div class="flex justify-between text-lg font-bold pt-2 border-t border-[#E8E0D8]">
-              <span>Total</span>
-              <span id="total" class="text-gold-700"></span>
-            </div>
-          </div>
-          <button id="btn-pagar" class="w-full mt-6 py-3 bg-campo-600 text-white font-bold rounded-xl hover:bg-campo-700 transition-all duration-200 active:scale-[0.98] shadow-lg">
-            Confirmar Pedido
-          </button>
-          <p class="text-xs text-muted text-center mt-3">
-            Al confirmar, aceptas nuestros <a href="/terminos" class="text-gold-700 hover:underline">términos</a>
-          </p>
-        </div>
-      </div>
     </div>
   </div>
 </BaseLayout>
 
+<style is:global>
+  .reveal {
+    opacity: 0;
+    transform: translateY(26px);
+    animation: rise-in 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .d1 { animation-delay: 0.05s; }
+  .d2 { animation-delay: 0.15s; }
+  .d3 { animation-delay: 0.25s; }
+  .d4 { animation-delay: 0.35s; }
+  .d5 { animation-delay: 0.45s; }
+  @keyframes rise-in {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes float-slow {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(22px, -26px) scale(1.06); }
+  }
+  @keyframes float-slower {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-26px, 20px) scale(1.09); }
+  }
+  .animate-float-slow { animation: float-slow 13s ease-in-out infinite; }
+  .animate-float-slower { animation: float-slower 17s ease-in-out infinite; }
+
+  .grain-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.045;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .card-lift {
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .card-lift:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 50px -20px rgba(44, 26, 16, 0.35);
+  }
+
+  .ghost-num {
+    position: absolute;
+    top: -1.2rem;
+    right: 1.25rem;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 4.6rem;
+    line-height: 1;
+    font-weight: 800;
+    font-style: italic;
+    color: rgba(184, 134, 11, 0.12);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .input-checkout {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    background: #fff;
+    border: 1.5px solid #E8E0D8;
+    border-radius: 0.9rem;
+    font-size: 0.9rem;
+    color: #2D2D2D;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+  }
+  .input-checkout::placeholder { color: #A99F91; }
+  .input-checkout:hover { border-color: #C9BBA8; }
+  .input-checkout:focus {
+    outline: none;
+    border-color: #b8860b;
+    background: #fffdfa;
+    box-shadow: 0 0 0 4px rgba(230, 168, 0, 0.14), 0 10px 28px -16px rgba(0, 0, 0, 0.2);
+  }
+
+  .step-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #6B6B6B;
+    background: #fff;
+    border: 1.5px solid #E8E0D8;
+    transition: all 0.3s ease;
+  }
+  .step-pill .step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    background: #F0E8DB;
+    color: #6B6B6B;
+    transition: all 0.3s ease;
+  }
+  .step-pill.done { border-color: #3B7E4B; color: #2D6A3E; background: #EFFAF2; }
+  .step-pill.done .step-num { background: #3B7E4B; color: #fff; }
+  .step-pill.active {
+    border-color: #b8860b;
+    color: #7a5500;
+    background: linear-gradient(135deg, #fffbe6, #fff3b0);
+    box-shadow: 0 10px 24px -12px rgba(184, 134, 11, 0.55);
+  }
+  .step-pill.active .step-num { background: linear-gradient(135deg, #e6a800, #b8860b); color: #fff; }
+  .step-line {
+    flex: 1;
+    max-width: 3rem;
+    height: 2px;
+    background: repeating-linear-gradient(90deg, #D8C9B4 0 6px, transparent 6px 10px);
+  }
+
+  .metodo-pago-label {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 1.1rem;
+    border: 2px solid #E8E0D8;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .metodo-pago-label:hover {
+    border-color: #C9BBA8;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px -16px rgba(0, 0, 0, 0.25);
+  }
+  .metodo-pago-label:focus-within {
+    border-color: #b8860b;
+    box-shadow: 0 0 0 4px rgba(230, 168, 0, 0.14);
+  }
+  .metodo-pago-label.selected {
+    border-color: #b8860b;
+    background: linear-gradient(135deg, #fffbe6, #fff8d6);
+    box-shadow: 0 14px 34px -16px rgba(184, 134, 11, 0.55);
+  }
+  .metodo-pago-label .check-circle {
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .metodo-pago-label.selected .check-circle {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .metodo-pago-label .icon-box {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .metodo-pago-label:hover .icon-box,
+  .metodo-pago-label.selected .icon-box {
+    transform: scale(1.06) rotate(-2deg);
+  }
+
+  .btn-shimmer { position: relative; overflow: hidden; }
+  .btn-shimmer::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -70%;
+    height: 100%;
+    width: 45%;
+    background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+    transform: skewX(-20deg);
+    animation: shimmer 3.2s ease-in-out infinite;
+  }
+  @keyframes shimmer {
+    0% { left: -70%; }
+    55% { left: 135%; }
+    100% { left: 135%; }
+  }
+
+  .scrollbar-thin::-webkit-scrollbar { width: 5px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.06); border-radius: 999px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(230, 168, 0, 0.4); border-radius: 999px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; animation: none; }
+    .animate-float-slow, .animate-float-slower { animation: none; }
+    .btn-shimmer::after { animation: none; }
+    .metodo-pago-label, .card-lift { transition: none; }
+  }
+</style>
+
 <script>
-  import { $cart, clearCart } from '../stores/cart';
+  import { $cart, clearCart, fetchCart } from '../stores/cart';
   import { $user, $isAuthenticated } from '../stores/auth';
 
   const metodosPago = [
@@ -87,18 +400,61 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     { id: 'daviplata', nombre: 'Daviplata', descripcion: 'Billetera digital' },
     { id: 'tarjeta', nombre: 'Tarjeta Débito/Crédito', descripcion: 'Visa, Mastercard, Amex' },
     { id: 'efectivo', nombre: 'Efectivo', descripcion: 'Contra entrega o presencial' },
-    { id: 'whatsapp', nombre: 'WhatsApp', descripcion: 'Coordina tu pago' },
   ];
 
   function getMetodoIcon(m: typeof metodosPago[0]) {
-    if (m.id === 'whatsapp') {
-      return '<svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>';
+    switch (m.id) {
+      case 'pse':
+        return '<img src="/images/pagos/pse.svg" alt="PSE" class="w-full h-full object-contain" />';
+      case 'nequi':
+        return '<img src="/images/pagos/nequi.svg" alt="Nequi" class="w-full h-full object-contain" />';
+      case 'daviplata':
+        return '<img src="/images/pagos/daviplata.svg" alt="Daviplata" class="w-full h-full object-contain" />';
+      case 'tarjeta':
+        return '<span class="flex items-center gap-1"><img src="/images/pagos/visa.svg" alt="Visa" class="h-6 w-auto object-contain" /><img src="/images/pagos/mastercard.svg" alt="Mastercard" class="h-6 w-auto object-contain" /></span>';
+      case 'efectivo':
+        return '<svg class="w-7 h-7" viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="12" rx="2" stroke="#2D6A3E" stroke-width="1.8"/><circle cx="12" cy="12" r="2.8" stroke="#B8860B" stroke-width="1.8"/><path d="M6.5 9.5h.01M17.5 14.5h.01" stroke="#2D6A3E" stroke-width="2.4" stroke-linecap="round"/></svg>';
+      default:
+        return '';
     }
-    return '<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>';
   }
 
   function formatCOP(value: number): string {
     return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(value);
+  }
+
+  function animateCOP(el: HTMLElement, target: number) {
+    const start = parseFloat(String(el.textContent).replace(/[^\d]/g, '')) || 0;
+    const duration = 700;
+    const t0 = performance.now();
+    function step(t: number) {
+      const p = Math.min((t - t0) / duration, 1);
+      const ease = 1 - Math.pow(1 - p, 3);
+      el.textContent = formatCOP(Math.round(start + (target - start) * ease));
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  function renderLoading() {
+    const resumenItems = document.getElementById('resumen-items');
+    const countEl = document.getElementById('resumen-count');
+    const btnPagar = document.getElementById('btn-pagar');
+    if (resumenItems) {
+      resumenItems.innerHTML = `
+        <div class="space-y-3">
+          ${[0, 1].map(() => `
+            <div class="flex gap-3 p-3 rounded-2xl bg-white/[0.05] border border-white/10 animate-pulse">
+              <div class="w-16 h-16 rounded-xl bg-white/10"></div>
+              <div class="flex-1 space-y-2 py-1">
+                <div class="h-3 rounded bg-white/10 w-3/4"></div>
+                <div class="h-3 rounded bg-white/10 w-1/2"></div>
+              </div>
+            </div>`).join('')}
+        </div>`;
+    }
+    if (countEl) countEl.textContent = 'Cargando';
+    if (btnPagar) btnPagar.classList.add('hidden');
   }
 
   function renderMetodosPago() {
@@ -106,26 +462,27 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     if (!container) return;
 
     container.innerHTML = metodosPago.map(m => `
-      <label class="metodo-pago-label relative flex items-center gap-3 p-4 border-2 rounded-xl cursor-pointer transition-all hover:border-gold-400 ${m.id === 'pse' ? 'border-gold-700 bg-gold-50' : 'border-[#E8E0D8]'}">
-        <input type="radio" name="metodo_pago" value="${m.id}" class="mt-1 w-4 h-4 text-gold-700" ${m.id === 'pse' ? 'checked' : ''} />
-        <div class="w-12 h-12 bg-gold-100 rounded-xl flex items-center justify-center flex-shrink-0">
+      <label class="metodo-pago-label ${m.id === 'pse' ? 'selected' : ''}">
+        <input type="radio" name="metodo_pago" value="${m.id}" class="sr-only" ${m.id === 'pse' ? 'checked' : ''} />
+        <span class="icon-box relative w-14 h-14 rounded-xl bg-white border border-[#E8E0D8] flex items-center justify-center flex-shrink-0 shadow-sm overflow-hidden p-1.5">
           ${getMetodoIcon(m)}
-        </div>
-        <div class="flex-1 min-w-0">
-          <p class="font-bold text-[#2D2D2D] text-sm">${m.nombre}</p>
-          <p class="text-xs text-muted">${m.descripcion}</p>
-        </div>
+        </span>
+        <span class="flex-1 min-w-0">
+          <span class="block font-bold text-[#2D2D2D] text-sm leading-snug">${m.nombre}</span>
+          <span class="block text-xs text-muted mt-0.5">${m.descripcion}</span>
+        </span>
+        <span class="check-circle w-6 h-6 rounded-full bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-gold-700/40">
+          <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M5 13l4 4L19 7" />
+          </svg>
+        </span>
       </label>
     `).join('');
 
-    document.querySelectorAll('.metodo-pago-label').forEach(label => {
-      label.addEventListener('click', () => {
-        document.querySelectorAll('.metodo-pago-label').forEach(l => {
-          l.classList.remove('border-gold-700', 'bg-gold-50');
-          l.classList.add('border-[#E8E0D8]');
-        });
-        label.classList.remove('border-[#E8E0D8]');
-        label.classList.add('border-gold-700', 'bg-gold-50');
+    document.querySelectorAll<HTMLInputElement>('input[name="metodo_pago"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        document.querySelectorAll('.metodo-pago-label').forEach(l => l.classList.remove('selected'));
+        radio.closest('.metodo-pago-label')?.classList.add('selected');
       });
     });
   }
@@ -135,56 +492,106 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     const resumenItems = document.getElementById('resumen-items');
     const subtotalEl = document.getElementById('subtotal');
     const totalEl = document.getElementById('total');
+    const countEl = document.getElementById('resumen-count');
+    const btnPagar = document.getElementById('btn-pagar');
 
     if (!resumenItems || !subtotalEl || !totalEl) return;
 
     if (items.length === 0) {
-      window.location.href = '/marketplace';
+      resumenItems.innerHTML = `
+        <div class="flex flex-col items-center justify-center text-center py-10">
+          <div class="w-16 h-16 rounded-2xl bg-white/[0.07] border border-white/10 flex items-center justify-center mb-4">
+            <svg class="w-8 h-8 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </div>
+          <p class="text-white/80 font-display text-lg">Tu carrito está vacío</p>
+          <a href="/marketplace" class="mt-4 px-5 py-2.5 rounded-xl bg-gradient-to-r from-gold-500 to-gold-600 text-campo-900 font-bold text-sm hover:brightness-110 transition-all">Explorar Marketplace</a>
+        </div>`;
+      subtotalEl.textContent = formatCOP(0);
+      totalEl.textContent = formatCOP(0);
+      if (countEl) countEl.textContent = '0 items';
+      if (btnPagar) btnPagar.classList.add('hidden');
       return;
     }
 
     resumenItems.innerHTML = items.map(item => `
-      <div class="flex gap-3 p-3 bg-[#FFFDF7] rounded-xl border border-[#E8E0D8]">
-        <img src="${item.imagen}" alt="${item.nombre}" class="w-16 h-16 object-cover rounded-lg" />
-        <div class="flex-1 min-w-0">
-          <p class="text-sm font-bold text-[#2D2D2D] truncate">${item.nombre}</p>
-          <p class="text-xs text-muted">Cantidad: ${item.cantidad}</p>
-          <p class="text-sm font-bold text-gold-700">${formatCOP(item.precio * item.cantidad)}</p>
+      <div class="flex gap-3 p-3 rounded-2xl bg-white/[0.06] border border-white/10 backdrop-blur-sm hover:bg-white/[0.09] transition-colors">
+        <div class="relative flex-shrink-0">
+          <img src="${item.imagen}" alt="${item.nombre}" class="w-16 h-16 object-cover rounded-xl ring-1 ring-white/10" onerror="this.src='/images/ganado.svg'" />
+          <span class="absolute -top-1.5 -right-1.5 min-w-[1.35rem] h-[1.35rem] px-1 rounded-full bg-gold-500 text-campo-900 text-[10px] font-bold flex items-center justify-center shadow-lg">${item.cantidad}</span>
+        </div>
+        <div class="flex-1 min-w-0 flex flex-col">
+          <p class="text-sm font-semibold text-white truncate">${item.nombre}</p>
+          <p class="text-xs text-white/50 mt-0.5 truncate">${item.vendedor || ''}</p>
+          <p class="mt-auto text-sm font-bold text-gold-300">${formatCOP(item.precio * item.cantidad)}</p>
         </div>
       </div>
     `).join('');
 
+    if (countEl) countEl.textContent = `${items.length} item${items.length !== 1 ? 's' : ''}`;
+    if (btnPagar) btnPagar.classList.remove('hidden');
+
     const total = items.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
-    subtotalEl.textContent = formatCOP(total);
-    totalEl.textContent = formatCOP(total);
+    animateCOP(subtotalEl, total);
+    animateCOP(totalEl, total);
   }
 
   document.getElementById('btn-pagar')?.addEventListener('click', async () => {
     const nombre = (document.getElementById('nombre') as HTMLInputElement)?.value;
     const telefono = (document.getElementById('telefono') as HTMLInputElement)?.value;
     const direccion = (document.getElementById('direccion') as HTMLInputElement)?.value;
+    const municipio = (document.getElementById('municipio') as HTMLInputElement)?.value;
+    const departamento = (document.getElementById('departamento') as HTMLInputElement)?.value;
+    const barrio = (document.getElementById('barrio') as HTMLInputElement)?.value;
+    const tipoEntrega = (document.getElementById('tipo_entrega') as HTMLSelectElement)?.value;
+    const referencia = (document.getElementById('referencia') as HTMLInputElement)?.value;
+    const horario = (document.getElementById('horario') as HTMLSelectElement)?.value;
     const notas = (document.getElementById('notas') as HTMLTextAreaElement)?.value;
     const metodoPago = (document.querySelector('input[name="metodo_pago"]:checked') as HTMLInputElement)?.value;
 
     const errorEl = document.getElementById('error-pago');
-    if (!nombre || !telefono || !direccion) {
+    if (!nombre || !telefono || !direccion || !municipio || !departamento) {
       if (errorEl) {
-        errorEl.textContent = 'Por favor completa todos los campos de entrega';
+        errorEl.textContent = 'Por favor completa todos los campos obligatorios de entrega';
         errorEl.classList.remove('hidden');
+        document.getElementById('nombre')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
       return;
     }
+    if (errorEl) errorEl.classList.add('hidden');
+
+    const tipoEntregaLabel: Record<string, string> = { finca: 'Finca', casa: 'Casa', oficina: 'Oficina', otro: 'Otro' };
+    const horarioLabel: Record<string, string> = {
+      manana: 'En la mañana (8am – 12m)',
+      tarde: 'En la tarde (2pm – 6pm)',
+      cualquiera: 'Sin preferencia',
+    };
+
+    const datosEntrega = [
+      `Municipio: ${municipio}`,
+      `Departamento: ${departamento}`,
+      barrio && `Barrio/Vereda: ${barrio}`,
+      `Tipo de entrega: ${tipoEntregaLabel[tipoEntrega] || tipoEntrega}`,
+      referencia && `Punto de referencia: ${referencia}`,
+      `Horario preferido: ${horarioLabel[horario] || horario}`,
+    ].filter(Boolean).join(' | ');
+
+    const notasCompletas = [notas, datosEntrega].filter(Boolean).join(' — ');
 
     const items = $cart.get();
     const total = items.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
 
-    if (metodoPago === 'whatsapp') {
-      const productos = items.map(i => `${i.cantidad}x ${i.nombre}`).join(', ');
-      const texto = `Hola! Quiero comprar en Agroup:%0A%0A*Productos:* ${productos}%0A*Total:* ${formatCOP(total)}%0A%0A*Datos de entrega:*%0ANombre: ${nombre}%0ATeléfono: ${telefono}%0ADirección: ${direccion}${notas ? '%0ANotas: ' + notas : ''}`;
-      window.open(`https://wa.me/573001234567?text=${texto}`, '_blank');
-      clearCart();
-      window.location.href = '/pedido-exito?metodo=whatsapp';
-      return;
+    const btn = document.getElementById('btn-pagar') as HTMLButtonElement;
+    const btnOriginal = btn?.innerHTML;
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `
+        <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+        </svg>
+        Procesando pedido...`;
     }
 
     try {
@@ -192,7 +599,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items, total, metodoPago, nombre, telefono, direccion, notas }),
+        body: JSON.stringify({ items, total, metodoPago, nombre, telefono, direccion, notas: notasCompletas }),
       });
       const data = await res.json();
 
@@ -204,6 +611,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         window.location.href = `/pedido-exito?orden=${data.ordenId}&metodo=${metodoPago}`;
       }
     } catch (err) {
+      if (btn && btnOriginal) {
+        btn.disabled = false;
+        btn.innerHTML = btnOriginal;
+      }
       if (errorEl) {
         errorEl.textContent = 'Error al procesar el pago. Intenta de nuevo.';
         errorEl.classList.remove('hidden');
@@ -224,14 +635,30 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     const nombreEl = document.getElementById('nombre') as HTMLInputElement;
     const telefonoEl = document.getElementById('telefono') as HTMLInputElement;
     const direccionEl = document.getElementById('direccion') as HTMLInputElement;
+    const municipioEl = document.getElementById('municipio') as HTMLInputElement;
+    const departamentoEl = document.getElementById('departamento') as HTMLInputElement;
+    const barrioEl = document.getElementById('barrio') as HTMLInputElement;
 
     if (nombreEl && user.nombre) nombreEl.value = user.nombre;
     if (telefonoEl && user.celular) telefonoEl.value = user.celular;
     if (direccionEl && user.direccion) direccionEl.value = user.direccion;
+    if (municipioEl && (user.municipio || user.ciudad)) municipioEl.value = user.municipio || user.ciudad || '';
+    if (departamentoEl && user.departamento) departamentoEl.value = user.departamento;
+    if (barrioEl && user.corregimiento) barrioEl.value = user.corregimiento;
   }
 
-  checkAuth();
   $cart.subscribe(renderResumen);
   renderMetodosPago();
-  renderResumen();
+  renderLoading();
+
+  async function initCheckout() {
+    checkAuth();
+    if (!$isAuthenticated.get()) return;
+    await fetchCart();
+    renderResumen();
+    if ($cart.get().length === 0) {
+      window.location.href = '/marketplace';
+    }
+  }
+  initCheckout();
 </script>
