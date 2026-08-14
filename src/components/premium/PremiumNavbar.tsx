@@ -41,7 +41,7 @@ export default function PremiumNavbar() {
               </div>
               <div>
                 <span className="text-2xl font-bold text-white tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
-                  Agroup
+                  AgroUp
                 </span>
                 <span className="hidden sm:block text-[10px] text-[#D9A441]/80 font-medium -mt-1 tracking-wide uppercase">
                   Mercado Ganadero

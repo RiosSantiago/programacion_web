@@ -19,10 +19,10 @@ const { hideNav, navVariant } = Astro.props;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Agroup - El marketplace ganadero de los Andes colombianos. Compra y vende bovinos, equinos, porcinos y más directamente de los mejores productores de Manizales y Caldas." />
+    <meta name="description" content="AgroUp - El marketplace ganadero de los Andes colombianos. Compra y vende bovinos, equinos, porcinos y más directamente de los mejores productores de Manizales y Caldas." />
     <meta name="keywords" content="ganado, bovinos, caballos, marketplace, manizales, caldas, colombia, ganado colombiano, compra ganado, vende ganado" />
-    <meta name="author" content="Agroup" />
-    <meta property="og:title" content="Agroup | Marketplace Ganadero - Manizales, Colombia" />
+    <meta name="author" content="AgroUp" />
+    <meta property="og:title" content="AgroUp | Marketplace Ganadero - Manizales, Colombia" />
     <meta property="og:description" content="El marketplace ganadero de los Andes colombianos. Compra y vende directamente sin intermediarios." />
     <meta property="og:type" content="website" />
     <link rel="icon" type="image/png" sizes="512x512" href="/favicon-512x512.png" />
@@ -35,12 +35,12 @@ const { hideNav, navVariant } = Astro.props;
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="apple-touch-icon" sizes="192x192" href="/apple-touch-icon.png" />
     <meta name="theme-color" content="#132D1A" />
-    <title>Agroup | Marketplace Ganadero - Manizales, Colombia</title>
+    <title>AgroUp | Marketplace Ganadero - Manizales, Colombia</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&amp;family=Inter:wght@300;400;500;600;700;800&amp;family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&amp;display=swap" rel="stylesheet" />
   </head>
-  <body class="bg-[#FFFDF7] font-sans text-[#2D2D2D] antialiased flex flex-col min-h-screen">
+  <body class="bg-stone-100 font-sans text-[#2D2D2D] antialiased flex flex-col min-h-screen">
     {!hideNav && <Navbar variant={navVariant || 'dark'} />}
     <main class={hideNav ? 'flex-1 pt-0' : 'flex-1 pt-[64px]'}>
       <slot />
