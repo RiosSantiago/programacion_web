@@ -118,12 +118,17 @@ export const PUT: APIRoute = async ({ params, request }) => {
 
     for (const field of allowedFields) {
       if (data[field] !== undefined) {
-        fields.push(`${field} = ?`);
         let val = data[field];
         if (field === 'descripcion') val = String(val).slice(0, 500);
-        if (field === 'certificaciones') val = JSON.stringify(val);
+        if (field === 'certificaciones') {
+          val = typeof val === 'string' ? val : JSON.stringify(val);
+          fields.push(`certificaciones = ?`, `ica_pdf = ?`);
+          paramsArr.push(val, val);
+          continue;
+        }
         if (field === 'stock') val = parseInt(val);
         if (field === 'precio' || field === 'precio_unitario' || field === 'peso') val = val !== null && val !== '' ? parseFloat(val) : null;
+        fields.push(`${field} = ?`);
         paramsArr.push(val);
       }
     }

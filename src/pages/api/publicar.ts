@@ -119,8 +119,8 @@ export const POST: APIRoute = async ({ request }) => {
         nombre, categoria, categoria_id, raza, peso, peso_unitario, ubicacion, departamento,
         precio, precio_unitario, precio_anterior, stock, vendedor_id, vendedor_rating,
         estado, salud, envio, destacado, oferta, trazabilidad, tipo_precio, descripcion, video, sexo,
-        finca, vereda, referencia_ubicacion, ica_pdf, transporte
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        finca, vereda, referencia_ubicacion, ica_pdf, certificaciones, transporte
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         data.nombre,
         categoriaCol,
@@ -149,6 +149,7 @@ export const POST: APIRoute = async ({ request }) => {
         finca,
         vereda,
         referencia.slice(0, 200),
+        data.certificaciones ? JSON.stringify(data.certificaciones) : '',
         data.certificaciones ? JSON.stringify(data.certificaciones) : '',
         data.transporte === 'agroup' ? 'agroup' : 'propio',
       ]
