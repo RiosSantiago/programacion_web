@@ -107,6 +107,15 @@ export const PUT: APIRoute = async ({ params, request }) => {
     if (data.nombre_finca !== undefined && data.finca === undefined)           data.finca = data.nombre_finca;
     if (data.referencia   !== undefined && data.referencia_ubicacion === undefined) data.referencia_ubicacion = data.referencia;
 
+    // Recálculo / consistencia de precio_unitario en backend
+    const finalStock = data.stock !== undefined ? parseInt(data.stock) : product.stock;
+    const finalPrecio = data.precio !== undefined ? parseFloat(data.precio) : product.precio;
+    if (data.precio_unitario === undefined && (data.precio !== undefined || data.stock !== undefined)) {
+      data.precio_unitario = finalStock > 0 ? parseFloat((finalPrecio / finalStock).toFixed(2)) : finalPrecio;
+    } else if (data.precio_unitario !== undefined && data.precio_unitario !== null) {
+      data.precio_unitario = parseFloat(parseFloat(data.precio_unitario).toFixed(2));
+    }
+
     for (const field of allowedFields) {
       if (data[field] !== undefined) {
         fields.push(`${field} = ?`);
