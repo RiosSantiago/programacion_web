@@ -51,9 +51,56 @@ export const POST: APIRoute = async ({ request }) => {
       categoriaCol = (catSlug.replace(/s$/, '') || 'bovino');
     }
 
-    if (!esAgricola && (!finca || finca.length < 3 || finca.length > 80)) {
-      return new Response(JSON.stringify({ error: 'El nombre de la finca es obligatorio y debe tener entre 3 y 80 caracteres.' }), { status: 400 });
+    if (!data.nombre || !data.nombre.trim()) {
+      return new Response(JSON.stringify({ error: 'El nombre es obligatorio.' }), { status: 400 });
     }
+    if (!catSlug) {
+      return new Response(JSON.stringify({ error: 'La categoría es obligatoria.' }), { status: 400 });
+    }
+    if (!data.ubicacion || !data.ubicacion.trim()) {
+      return new Response(JSON.stringify({ error: 'El municipio es obligatorio.' }), { status: 400 });
+    }
+
+    // Validaciones específicas de Pecuario
+    if (!esAgricola) {
+      if (!sexo) {
+        return new Response(JSON.stringify({ error: 'El sexo es obligatorio.' }), { status: 400 });
+      }
+      if (!data.stock || isNaN(parseInt(data.stock)) || parseInt(data.stock) <= 0) {
+        return new Response(JSON.stringify({ error: 'La cantidad (stock) es obligatoria y debe ser un número mayor a 0.' }), { status: 400 });
+      }
+      if (!finca || finca.length < 3 || finca.length > 80) {
+        return new Response(JSON.stringify({ error: 'El nombre de la finca es obligatorio y debe tener entre 3 y 80 caracteres.' }), { status: 400 });
+      }
+      if (!data.precio || isNaN(parseFloat(data.precio)) || parseFloat(data.precio) <= 0) {
+        return new Response(JSON.stringify({ error: 'El precio total es obligatorio y debe ser un número positivo.' }), { status: 400 });
+      }
+      if (!data.raza || !data.raza.trim()) {
+        return new Response(JSON.stringify({ error: 'La raza es obligatoria.' }), { status: 400 });
+      }
+      if (!data.tipoPrecio || !['fijo', 'negociable'].includes(data.tipoPrecio)) {
+        return new Response(JSON.stringify({ error: 'El tipo de precio es obligatorio.' }), { status: 400 });
+      }
+      if (!data.salud || !data.salud.trim()) {
+        return new Response(JSON.stringify({ error: 'El estado de salud es obligatorio.' }), { status: 400 });
+      }
+    }
+
+    // Validaciones comunes (Pecuario + Agrícola)
+    if (data.peso === undefined || data.peso === null || String(data.peso).trim() === '' || isNaN(parseFloat(data.peso)) || parseFloat(data.peso) <= 0) {
+      return new Response(JSON.stringify({ error: 'El peso es obligatorio y debe ser un número mayor a 0.' }), { status: 400 });
+    }
+    if (!data.transporte || !['agroup', 'propio'].includes(data.transporte)) {
+      return new Response(JSON.stringify({ error: 'El método de transporte es obligatorio.' }), { status: 400 });
+    }
+    if (!data.descripcion || !data.descripcion.trim()) {
+      return new Response(JSON.stringify({ error: 'La descripción es obligatoria.' }), { status: 400 });
+    }
+    if (!data.imagenes || !Array.isArray(data.imagenes) || data.imagenes.length === 0 || 
+        (data.imagenes.length === 1 && (data.imagenes[0] === '/images/categories/bovinos.webp' || data.imagenes[0] === '/images/categories/cultivos.webp'))) {
+      return new Response(JSON.stringify({ error: 'Debes incluir al menos una foto del producto.' }), { status: 400 });
+    }
+
     if (vereda.length > 80) {
       return new Response(JSON.stringify({ error: 'La vereda no debe exceder 80 caracteres.' }), { status: 400 });
     }
@@ -61,13 +108,19 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ error: 'La referencia no debe exceder 200 caracteres.' }), { status: 400 });
     }
 
+    const precioTotal = parseFloat(data.precio);
+    const stockQty = parseInt(data.stock) || 1;
+    const precioUnitario = data.precio_unitario !== undefined && data.precio_unitario !== null && !isNaN(parseFloat(data.precio_unitario))
+      ? parseFloat(data.precio_unitario)
+      : (stockQty > 0 ? parseFloat((precioTotal / stockQty).toFixed(2)) : precioTotal);
+
     const { lastInsertRowid: newId } = await queryRun(
       `INSERT INTO productos (
         nombre, categoria, categoria_id, raza, peso, peso_unitario, ubicacion, departamento,
-        precio, precio_anterior, stock, vendedor_id, vendedor_rating,
+        precio, precio_unitario, precio_anterior, stock, vendedor_id, vendedor_rating,
         estado, salud, envio, destacado, oferta, trazabilidad, tipo_precio, descripcion, video, sexo,
         finca, vereda, referencia_ubicacion, ica_pdf, transporte
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         data.nombre,
         categoriaCol,
@@ -77,9 +130,10 @@ export const POST: APIRoute = async ({ request }) => {
         null,
         data.ubicacion,
         data.departamento || 'Caldas',
-        parseFloat(data.precio),
+        precioTotal,
+        precioUnitario,
         null,
-        parseInt(data.stock),
+        stockQty,
         userId,
         4.5,
         'disponible',

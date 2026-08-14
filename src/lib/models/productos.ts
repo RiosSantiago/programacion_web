@@ -12,6 +12,7 @@ export interface Producto {
   ubicacion: string;
   departamento: string;
   precio: number;
+  precio_unitario?: number | null;
   precio_anterior?: number | null;
   precioAnterior?: number | null;
   stock: number;

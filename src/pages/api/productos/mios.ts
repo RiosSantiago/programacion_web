@@ -18,7 +18,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     const rows = await queryAll(
       `SELECT p.id, p.nombre, p.categoria_id, p.raza, p.peso, p.peso_unitario,
-              p.ubicacion, p.departamento, p.precio, p.precio_anterior, p.stock,
+              p.ubicacion, p.departamento, p.precio, p.precio_unitario, p.precio_anterior, p.stock,
               p.vendedor_id, p.vendedor_rating, p.estado, p.salud, p.envio,
               p.destacado, p.oferta, p.trazabilidad, p.tipo_precio, p.sexo,
               p.fecha_nacimiento, p.descripcion, p.video, p.finca, p.vereda,

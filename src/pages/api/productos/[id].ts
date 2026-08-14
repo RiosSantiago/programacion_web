@@ -28,7 +28,7 @@ export const GET: APIRoute = async ({ params }) => {
 
     const product = await queryGet<any>(
       `SELECT p.id, p.nombre, p.categoria_id, p.raza, p.peso, p.peso_unitario,
-              p.ubicacion, p.departamento, p.precio, p.precio_anterior, p.stock,
+              p.ubicacion, p.departamento, p.precio, p.precio_unitario, p.precio_anterior, p.stock,
               p.vendedor_id, p.vendedor_rating, p.estado, p.salud, p.envio,
               p.destacado, p.oferta, p.trazabilidad, p.tipo_precio, p.sexo,
               p.fecha_nacimiento, p.descripcion, p.video, p.finca, p.vereda,
@@ -65,7 +65,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
 
     const rol = await getUserRole(userId);
     const SELECT_PROD = `SELECT p.id, p.nombre, p.categoria_id, p.raza, p.peso, p.peso_unitario,
-      p.ubicacion, p.departamento, p.precio, p.precio_anterior, p.stock,
+      p.ubicacion, p.departamento, p.precio, p.precio_unitario, p.precio_anterior, p.stock,
       p.vendedor_id, p.vendedor_rating, p.estado, p.salud, p.envio,
       p.destacado, p.oferta, p.trazabilidad, p.tipo_precio, p.sexo,
       p.fecha_nacimiento, p.descripcion, p.video, p.finca, p.vereda,
@@ -83,11 +83,23 @@ export const PUT: APIRoute = async ({ params, request }) => {
     if (!product) return new Response(JSON.stringify({ error: 'Producto no encontrado o no autorizado' }), { status: 404 });
 
     const data = await request.json();
+
+    // Validaciones server-side de stock y precios
+    if (data.stock !== undefined && (isNaN(parseInt(data.stock)) || parseInt(data.stock) < 0)) {
+      return new Response(JSON.stringify({ error: 'El stock no puede ser negativo.' }), { status: 400 });
+    }
+    if (data.precio !== undefined && (isNaN(parseFloat(data.precio)) || parseFloat(data.precio) <= 0)) {
+      return new Response(JSON.stringify({ error: 'El precio debe ser un número positivo.' }), { status: 400 });
+    }
+    if (data.precio_unitario !== undefined && (isNaN(parseFloat(data.precio_unitario)) || parseFloat(data.precio_unitario) <= 0)) {
+      return new Response(JSON.stringify({ error: 'El precio unitario debe ser un número positivo.' }), { status: 400 });
+    }
+
     const fields: string[] = [];
     const paramsArr: any[] = [];
 
     const allowedFields = [
-      'nombre', 'raza', 'peso', 'ubicacion', 'departamento', 'precio', 'stock',
+      'nombre', 'raza', 'peso', 'ubicacion', 'departamento', 'precio', 'precio_unitario', 'stock',
       'salud', 'estado', 'tipo_precio', 'sexo', 'fecha_nacimiento', 'descripcion', 'video',
       'finca', 'vereda', 'referencia_ubicacion', 'certificaciones', 'transporte',
     ];
@@ -101,6 +113,8 @@ export const PUT: APIRoute = async ({ params, request }) => {
         let val = data[field];
         if (field === 'descripcion') val = String(val).slice(0, 500);
         if (field === 'certificaciones') val = JSON.stringify(val);
+        if (field === 'stock') val = parseInt(val);
+        if (field === 'precio' || field === 'precio_unitario' || field === 'peso') val = val !== null && val !== '' ? parseFloat(val) : null;
         paramsArr.push(val);
       }
     }

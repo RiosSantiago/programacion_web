@@ -210,12 +210,20 @@ const campos = [
                 <input type="text" id="edit-raza" class="w-full px-3 py-2.5 text-sm font-semibold rounded-lg border border-[#E8E0D8] outline-none transition-colors" style="color: #2D2D2D;" onfocus="this.style.borderColor='#1b3928'" onblur="this.style.borderColor='#E8E0D8'" />
               </div>
               <div>
-                <label class="block text-[10px] font-semibold tracking-widest mb-1.5" style="color: #9CA3AF;">PRECIO ($)</label>
+                <label class="block text-[10px] font-semibold tracking-widest mb-1.5" style="color: #9CA3AF;">PRECIO TOTAL ($) *</label>
                 <input type="number" id="edit-precio" class="w-full px-3 py-2.5 text-sm font-semibold rounded-lg border border-[#E8E0D8] outline-none transition-colors" style="color: #2D2D2D;" onfocus="this.style.borderColor='#1b3928'" onblur="this.style.borderColor='#E8E0D8'" />
               </div>
               <div>
-                <label class="block text-[10px] font-semibold tracking-widest mb-1.5" style="color: #9CA3AF;">STOCK</label>
-                <input type="number" id="edit-stock" class="w-full px-3 py-2.5 text-sm font-semibold rounded-lg border border-[#E8E0D8] outline-none transition-colors" style="color: #2D2D2D;" onfocus="this.style.borderColor='#1b3928'" onblur="this.style.borderColor='#E8E0D8'" />
+                <label class="block text-[10px] font-semibold tracking-widest mb-1.5" style="color: #9CA3AF;">PRECIO UNITARIO ($ / CABEZA)</label>
+                <input type="number" id="edit-precio-unitario" class="w-full px-3 py-2.5 text-sm font-semibold rounded-lg border border-[#E8E0D8] outline-none transition-colors" style="color: #2D2D2D;" onfocus="this.style.borderColor='#1b3928'" onblur="this.style.borderColor='#E8E0D8'" />
+              </div>
+              <div>
+                <div class="flex justify-between items-center mb-1.5">
+                  <label class="block text-[10px] font-semibold tracking-widest" style="color: #9CA3AF;">CANTIDAD DISPONIBLE (STOCK) *</label>
+                  <span id="edit-stock-max-hint" class="text-[10px] font-semibold text-emerald-800"></span>
+                </div>
+                <input type="number" id="edit-stock" min="0" class="w-full px-3 py-2.5 text-sm font-semibold rounded-lg border border-[#E8E0D8] outline-none transition-colors" style="color: #2D2D2D;" onfocus="this.style.borderColor='#1b3928'" onblur="this.style.borderColor='#E8E0D8'" />
+                <p class="text-[11px] text-[#6B6B6B] mt-1">Reduce el stock si vendiste animales por fuera.</p>
               </div>
               <div>
                 <label class="block text-[10px] font-semibold tracking-widest mb-1.5" style="color: #9CA3AF;">PESO (KG)</label>
@@ -474,6 +482,7 @@ const campos = [
   }
 
   let productoAEditar = null;
+  let stockOriginalEditar = 1;
   let editImages = [];
   let editVideo = '';
   let editCertificaciones: string[] = [];
@@ -504,14 +513,27 @@ const campos = [
 
   function abrirEditar(producto) {
     productoAEditar = producto;
+    stockOriginalEditar = parseInt(producto.stock) || 1;
     editImages = Array.isArray(producto.imagenes) ? [...producto.imagenes] : [];
     editVideo = producto.video || '';
     document.getElementById('edit-id').value = producto.id || '';
     document.getElementById('edit-nombre').value = producto.nombre || '';
     document.getElementById('edit-categoria').value = producto.categoria || 'bovinos';
     document.getElementById('edit-raza').value = producto.raza || '';
-    document.getElementById('edit-precio').value = producto.precio || '';
-    document.getElementById('edit-stock').value = producto.stock || '';
+    
+    const precioVal = parseFloat(producto.precio) || 0;
+    const stockVal = parseInt(producto.stock) || 1;
+    const unitVal = producto.precio_unitario ? parseFloat(producto.precio_unitario) : (stockVal > 0 ? Math.round(precioVal / stockVal) : precioVal);
+
+    document.getElementById('edit-precio').value = precioVal || '';
+    document.getElementById('edit-precio-unitario').value = unitVal || '';
+    document.getElementById('edit-stock').value = stockVal;
+    
+    const hintEl = document.getElementById('edit-stock-max-hint');
+    if (hintEl) {
+      hintEl.textContent = `(Lote original: ${stockOriginalEditar} cabezas)`;
+    }
+
     document.getElementById('edit-peso').value = producto.peso || '';
     document.getElementById('edit-ubicacion').value = producto.ubicacion || '';
     document.getElementById('edit-departamento').value = 'Caldas';
@@ -741,20 +763,80 @@ const campos = [
     e.target.value = '';
   });
 
+  // Sincronización dinámica de precios y stock en edición
+  document.getElementById('edit-precio-unitario')?.addEventListener('input', () => {
+    const unit = parseFloat((document.getElementById('edit-precio-unitario') as HTMLInputElement).value) || 0;
+    const stock = parseInt((document.getElementById('edit-stock') as HTMLInputElement).value) || 0;
+    if (unit > 0 && stock > 0) {
+      (document.getElementById('edit-precio') as HTMLInputElement).value = String(Math.round(unit * stock));
+    }
+  });
+
+  document.getElementById('edit-stock')?.addEventListener('input', () => {
+    const stockInput = document.getElementById('edit-stock') as HTMLInputElement;
+    let stock = parseInt(stockInput.value);
+    const errorEl = document.getElementById('edit-error');
+    if (isNaN(stock) || stock < 0) {
+      stockInput.value = '0';
+      stock = 0;
+    } else if (stock > stockOriginalEditar) {
+      stockInput.value = String(stockOriginalEditar);
+      stock = stockOriginalEditar;
+      if (errorEl) {
+        errorEl.textContent = `No puedes aumentar el stock por encima del lote original (${stockOriginalEditar} cabezas). Para agregar más animales crea una nueva publicación.`;
+        errorEl.classList.remove('hidden');
+        setTimeout(() => errorEl?.classList.add('hidden'), 4000);
+      }
+    }
+    const unit = parseFloat((document.getElementById('edit-precio-unitario') as HTMLInputElement).value) || 0;
+    if (unit > 0) {
+      (document.getElementById('edit-precio') as HTMLInputElement).value = String(Math.round(unit * stock));
+    }
+  });
+
+  document.getElementById('edit-precio')?.addEventListener('input', () => {
+    const total = parseFloat((document.getElementById('edit-precio') as HTMLInputElement).value) || 0;
+    const stock = parseInt((document.getElementById('edit-stock') as HTMLInputElement).value) || 1;
+    if (total > 0 && stock > 0) {
+      (document.getElementById('edit-precio-unitario') as HTMLInputElement).value = String(Math.round(total / stock));
+    }
+  });
+
   document.getElementById('form-editar').addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!productoAEditar) return;
     const errorEl = document.getElementById('edit-error');
     errorEl.classList.add('hidden');
 
+    const precioTotalVal = parseFloat((document.getElementById('edit-precio') as HTMLInputElement).value) || 0;
+    const stockVal = parseInt((document.getElementById('edit-stock') as HTMLInputElement).value) || 0;
+    const precioUnitarioVal = parseFloat((document.getElementById('edit-precio-unitario') as HTMLInputElement).value) || (stockVal > 0 ? Math.round(precioTotalVal / stockVal) : precioTotalVal);
+
+    if (stockVal < 0) {
+      errorEl.textContent = 'El stock no puede ser negativo.';
+      errorEl.classList.remove('hidden');
+      return;
+    }
+    if (stockVal > stockOriginalEditar) {
+      errorEl.textContent = `El stock no puede exceder el lote original (${stockOriginalEditar} cabezas).`;
+      errorEl.classList.remove('hidden');
+      return;
+    }
+    if (precioTotalVal <= 0) {
+      errorEl.textContent = 'El precio debe ser un número positivo.';
+      errorEl.classList.remove('hidden');
+      return;
+    }
+
     const body = {
-      nombre: document.getElementById('edit-nombre').value.trim(),
-      categoria: document.getElementById('edit-categoria').value,
-      raza: document.getElementById('edit-raza').value.trim(),
-      precio: parseInt(document.getElementById('edit-precio').value) || 0,
-      stock: parseInt(document.getElementById('edit-stock').value) || 0,
-      peso: document.getElementById('edit-peso').value ? parseFloat(document.getElementById('edit-peso').value) : null,
-      ubicacion: document.getElementById('edit-ubicacion').value.trim(),
+      nombre: (document.getElementById('edit-nombre') as HTMLInputElement).value.trim(),
+      categoria: (document.getElementById('edit-categoria') as HTMLSelectElement).value,
+      raza: (document.getElementById('edit-raza') as HTMLInputElement).value.trim(),
+      precio: precioTotalVal,
+      precio_unitario: precioUnitarioVal,
+      stock: stockVal,
+      peso: (document.getElementById('edit-peso') as HTMLInputElement).value ? parseFloat((document.getElementById('edit-peso') as HTMLInputElement).value) : null,
+      ubicacion: (document.getElementById('edit-ubicacion') as HTMLSelectElement).value.trim(),
       departamento: 'Caldas',
       finca: document.getElementById('edit-finca').value.trim(),
       vereda: document.getElementById('edit-vereda').value.trim(),

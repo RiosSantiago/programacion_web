@@ -49,7 +49,7 @@ export default function PublicationForm() {
 
   const [formData, setFormData] = useState({
     nombre: params.get('animal') || '',
-    categoria: '',
+    categoria: params.get('categoria') || '',
     raza: params.get('raza') || '',
     peso: params.get('peso') || '',
     precio: '',
@@ -76,10 +76,61 @@ export default function PublicationForm() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [attemptedSubmit, setAttemptedSubmit] = useState(false);
 
   const photoInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
   const certInputRef = useRef<HTMLInputElement>(null);
+
+  // Re-evaluación dinámica de campos obligatorios
+  const getFieldErrors = () => {
+    const errs: Record<string, string> = {};
+    if (!formData.nombre.trim()) {
+      errs.nombre = 'El nombre del animal/lote es obligatorio.';
+    }
+    if (!formData.categoria) {
+      errs.categoria = 'La categoría es obligatoria.';
+    }
+    if (!formData.raza.trim()) {
+      errs.raza = 'La raza es obligatoria.';
+    }
+    if (!formData.peso.trim() || isNaN(Number(formData.peso)) || Number(formData.peso) <= 0) {
+      errs.peso = 'El peso (kg) es obligatorio y debe ser mayor a 0.';
+    }
+    if (!formData.sexo) {
+      errs.sexo = 'El sexo es obligatorio.';
+    }
+    if (!formData.stock || isNaN(Number(formData.stock)) || Number(formData.stock) <= 0) {
+      errs.stock = 'La cantidad es obligatoria y debe ser mayor a 0.';
+    }
+    if (!formData.ubicacion) {
+      errs.ubicacion = 'El municipio es obligatorio.';
+    }
+    if (!formData.finca.trim() || formData.finca.trim().length < 3 || formData.finca.trim().length > 80) {
+      errs.finca = 'El nombre de la finca es obligatorio (entre 3 y 80 caracteres).';
+    }
+    if (!formData.tipoPrecio) {
+      errs.tipoPrecio = 'El tipo de precio es obligatorio.';
+    }
+    if (!formData.precio.trim() || isNaN(Number(formData.precio)) || Number(formData.precio) <= 0) {
+      errs.precio = 'El precio total es obligatorio y debe ser mayor a 0.';
+    }
+    if (!formData.salud) {
+      errs.salud = 'El estado de salud es obligatorio.';
+    }
+    if (!transporte) {
+      errs.transporte = 'El método de transporte es obligatorio.';
+    }
+    if (!formData.descripcion.trim()) {
+      errs.descripcion = 'La descripción es obligatoria.';
+    }
+    if (photos.length === 0) {
+      errs.photos = 'Debes adjuntar al menos 1 foto del animal.';
+    }
+    return errs;
+  };
+
+  const fieldErrors = attemptedSubmit ? getFieldErrors() : {};
 
   function handlePhotoSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || []);
@@ -135,29 +186,53 @@ export default function PublicationForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setAttemptedSubmit(true);
     setError('');
 
-    let uploadedPhotoUrls: string[] = [];
-    let uploadedVideoUrl = '';
+    const newErrors = getFieldErrors();
+    const fieldOrder = [
+      'nombre',
+      'categoria',
+      'raza',
+      'peso',
+      'sexo',
+      'stock',
+      'ubicacion',
+      'finca',
+      'tipoPrecio',
+      'precio',
+      'salud',
+      'transporte',
+      'descripcion',
+      'photos',
+    ];
 
-    if (!formData.sexo) {
-      setError('El sexo es obligatorio');
+    const firstError = fieldOrder.find((key) => newErrors[key]);
+    if (firstError) {
+      setError('Por favor completa todos los campos obligatorios marcados con (*).');
+      const el = document.getElementById(`field-${firstError}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if ('focus' in el && typeof (el as any).focus === 'function') {
+          (el as any).focus();
+        }
+      }
       return;
     }
-    if (!formData.finca || formData.finca.trim().length < 3 || formData.finca.trim().length > 80) {
-      setError('El nombre de la finca es obligatorio y debe tener entre 3 y 80 caracteres');
-      return;
-    }
+
     if (formData.vereda && formData.vereda.length > 80) {
-      setError('La vereda no debe superar los 80 caracteres');
+      setError('La vereda no debe superar los 80 caracteres.');
       return;
     }
     if (formData.referencia_ubicacion && formData.referencia_ubicacion.length > 200) {
-      setError('El sector o referencia no debe superar los 200 caracteres');
+      setError('El sector o referencia no debe superar los 200 caracteres.');
       return;
     }
 
+    setLoading(true);
+
+    let uploadedPhotoUrls: string[] = [];
+    let uploadedVideoUrl = '';
     let uploadedCertUrls: string[] = [];
 
     if (photos.length > 0 || video || certificaciones.length > 0) {
@@ -179,12 +254,17 @@ export default function PublicationForm() {
       }
     }
 
+    const numPrecio = parseFloat(formData.precio) || 0;
+    const numStock = parseInt(formData.stock) || 1;
+    const precioUnitarioCalc = numStock > 0 ? Math.round(numPrecio / numStock) : numPrecio;
+
     const payload = {
       nombre: formData.nombre,
       categoria: formData.categoria,
       raza: formData.raza,
       peso: formData.peso,
       precio: formData.precio,
+      precio_unitario: precioUnitarioCalc,
       tipoPrecio: formData.tipoPrecio,
       stock: formData.stock,
       salud: formData.salud,
@@ -195,7 +275,7 @@ export default function PublicationForm() {
       vereda: formData.vereda,
       referencia_ubicacion: formData.referencia_ubicacion,
       descripcion: formData.descripcion,
-      imagenes: uploadedPhotoUrls.length > 0 ? uploadedPhotoUrls : ['/images/categories/bovinos.webp'],
+      imagenes: uploadedPhotoUrls,
       video: uploadedVideoUrl,
       certificaciones: uploadedCertUrls,
       transporte,
@@ -241,7 +321,7 @@ export default function PublicationForm() {
   function resetForm() {
     setFormData({
       nombre: '',
-      categoria: categorias[0]?.value || '',
+      categoria: '',
       raza: '',
       peso: '',
       precio: '',
@@ -262,6 +342,8 @@ export default function PublicationForm() {
     setVideoPreview('');
     setCertificaciones([]);
     setCertPreviews([]);
+    setAttemptedSubmit(false);
+    setError('');
     setSuccess(false);
   }
 
@@ -292,99 +374,140 @@ export default function PublicationForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} noValidate className="space-y-6">
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-700">{error}</p>
+        <div className="bg-red-50/70 border border-red-200/80 rounded-lg p-4">
+          <p className="text-red-800/90 font-medium">{error}</p>
         </div>
       )}
 
+      {/* Nombre del animal/lote * */}
       <div>
         <label className="block text-sm font-medium text-slate-700 mb-1">Nombre del animal/lote *</label>
         <input
+          id="field-nombre"
           type="text"
-          required
           value={formData.nombre}
           onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
           placeholder="Lote de 15 Novillos Angus"
-          className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500"
+          className={`w-full px-3 py-2 border rounded-lg text-sm transition-colors focus:outline-none focus:ring-2 ${
+            fieldErrors.nombre
+              ? 'border-red-300 ring-1 ring-red-200 focus:ring-red-200'
+              : 'border-slate-300 focus:ring-emerald-500'
+          }`}
         />
+        {fieldErrors.nombre && <p className="text-xs text-red-700/80 mt-1 font-medium">{fieldErrors.nombre}</p>}
       </div>
 
+      {/* Categoría * y Raza * */}
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Categoría *</label>
           <select
+            id="field-categoria"
             value={formData.categoria}
             onChange={(e) => setFormData({ ...formData, categoria: e.target.value })}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white"
+            className={`w-full px-3 py-2 border rounded-lg text-sm bg-white transition-colors focus:outline-none focus:ring-2 ${
+              fieldErrors.categoria
+                ? 'border-red-300 ring-1 ring-red-200 focus:ring-red-200'
+                : 'border-slate-300 focus:ring-emerald-500'
+            }`}
           >
-            {categorias.length === 0 && <option value="">Cargando...</option>}
+            <option value="">Seleccionar Categoría</option>
             {categorias.map((cat) => (
               <option key={cat.value} value={cat.value}>
                 {cat.label}
               </option>
             ))}
           </select>
+          {fieldErrors.categoria && <p className="text-xs text-red-700/80 mt-1 font-medium">{fieldErrors.categoria}</p>}
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Raza</label>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Raza *</label>
           <input
+            id="field-raza"
             type="text"
             value={formData.raza}
             onChange={(e) => setFormData({ ...formData, raza: e.target.value })}
             placeholder="Angus Negro"
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500"
+            className={`w-full px-3 py-2 border rounded-lg text-sm transition-colors focus:outline-none focus:ring-2 ${
+              fieldErrors.raza
+                ? 'border-red-300 ring-1 ring-red-200 focus:ring-red-200'
+                : 'border-slate-300 focus:ring-emerald-500'
+            }`}
           />
+          {fieldErrors.raza && <p className="text-xs text-red-700/80 mt-1 font-medium">{fieldErrors.raza}</p>}
         </div>
       </div>
 
+      {/* Peso (kg) *, Sexo *, Cantidad * */}
       <div className="grid grid-cols-3 gap-4">
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Peso (kg)</label>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Peso (kg) *</label>
           <input
+            id="field-peso"
             type="number"
             value={formData.peso}
             onChange={(e) => setFormData({ ...formData, peso: e.target.value })}
             placeholder="420"
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500"
+            className={`w-full px-3 py-2 border rounded-lg text-sm transition-colors focus:outline-none focus:ring-2 ${
+              fieldErrors.peso
+                ? 'border-red-300 ring-1 ring-red-200 focus:ring-red-200'
+                : 'border-slate-300 focus:ring-emerald-500'
+            }`}
           />
+          {fieldErrors.peso && <p className="text-xs text-red-700/80 mt-1 font-medium">{fieldErrors.peso}</p>}
         </div>
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Sexo *</label>
           <select
-            required
+            id="field-sexo"
             value={formData.sexo}
             onChange={(e) => setFormData({ ...formData, sexo: e.target.value })}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-emerald-500"
+            className={`w-full px-3 py-2 border rounded-lg text-sm bg-white transition-colors focus:outline-none focus:ring-2 ${
+              fieldErrors.sexo
+                ? 'border-red-300 ring-1 ring-red-200 focus:ring-red-200'
+                : 'border-slate-300 focus:ring-emerald-500'
+            }`}
           >
             <option value="">Seleccionar</option>
             <option value="macho">Macho</option>
             <option value="hembra">Hembra</option>
             <option value="mixto">Mixto</option>
           </select>
+          {fieldErrors.sexo && <p className="text-xs text-red-700/80 mt-1 font-medium">{fieldErrors.sexo}</p>}
         </div>
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Cantidad *</label>
           <input
+            id="field-stock"
             type="number"
-            required
             value={formData.stock}
             onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
             placeholder="1"
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500"
+            className={`w-full px-3 py-2 border rounded-lg text-sm transition-colors focus:outline-none focus:ring-2 ${
+              fieldErrors.stock
+                ? 'border-red-300 ring-1 ring-red-200 focus:ring-red-200'
+                : 'border-slate-300 focus:ring-emerald-500'
+            }`}
           />
+          {fieldErrors.stock && <p className="text-xs text-red-700/80 mt-1 font-medium">{fieldErrors.stock}</p>}
         </div>
       </div>
 
+      {/* Municipio * y Departamento */}
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Municipio *</label>
           <select
-            required
+            id="field-ubicacion"
             value={formData.ubicacion}
             onChange={(e) => setFormData({ ...formData, ubicacion: e.target.value })}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-emerald-500"
+            className={`w-full px-3 py-2 border rounded-lg text-sm bg-white transition-colors focus:outline-none focus:ring-2 ${
+              fieldErrors.ubicacion
+                ? 'border-red-300 ring-1 ring-red-200 focus:ring-red-200'
+                : 'border-slate-300 focus:ring-emerald-500'
+            }`}
           >
             <option value="">Seleccionar Municipio</option>
             {municipiosCaldas.map((mun) => (
@@ -393,6 +516,7 @@ export default function PublicationForm() {
               </option>
             ))}
           </select>
+          {fieldErrors.ubicacion && <p className="text-xs text-red-700/80 mt-1 font-medium">{fieldErrors.ubicacion}</p>}
         </div>
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Departamento</label>
@@ -406,22 +530,30 @@ export default function PublicationForm() {
         </div>
       </div>
 
+      {/* Finca * y Vereda (opcional) */}
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Nombre de la finca *</label>
           <input
+            id="field-finca"
             type="text"
-            required
             minLength={3}
             maxLength={80}
             value={formData.finca}
             onChange={(e) => setFormData({ ...formData, finca: e.target.value })}
             placeholder="Ej. Hacienda El Paraíso"
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500"
+            className={`w-full px-3 py-2 border rounded-lg text-sm transition-colors focus:outline-none focus:ring-2 ${
+              fieldErrors.finca
+                ? 'border-red-300 ring-1 ring-red-200 focus:ring-red-200'
+                : 'border-slate-300 focus:ring-emerald-500'
+            }`}
           />
+          {fieldErrors.finca && <p className="text-xs text-red-700/80 mt-1 font-medium">{fieldErrors.finca}</p>}
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Vereda / Corregimiento</label>
+          <label className="block text-sm font-medium text-slate-700 mb-1">
+            Vereda / Corregimiento <span className="text-slate-400 font-normal">(opcional)</span>
+          </label>
           <input
             type="text"
             maxLength={80}
@@ -433,9 +565,12 @@ export default function PublicationForm() {
         </div>
       </div>
 
+      {/* Sector o referencia (opcional) */}
       <div>
         <div className="flex justify-between items-center mb-1">
-          <label className="block text-sm font-medium text-slate-700">Sector o referencia</label>
+          <label className="block text-sm font-medium text-slate-700">
+            Sector o referencia <span className="text-slate-400 font-normal">(opcional)</span>
+          </label>
           <span className="text-xs text-slate-400">{formData.referencia_ubicacion.length}/200</span>
         </div>
         <textarea
@@ -443,14 +578,15 @@ export default function PublicationForm() {
           rows={2}
           value={formData.referencia_ubicacion}
           onChange={(e) => setFormData({ ...formData, referencia_ubicacion: e.target.value })}
-          placeholder="Ej. A 2 km del parque principal, vía al corregimiento de San Jose."
+          placeholder="Ej. A 2 km del parque principal, vía al corregimiento de San José."
           className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 resize-none"
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-slate-700 mb-2">Tipo de Precio</label>
-        <div className="flex gap-3">
+      {/* Tipo de Precio * */}
+      <div id="field-tipoPrecio" tabIndex={-1}>
+        <label className="block text-sm font-medium text-slate-700 mb-2">Tipo de Precio *</label>
+        <div className={`flex gap-3 p-1 rounded-2xl transition-colors ${fieldErrors.tipoPrecio ? 'border-2 border-red-300 bg-red-50/10' : ''}`}>
           <label className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 cursor-pointer transition-all ${
             formData.tipoPrecio === 'fijo'
               ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
@@ -488,42 +624,66 @@ export default function PublicationForm() {
             <span className="text-sm font-semibold">Precio Negociable</span>
           </label>
         </div>
+        {fieldErrors.tipoPrecio && <p className="text-xs text-red-700/80 mt-1 font-medium">{fieldErrors.tipoPrecio}</p>}
       </div>
 
+      {/* Precio total (COP) * y Estado de salud * */}
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Precio total (COP) *</label>
           <input
+            id="field-precio"
             type="number"
-            required
             value={formData.precio}
             onChange={(e) => setFormData({ ...formData, precio: e.target.value })}
             placeholder="4200000"
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500"
+            className={`w-full px-3 py-2 border rounded-lg text-sm transition-colors focus:outline-none focus:ring-2 ${
+              fieldErrors.precio
+                ? 'border-red-300 ring-1 ring-red-200 focus:ring-red-200'
+                : 'border-slate-300 focus:ring-emerald-500'
+            }`}
           />
           {formData.tipoPrecio === 'negociable' && (
             <p className="text-xs text-amber-600 mt-1">Los compradores podrán hacer ofertas por WhatsApp</p>
           )}
+          {parseInt(formData.stock) > 1 && parseFloat(formData.precio) > 0 && (
+            <div className="mt-2.5 p-2.5 bg-emerald-50/90 border border-emerald-200/90 rounded-xl flex items-center justify-between text-xs text-emerald-900 shadow-sm animate-fadeIn">
+              <span className="font-semibold flex items-center gap-1.5 text-emerald-800">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                Precio unitario por animal:
+              </span>
+              <span className="font-bold text-sm text-emerald-900">
+                ${Math.round(parseFloat(formData.precio) / parseInt(formData.stock)).toLocaleString('es-CO')} COP
+              </span>
+            </div>
+          )}
+          {fieldErrors.precio && <p className="text-xs text-red-700/80 mt-1 font-medium">{fieldErrors.precio}</p>}
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Estado de salud</label>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Estado de salud *</label>
           <select
+            id="field-salud"
             value={formData.salud}
             onChange={(e) => setFormData({ ...formData, salud: e.target.value })}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white"
+            className={`w-full px-3 py-2 border rounded-lg text-sm bg-white transition-colors focus:outline-none focus:ring-2 ${
+              fieldErrors.salud
+                ? 'border-red-300 ring-1 ring-red-200 focus:ring-red-200'
+                : 'border-slate-300 focus:ring-emerald-500'
+            }`}
           >
+            <option value="">Seleccionar</option>
             <option value="Bueno">Bueno</option>
             <option value="Regular">Regular</option>
             <option value="Excelente">Excelente</option>
           </select>
+          {fieldErrors.salud && <p className="text-xs text-red-700/80 mt-1 font-medium">{fieldErrors.salud}</p>}
         </div>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-slate-700 mb-2">
-          Transporte <span className="text-slate-400 font-normal">(selecciona una opción)</span>
-        </label>
-        <div className="flex flex-col sm:flex-row gap-3">
+      {/* Transporte * */}
+      <div id="field-transporte" tabIndex={-1}>
+        <label className="block text-sm font-medium text-slate-700 mb-2">Transporte *</label>
+        <div className={`flex flex-col sm:flex-row gap-3 p-1 rounded-2xl transition-colors ${fieldErrors.transporte ? 'border-2 border-red-300 bg-red-50/10' : ''}`}>
           <label className={`flex-1 flex items-center gap-3 px-4 py-3 rounded-xl border-2 cursor-pointer transition-all ${
             transporte === 'agroup'
               ? 'border-emerald-600 bg-emerald-50 text-emerald-800'
@@ -555,38 +715,51 @@ export default function PublicationForm() {
             <span className="text-sm font-semibold">Transporte por medios propios</span>
           </label>
         </div>
+        {fieldErrors.transporte && <p className="text-xs text-red-700/80 mt-1 font-medium">{fieldErrors.transporte}</p>}
       </div>
 
+      {/* Descripción * */}
       <div>
         <label className="block text-sm font-medium text-slate-700 mb-1">
-          Descripción <span className="text-slate-400 font-normal">(máx. 500 caracteres)</span>
+          Descripción * <span className="text-slate-400 font-normal">(máx. 500 caracteres)</span>
         </label>
         <textarea
+          id="field-descripcion"
           value={formData.descripcion}
           onChange={(e) => setFormData({ ...formData, descripcion: e.target.value.slice(0, 500) })}
           placeholder="Describe brevemente el animal o lote..."
           maxLength={500}
           rows={3}
-          className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 resize-none"
+          className={`w-full px-3 py-2 border rounded-lg text-sm transition-colors resize-none focus:outline-none focus:ring-2 ${
+            fieldErrors.descripcion
+              ? 'border-red-300 ring-1 ring-red-200 focus:ring-red-200'
+              : 'border-slate-300 focus:ring-emerald-500'
+          }`}
         />
         <p className="text-xs text-slate-400 text-right mt-1">{formData.descripcion.length}/500</p>
+        {fieldErrors.descripcion && <p className="text-xs text-red-700/80 mt-1 font-medium">{fieldErrors.descripcion}</p>}
       </div>
 
-      {/* Photos */}
-      <div>
+      {/* Fotos del animal * */}
+      <div id="field-photos" tabIndex={-1}>
         <label className="block text-sm font-medium text-slate-700 mb-1">
-          Fotos del animal <span className="text-slate-400 font-normal">(opcional, máximo 5)</span>
+          Fotos del animal * <span className="text-slate-400 font-normal">(mínimo 1, máximo 5)</span>
         </label>
         <div
           onClick={() => photoInputRef.current?.click()}
-          className="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/30 transition-colors"
+          className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors ${
+            fieldErrors.photos
+              ? 'border-red-300 bg-red-50/10'
+              : 'border-slate-300 hover:border-emerald-400 hover:bg-emerald-50/30'
+          }`}
         >
-          <svg className="w-8 h-8 text-slate-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className={`w-8 h-8 mx-auto mb-2 ${fieldErrors.photos ? 'text-red-300' : 'text-slate-300'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
           <p className="text-sm text-slate-500">Haz clic para seleccionar fotos</p>
           <p className="text-xs text-slate-400 mt-1">{photos.length}/5 fotos seleccionadas</p>
         </div>
+        {fieldErrors.photos && <p className="text-xs text-red-700/80 mt-1 font-medium">{fieldErrors.photos}</p>}
         <input
           ref={photoInputRef}
           type="file"
@@ -603,7 +776,7 @@ export default function PublicationForm() {
                 <button
                   type="button"
                   onClick={() => removePhoto(i)}
-                  className="absolute top-0.5 right-0.5 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute top-0.5 right-0.5 w-5 h-5 bg-red-400 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                 >
                   ×
                 </button>
@@ -613,7 +786,7 @@ export default function PublicationForm() {
         )}
       </div>
 
-      {/* Video */}
+      {/* Video (opcional) */}
       <div>
         <label className="block text-sm font-medium text-slate-700 mb-1">
           Video del animal <span className="text-slate-400 font-normal">(opcional)</span>
@@ -634,7 +807,7 @@ export default function PublicationForm() {
             <button
               type="button"
               onClick={removeVideo}
-              className="absolute top-2 right-2 w-7 h-7 bg-red-500 text-white rounded-full text-sm flex items-center justify-center hover:bg-red-600 transition-colors"
+              className="absolute top-2 right-2 w-7 h-7 bg-red-400 text-white rounded-full text-sm flex items-center justify-center hover:bg-red-500 transition-colors"
             >
               ×
             </button>
@@ -649,7 +822,7 @@ export default function PublicationForm() {
         />
       </div>
 
-      {/* Certificaciones */}
+      {/* Certificaciones (opcional) */}
       <div>
         <label className="block text-sm font-medium text-slate-700 mb-1">
           Certificaciones (ICA, RUV, RFG y Registro genealógico) <span className="text-slate-400 font-normal">(opcional, máx. 5)</span>
@@ -678,7 +851,7 @@ export default function PublicationForm() {
                 <button
                   type="button"
                   onClick={() => removeCert(i)}
-                  className="w-6 h-6 bg-red-500 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-600 transition-colors shrink-0"
+                  className="w-6 h-6 bg-red-400 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-500 transition-colors shrink-0"
                 >
                   ×
                 </button>
@@ -699,7 +872,7 @@ export default function PublicationForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-3 text-white font-semibold rounded-lg hover:opacity-90 disabled:opacity-60 transition-all"
+        className="w-full py-3 text-white font-semibold rounded-lg hover:opacity-90 disabled:opacity-60 transition-all shadow-md"
         style={{ backgroundColor: '#1b3928' }}
       >
         {loading ? 'Publicando...' : 'Publicar Animal'}

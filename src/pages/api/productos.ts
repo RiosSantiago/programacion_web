@@ -9,7 +9,7 @@ export const GET: APIRoute = async ({ url }) => {
     let sqlQuery = `
       SELECT p.id, p.nombre, p.categoria_id AS "categoriaId", p.raza,
              p.peso, p.peso_unitario AS "pesoUnitario",
-             p.ubicacion, p.departamento, p.precio, p.precio_anterior AS "precioAnterior",
+             p.ubicacion, p.departamento, p.precio, p.precio_unitario AS "precioUnitario", p.precio_unitario, p.precio_anterior AS "precioAnterior",
              p.stock,
              u.nombre AS vendedor,
              p.vendedor_rating AS "vendedorRating",
