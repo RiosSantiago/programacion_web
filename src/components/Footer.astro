@@ -89,31 +89,37 @@ const links = {
 
       <!-- Columna 3: Vendedores & Soporte -->
       <div class="flex-1 min-w-0 px-8">
-        <!-- Wrapper compartido: el ancho lo fija el item más largo de cualquiera de las dos listas -->
-        <div class="mx-auto w-fit">
-          <h4 class="w-full text-xs font-semibold text-gold-400 uppercase tracking-widest mb-3 text-center">Vendedores</h4>
-          <ul class="p-0 m-0 list-none flex flex-col items-start space-y-2">
-            {links.vendedores.map((link) => (
-              <li class="flex items-center gap-2">
-                <span class="w-1 h-1 rounded-full bg-white/50 shrink-0"></span>
-                <a href={link.href} class="text-sm text-white/70 hover:text-gold-300 transition-colors whitespace-nowrap">
-                  {link.label}
-                </a>
-              </li>
-            ))}
-          </ul>
+        <!-- Contenedor flex-col items-center: centra cada sub-bloque en la columna -->
+        <div class="flex flex-col items-center">
+          <!-- Sub-bloque Vendedores: w-fit = ancho del item más largo de Vendedores -->
+          <div class="w-fit">
+            <h4 class="w-full text-xs font-semibold text-gold-400 uppercase tracking-widest mb-3 text-center">Vendedores</h4>
+            <ul class="p-0 m-0 list-none flex flex-col items-start space-y-2">
+              {links.vendedores.map((link) => (
+                <li class="flex items-center gap-2">
+                  <span class="w-1 h-1 rounded-full bg-white/50 shrink-0"></span>
+                  <a href={link.href} class="text-sm text-white/70 hover:text-gold-300 transition-colors whitespace-nowrap">
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-          <h4 class="w-full text-xs font-semibold text-gold-400 uppercase tracking-widest mt-5 mb-3 text-center">Soporte</h4>
-          <ul class="p-0 m-0 list-none flex flex-col items-start space-y-2">
-            {links.soporte.map((link) => (
-              <li class="flex items-center gap-2">
-                <span class="w-1 h-1 rounded-full bg-white/50 shrink-0"></span>
-                <a href={link.href} class="text-sm text-white/70 hover:text-gold-300 transition-colors whitespace-nowrap">
-                  {link.label}
-                </a>
-              </li>
-            ))}
-          </ul>
+          <!-- Sub-bloque Soporte: w-fit = ancho del item más largo de Soporte -->
+          <div class="w-fit mt-5">
+            <h4 class="w-full text-xs font-semibold text-gold-400 uppercase tracking-widest mb-3 text-center">Soporte</h4>
+            <ul class="p-0 m-0 list-none flex flex-col items-start space-y-2">
+              {links.soporte.map((link) => (
+                <li class="flex items-center gap-2">
+                  <span class="w-1 h-1 rounded-full bg-white/50 shrink-0"></span>
+                  <a href={link.href} class="text-sm text-white/70 hover:text-gold-300 transition-colors whitespace-nowrap">
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
 
@@ -205,30 +211,34 @@ const links = {
 
       <!-- Columna 3: Vendedores & Soporte -->
       <div class="pt-6 pb-6 sm:pl-8 border-b border-white/10 sm:border-b-0">
-        <div class="mx-auto w-fit">
-          <h4 class="w-full text-xs font-semibold text-gold-400 uppercase tracking-widest mb-3 text-center">Vendedores</h4>
-          <ul class="p-0 m-0 list-none flex flex-col items-start space-y-2">
-            {links.vendedores.map((link) => (
-              <li class="flex items-center gap-2">
-                <span class="w-1 h-1 rounded-full bg-white/50 shrink-0"></span>
-                <a href={link.href} class="text-sm text-white/70 hover:text-gold-300 transition-colors whitespace-nowrap">
-                  {link.label}
-                </a>
-              </li>
-            ))}
-          </ul>
+        <div class="flex flex-col items-center">
+          <div class="w-fit">
+            <h4 class="w-full text-xs font-semibold text-gold-400 uppercase tracking-widest mb-3 text-center">Vendedores</h4>
+            <ul class="p-0 m-0 list-none flex flex-col items-start space-y-2">
+              {links.vendedores.map((link) => (
+                <li class="flex items-center gap-2">
+                  <span class="w-1 h-1 rounded-full bg-white/50 shrink-0"></span>
+                  <a href={link.href} class="text-sm text-white/70 hover:text-gold-300 transition-colors whitespace-nowrap">
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-          <h4 class="w-full text-xs font-semibold text-gold-400 uppercase tracking-widest mt-5 mb-3 text-center">Soporte</h4>
-          <ul class="p-0 m-0 list-none flex flex-col items-start space-y-2">
-            {links.soporte.map((link) => (
-              <li class="flex items-center gap-2">
-                <span class="w-1 h-1 rounded-full bg-white/50 shrink-0"></span>
-                <a href={link.href} class="text-sm text-white/70 hover:text-gold-300 transition-colors whitespace-nowrap">
-                  {link.label}
-                </a>
-              </li>
-            ))}
-          </ul>
+          <div class="w-fit mt-5">
+            <h4 class="w-full text-xs font-semibold text-gold-400 uppercase tracking-widest mb-3 text-center">Soporte</h4>
+            <ul class="p-0 m-0 list-none flex flex-col items-start space-y-2">
+              {links.soporte.map((link) => (
+                <li class="flex items-center gap-2">
+                  <span class="w-1 h-1 rounded-full bg-white/50 shrink-0"></span>
+                  <a href={link.href} class="text-sm text-white/70 hover:text-gold-300 transition-colors whitespace-nowrap">
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
 
