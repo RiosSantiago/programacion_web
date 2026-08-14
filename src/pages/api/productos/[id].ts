@@ -107,13 +107,21 @@ export const PUT: APIRoute = async ({ params, request }) => {
     if (data.nombre_finca !== undefined && data.finca === undefined)           data.finca = data.nombre_finca;
     if (data.referencia   !== undefined && data.referencia_ubicacion === undefined) data.referencia_ubicacion = data.referencia;
 
-    // Recálculo / consistencia de precio_unitario en backend
+    // Recálculo / consistencia de precios en backend (precio_unitario como ancla)
     const finalStock = data.stock !== undefined ? parseInt(data.stock) : product.stock;
-    const finalPrecio = data.precio !== undefined ? parseFloat(data.precio) : product.precio;
-    if (data.precio_unitario === undefined && (data.precio !== undefined || data.stock !== undefined)) {
-      data.precio_unitario = finalStock > 0 ? parseFloat((finalPrecio / finalStock).toFixed(2)) : finalPrecio;
-    } else if (data.precio_unitario !== undefined && data.precio_unitario !== null) {
+    if (data.precio_unitario !== undefined && data.precio_unitario !== null) {
       data.precio_unitario = parseFloat(parseFloat(data.precio_unitario).toFixed(2));
+      // Si se definió precio_unitario o cambió el stock, el precio total del lote es precio_unitario * finalStock
+      data.precio = parseFloat((data.precio_unitario * finalStock).toFixed(2));
+    } else if (data.stock !== undefined && (data.precio === undefined || data.precio === null)) {
+      // Si solo se modificó el stock, mantener el precio_unitario del producto y recalcular el precio total
+      const unitAncla = product.precio_unitario ? parseFloat(product.precio_unitario) : (product.stock > 0 ? product.precio / product.stock : product.precio);
+      data.precio_unitario = parseFloat(unitAncla.toFixed(2));
+      data.precio = parseFloat((unitAncla * finalStock).toFixed(2));
+    } else if (data.precio !== undefined) {
+      // Si solo se modificó el precio total manualmente, derivar precio_unitario
+      data.precio = parseFloat(parseFloat(data.precio).toFixed(2));
+      data.precio_unitario = finalStock > 0 ? parseFloat((data.precio / finalStock).toFixed(2)) : data.precio;
     }
 
     for (const field of allowedFields) {

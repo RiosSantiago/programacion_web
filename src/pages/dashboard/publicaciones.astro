@@ -454,10 +454,10 @@ import PublicationForm from '../../components/dashboard/PublicationForm.tsx';
             setTimeout(() => errorEl.classList.add('hidden'), 4000);
           }
         }
-        const total = parseFloat(editPrecioInput.value) || 0;
-        if (total > 0 && stock > 0) {
-          const calcUnit = total / stock;
-          editUnitInput.value = Number.isInteger(calcUnit) ? String(calcUnit) : calcUnit.toFixed(2);
+        const unit = parseFloat(editUnitInput.value) || 0;
+        if (unit > 0) {
+          const calcTotal = unit * stock;
+          editPrecioInput.value = Number.isInteger(calcTotal) ? String(calcTotal) : calcTotal.toFixed(2);
         }
       });
 

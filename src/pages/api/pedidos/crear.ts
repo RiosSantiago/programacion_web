@@ -40,7 +40,7 @@ export const POST: APIRoute = async ({ request }) => {
         const cantidad   = item.cantidad || 1;
         if (productoId) {
           const updateRes = await tx.queryRun(
-            'UPDATE productos SET stock = stock - $1 WHERE id = $2 AND stock >= $1',
+            'UPDATE productos SET stock = stock - $1, precio = ROUND(COALESCE(precio_unitario, precio / NULLIF(stock, 0)) * (stock - $1), 2) WHERE id = $2 AND stock >= $1',
             [cantidad, productoId]
           );
           if (updateRes.changes === 0) {

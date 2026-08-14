@@ -789,10 +789,10 @@ const campos = [
         setTimeout(() => errorEl?.classList.add('hidden'), 4000);
       }
     }
-    const total = parseFloat((document.getElementById('edit-precio') as HTMLInputElement).value) || 0;
-    if (total > 0 && stock > 0) {
-      const calcUnit = total / stock;
-      (document.getElementById('edit-precio-unitario') as HTMLInputElement).value = Number.isInteger(calcUnit) ? String(calcUnit) : calcUnit.toFixed(2);
+    const unit = parseFloat((document.getElementById('edit-precio-unitario') as HTMLInputElement).value) || 0;
+    if (unit > 0) {
+      const calcTotal = unit * stock;
+      (document.getElementById('edit-precio') as HTMLInputElement).value = Number.isInteger(calcTotal) ? String(calcTotal) : calcTotal.toFixed(2);
     }
   });
 
