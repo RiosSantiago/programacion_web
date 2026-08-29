@@ -1,0 +1,509 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const sections = [
+  {
+    id: 'objeto',
+    number: '01',
+    icon: 'clipboard',
+    title: 'Objeto',
+    content:
+      'La presente Política de Tratamiento de Datos Personales (en adelante, "la Política") tiene por objeto establecer los criterios, principios, finalidades y procedimientos bajo los cuales se recolectan, almacenan, usan, circulan y suprimen los datos personales de productores, asociaciones agropecuarias, funcionarios, compradores institucionales y demás usuarios del ecosistema AgroUp, incluyendo la plataforma institucional "AgroUp" y el Marketplace de comercialización agropecuaria, en cumplimiento de la Ley 1581 de 2012 y demás normas concordantes.',
+  },
+  {
+    id: 'definiciones',
+    number: '02',
+    icon: 'search',
+    title: 'Definiciones',
+    items: [
+      'Dato personal: cualquier información vinculada o que pueda asociarse a una o varias personas naturales determinadas o determinables.',
+      'Dato sensible: aquel que afecta la intimidad del titular o cuyo uso indebido puede generar discriminación (p. ej. datos de salud del productor cuando se registren para programas específicos).',
+      'Titular: persona natural cuyos datos personales son objeto de tratamiento (productor, funcionario, comprador o usuario del Marketplace).',
+      'Responsable del tratamiento: la Secretaría de Agricultura y TICs, como entidad titular de las bases de datos institucionales generadas a través de AgroUp.',
+      'Encargado del tratamiento: Teclook, en su calidad de desarrollador y operador tecnológico de la plataforma, quien trata los datos por cuenta del Responsable conforme a las instrucciones y finalidades aquí definidas.',
+      'Tratamiento: cualquier operación sobre datos personales, como recolección, almacenamiento, uso, circulación o supresión.',
+    ],
+  },
+  {
+    id: 'marco-normativo',
+    number: '03',
+    icon: 'clipboard',
+    title: 'Marco normativo aplicable',
+    items: [
+      'Constitución Política de Colombia, arts. 15 y 20: derecho fundamental a la intimidad, al buen nombre y al acceso a la información.',
+      'Ley Estatutaria 1581 de 2012: Régimen General de Protección de Datos Personales en Colombia; base central de esta política.',
+      'Decreto 1377 de 2013 (compilado en el Decreto 1074 de 2015, Título 2, Capítulo 25): reglamenta la Ley 1581 — autorización, avisos de privacidad, políticas de tratamiento y transferencia internacional.',
+      'Ley 1266 de 2008: Habeas Data financiero y comercial, aplicable a la información derivada de transacciones del Marketplace AgroUp.',
+      'Circulares de la Superintendencia de Industria y Comercio (SIC) sobre el RNBD: obligación de inscripción de las bases de datos de AgroUp.',
+      'Ley 1480 de 2011 — Estatuto del Consumidor: protección al consumidor en las transacciones comerciales realizadas a través del Marketplace.',
+      'Ley 527 de 1999: validez jurídica de los mensajes de datos, firmas electrónicas y comercio electrónico.',
+      'Ley 23 de 1982, modificada por la Ley 44 de 1993: régimen de derechos de autor en Colombia, aplicable al software, contenidos e imágenes de la plataforma.',
+      'Decisión Andina 351 de 1993 (CAN): régimen común sobre derecho de autor y derechos conexos en la Comunidad Andina.',
+      'Convenio de Berna (1886) y Tratado OMPI sobre Derecho de Autor —WCT— (1996): marco internacional de protección de obras literarias, artísticas y de software, ratificado por Colombia.',
+      'Reglamento (UE) 2016/679 — GDPR: referencia internacional de buenas prácticas para transferencias internacionales de datos y estándares de privacidad por diseño.',
+      'La referencia a normas internacionales (Convenio de Berna, Tratado OMPI, GDPR) se realiza como estándar de buenas prácticas y para efectos de interoperabilidad en comercialización internacional; su aplicación directa depende de la jurisdicción de cada usuario o comprador.',
+    ],
+  },
+  {
+    id: 'responsable-encargado',
+    number: '04',
+    icon: 'user',
+    title: 'Responsable y encargado del tratamiento',
+    items: [
+      'Responsable del tratamiento: la Secretaría de Agricultura y TICs, entidad que define las finalidades institucionales del tratamiento de los datos de productores y del sector agropecuario.',
+      'Encargado del tratamiento: Teclook, como desarrollador y proveedor tecnológico de la plataforma AgroUp, quien realiza el tratamiento técnico de los datos por cuenta y bajo instrucción del Responsable, incluyendo el alojamiento, procesamiento y disponibilidad de la infraestructura.',
+      'Teclook y la Secretaría de Agricultura y TICs suscribirán un contrato de encargo de tratamiento de datos que precise las obligaciones específicas de seguridad, confidencialidad y uso exclusivo para las finalidades autorizadas, en los términos del artículo 25 del Decreto 1377 de 2013.',
+    ],
+  },
+  {
+    id: 'principios',
+    number: '05',
+    icon: 'check',
+    title: 'Principios rectores del tratamiento',
+    items: [
+      'Legalidad: el tratamiento se sujeta a la Ley 1581 de 2012 y demás normas aplicables.',
+      'Finalidad: el tratamiento obedece a finalidades legítimas, informadas al titular y relacionadas con la operación de AgroUp.',
+      'Libertad: los datos solo se recolectan con el consentimiento previo, expreso e informado del titular.',
+      'Veracidad o calidad: la información debe ser completa, exacta, actualizada y comprobable.',
+      'Transparencia: se garantiza al titular el derecho a obtener información sobre la existencia de datos que le conciernan.',
+      'Acceso y circulación restringida: el tratamiento se sujeta a los límites derivados de la naturaleza de los datos y de las finalidades autorizadas; los datos no estarán disponibles en internet salvo que exista autorización o mandato legal.',
+      'Seguridad: la información se maneja con las medidas técnicas, humanas y administrativas necesarias para evitar adulteración, pérdida o acceso no autorizado.',
+      'Confidencialidad: todas las personas que intervengan en el tratamiento se obligan a garantizar la reserva de la información, incluso después de finalizada su relación con Teclook o la Secretaría.',
+    ],
+  },
+  {
+    id: 'datos-objeto',
+    number: '06',
+    icon: 'clipboard',
+    title: 'Datos objeto de tratamiento',
+    content:
+      'El ecosistema AgroUp recolecta las siguientes categorías de datos, según el módulo o componente utilizado:',
+    items: [
+      'Datos de identificación y contacto (nombres, documento de identidad, teléfono, correo electrónico, dirección o vereda) — recolectados por la plataforma institucional AgroUp y el Marketplace.',
+      'Datos de ubicación y predio (coordenadas del predio, municipio, vereda, área cultivada, tipo de cultivo) — recolectados por el módulo de censo y trazabilidad.',
+      'Datos productivos y agropecuarios (tipología de cultivo, rendimiento, prácticas agrícolas, certificaciones y sellos verdes) — recolectados por el módulo de censo, trazabilidad y el asistente técnico IA Agro.',
+      'Datos transaccionales y comerciales (historial de publicaciones, órdenes, pagos y comunicaciones) — recolectados por el Marketplace AgroUp.',
+      'Datos de interacción con canales de IA (consultas realizadas al Agente de Atención al Productor vía web y WhatsApp API) — recolectados por los Agentes de Inteligencia Artificial Activa.',
+      'Datos institucionales de funcionarios (usuario, cargo y actuaciones dentro de los módulos de gestión) — recolectados por el panel de gestión institucional.',
+    ],
+  },
+  {
+    id: 'finalidades',
+    number: '07',
+    icon: 'check',
+    title: 'Finalidades del tratamiento',
+    content: 'Los datos personales recolectados a través de AgroUp serán tratados para las siguientes finalidades:',
+    items: [
+      'Gestionar la postulación, evaluación y seguimiento de convocatorias, incentivos y Capital Semilla dirigidos a productores agropecuarios.',
+      'Consolidar el censo agropecuario, la trazabilidad de cultivos y los indicadores de productividad para el ordenamiento territorial.',
+      'Facilitar la comercialización directa entre productores y compradores a través del Marketplace AgroUp, incluyendo la publicación de productos, negociación y gestión de órdenes.',
+      'Prestar atención automatizada a los productores mediante los Agentes de Inteligencia Artificial Activa (web y WhatsApp API), incluyendo orientación sobre programas, requisitos y asistencia técnica agrícola.',
+      'Generar reportes ejecutivos, estadísticas agregadas y anonimizadas para la toma de decisiones institucionales.',
+      'Dar cumplimiento a obligaciones legales, contractuales y de reporte ante autoridades competentes.',
+      'Prevenir el fraude y garantizar la seguridad de las transacciones realizadas en el Marketplace.',
+    ],
+  },
+  {
+    id: 'autorizacion',
+    number: '08',
+    icon: 'shield',
+    title: 'Autorización del titular',
+    content:
+      'Previo a cualquier tratamiento, el titular otorgará su autorización libre, previa, expresa e informada, mediante los siguientes mecanismos:',
+    items: [
+      'Aceptación de la casilla de autorización al momento del registro en la plataforma web o al iniciar conversación con el Agente de Atención al Productor vía WhatsApp.',
+      'Firma física o electrónica en los formularios de inscripción a convocatorias e incentivos, en los términos de la Ley 527 de 1999.',
+      'Aceptación de los Términos y Condiciones y de esta Política al publicar o adquirir productos en el Marketplace.',
+    ],
+    quote:
+      'Modelo de cláusula de autorización sugerida: "Autorizo de manera libre, previa, expresa e informada a la Secretaría de Agricultura y TICs, y a Teclook como encargado del tratamiento, para recolectar, almacenar, usar y circular mis datos personales conforme a la Política de Tratamiento de Datos Personales de AgroUp, para las finalidades allí descritas, incluyendo la gestión de convocatorias, la trazabilidad agropecuaria y la comercialización a través del Marketplace. Declaro conocer mis derechos como titular de la información, en los términos de la Ley 1581 de 2012."',
+  },
+  {
+    id: 'derechos',
+    number: '09',
+    icon: 'check',
+    title: 'Derechos de los titulares de la información',
+    content:
+      'De conformidad con el artículo 8 de la Ley 1581 de 2012, los titulares podrán:',
+    items: [
+      'Conocer, actualizar y rectificar sus datos personales frente a los Responsables o Encargados del tratamiento.',
+      'Solicitar prueba de la autorización otorgada, salvo que la ley exceptúe dicho requisito.',
+      'Ser informados sobre el uso dado a sus datos personales.',
+      'Presentar quejas ante la Superintendencia de Industria y Comercio por infracciones a la normativa de protección de datos.',
+      'Revocar la autorización y/o solicitar la supresión del dato, cuando no se respeten los principios, derechos y garantías constitucionales y legales.',
+      'Acceder de forma gratuita a sus datos personales que hayan sido objeto de tratamiento.',
+    ],
+  },
+  {
+    id: 'pqrs',
+    number: '10',
+    icon: 'mail',
+    title: 'Procedimiento de consultas y reclamos (PQRS)',
+    content:
+      'Los titulares podrán elevar consultas o reclamos sobre el tratamiento de sus datos a través de los canales oficiales de AgroUp o de la Secretaría de Agricultura y TICs. Los términos de atención, conforme al Decreto 1377 de 2013, serán:',
+    items: [
+      'Consultas: se atenderán en un término máximo de diez (10) días hábiles contados a partir de la fecha de recibo. Si no fuera posible atenderla dentro de dicho término, se informará al interesado antes del vencimiento, expresando los motivos y señalando la fecha en que se atenderá, que no podrá superar los cinco (5) días hábiles siguientes.',
+      'Reclamos: se resolverán en un término máximo de quince (15) días hábiles contados a partir del día siguiente a la fecha de recibo. Cuando no sea posible atenderlo dentro de dicho término, se informará al titular los motivos de la demora y la fecha en que se atenderá, que no podrá superar los ocho (8) días hábiles siguientes al vencimiento del primer término.',
+    ],
+  },
+  {
+    id: 'transferencia',
+    number: '11',
+    icon: 'server',
+    title: 'Transferencia y transmisión de datos personales',
+    content:
+      'Los datos personales tratados en AgroUp podrán ser transmitidos o transferidos en los siguientes casos:',
+    items: [
+      'Transmisión al Encargado (Teclook): para efectos de alojamiento, procesamiento técnico y soporte de la plataforma, bajo contrato de encargo de tratamiento que garantice el mismo nivel de protección exigido a la Secretaría.',
+      'Transferencia a terceros proveedores de pago o logística vinculados al Marketplace: únicamente los datos estrictamente necesarios para completar la transacción comercial, bajo cláusulas contractuales de confidencialidad.',
+      'Transferencia internacional de datos: en caso de que la infraestructura tecnológica (servidores en la nube) se encuentre alojada fuera de Colombia, se garantizará que el país de destino cuente con niveles adecuados de protección de datos, conforme al artículo 26 de la Ley 1581 de 2012, o se suscribirán las cláusulas contractuales correspondientes.',
+      'Entrega a autoridades competentes: cuando exista requerimiento legal, judicial o administrativo válido.',
+      'En ningún caso se transferirán datos personales a terceros con fines de comercialización publicitaria sin la autorización previa, expresa e informada del titular, conforme se detalla en la Sección 13.',
+    ],
+  },
+  {
+    id: 'inteligencia-artificial',
+    number: '12',
+    icon: 'search',
+    title: 'Tratamiento de datos mediante Inteligencia Artificial',
+    content:
+      'Los Agentes de Inteligencia Artificial Activa de AgroUp (Agente de Atención al Productor y Asistente Interno de Tramitología) procesan datos personales para brindar orientación y automatizar respuestas. En relación con este tratamiento:',
+    items: [
+      'Se informará al titular que interactúa con un sistema automatizado, sin perjuicio de la posibilidad de solicitar atención humana.',
+      'Las conversaciones podrán ser almacenadas con fines de mejora del servicio, trazabilidad y auditoría, bajo los mismos principios de seguridad y confidencialidad de esta Política.',
+      'No se tomarán decisiones que produzcan efectos jurídicos significativos sobre el titular basadas exclusivamente en tratamiento automatizado, sin posibilidad de intervención humana, en especial respecto de la asignación de incentivos o Capital Semilla.',
+    ],
+  },
+  {
+    id: 'comercializacion',
+    number: '13',
+    icon: 'shield',
+    title: 'Política de comercialización de datos y del Marketplace AgroUp',
+    content:
+      'El Marketplace AgroUp tiene como finalidad conectar productores agropecuarios con compradores institucionales, marcas y consumidores finales. En relación con la comercialización de información:',
+    items: [
+      'Los datos personales de los titulares (identificación, contacto, ubicación exacta del predio) no serán objeto de comercialización, cesión o venta a terceros con fines distintos a la operación del Marketplace, sin autorización previa, expresa e informada.',
+      'La información publicada por el productor sobre sus productos (fichas de origen, fotografías, precios, disponibilidad) se considera información comercial pública dentro de la plataforma, necesaria para la finalidad misma del Marketplace, y su visibilidad está cubierta por la autorización otorgada al momento de la publicación.',
+      'Los reportes estadísticos, indicadores agregados y análisis de mercado que Teclook o la Secretaría elaboren a partir de la información del ecosistema se presentarán de forma anonimizada o disociada, de manera que no permitan identificar a un productor individual, salvo autorización expresa para casos de reconocimiento (p. ej. sellos verdes o certificaciones de origen).',
+      'Toda alianza comercial, patrocinio o integración con terceros que implique el uso de datos personales de los usuarios del Marketplace deberá contar con autorización previa del titular y ser incorporada como una nueva finalidad en esta Política.',
+    ],
+  },
+  {
+    id: 'propiedad-intelectual',
+    number: '14',
+    icon: 'clipboard',
+    title: 'Propiedad intelectual y derechos de autor',
+    content:
+      'En relación con los contenidos, software y demás obras presentes en el ecosistema AgroUp, se establece lo siguiente, en concordancia con la Ley 23 de 1982, la Decisión Andina 351 de 1993 y el Convenio de Berna:',
+    items: [
+      'El código fuente, la arquitectura, las bases de datos relacionales y el diseño de la plataforma "AgroUp" son propiedad intelectual de Teclook, salvo que se pacte lo contrario mediante contrato de cesión o licencia de uso con la Secretaría de Agricultura y TICs.',
+      'Las marcas, logotipos y demás signos distintivos de AgroUp y Teclook se encuentran protegidos y su uso por terceros requiere autorización expresa.',
+      'El contenido generado por los productores (fotografías, descripciones y fichas de producto) conserva su titularidad en cabeza del productor, quien otorga a Teclook y a la Secretaría una licencia no exclusiva, gratuita y revocable para su reproducción y exhibición dentro del Marketplace, con el único fin de promover la comercialización de sus productos.',
+      'Los contenidos generados o sugeridos por los Agentes de Inteligencia Artificial se rigen por los términos de uso de la plataforma y no constituyen asesoría profesional vinculante, sin perjuicio de la responsabilidad de la Secretaría respecto de la información institucional que valide.',
+    ],
+  },
+  {
+    id: 'confidencialidad',
+    number: '15',
+    icon: 'shield',
+    title: 'Confidencialidad',
+    content:
+      'Teclook, sus colaboradores, y los funcionarios de la Secretaría de Agricultura y TICs que tengan acceso a datos personales o información comercial sensible del ecosistema AgroUp, se obligan a:',
+    items: [
+      'Guardar reserva y confidencialidad sobre la información conocida en desarrollo de sus funciones, incluso después de finalizada su relación contractual o laboral.',
+      'No divulgar, ceder ni utilizar la información para fines distintos a los autorizados en esta Política.',
+      'Suscribir acuerdos individuales de confidencialidad cuando su rol implique acceso a bases de datos completas o información estratégica del sector.',
+      'El incumplimiento de esta obligación dará lugar a las acciones legales, contractuales y disciplinarias a que haya lugar.',
+    ],
+  },
+  {
+    id: 'seguridad',
+    number: '16',
+    icon: 'shield',
+    title: 'Seguridad de la información',
+    content:
+      'Teclook implementará medidas técnicas, humanas y administrativas razonables para proteger los datos personales contra acceso no autorizado, pérdida, alteración o uso indebido, incluyendo:',
+    items: [
+      'Cifrado de información sensible en tránsito y en reposo.',
+      'Control de acceso basado en roles para los paneles de gestión institucional.',
+      'Copias de seguridad periódicas y protocolos de recuperación ante incidentes.',
+      'Protocolo de notificación de incidentes de seguridad a la Superintendencia de Industria y Comercio y a los titulares afectados, cuando la normativa así lo exija.',
+    ],
+  },
+  {
+    id: 'vigencia',
+    number: '17',
+    icon: 'server',
+    title: 'Vigencia de las bases de datos y conservación',
+    content:
+      'Las bases de datos de AgroUp se conservarán durante el tiempo necesario para cumplir las finalidades que justificaron su tratamiento y, posteriormente, durante los términos de prescripción legal aplicables a las obligaciones que de ellas se deriven, luego de lo cual serán suprimidas o anonimizadas, salvo obligación legal de conservación.',
+  },
+  {
+    id: 'menores',
+    number: '18',
+    icon: 'user',
+    title: 'Tratamiento de datos de menores de edad',
+    content:
+      'AgroUp no está dirigido a menores de edad. En caso de que datos de menores resulten necesarios para la caracterización de un núcleo familiar productor, su tratamiento se realizará exclusivamente con la autorización de sus representantes legales y en interés superior del menor, conforme al artículo 7 de la Ley 1581 de 2012 y al Código de la Infancia y la Adolescencia.',
+  },
+  {
+    id: 'modificaciones',
+    number: '19',
+    icon: 'clipboard',
+    title: 'Modificaciones a la política',
+    content:
+      'Esta Política podrá ser modificada en cualquier momento por el Responsable del tratamiento. Los cambios sustanciales serán informados a los titulares a través de los canales oficiales de AgroUp antes de su entrada en vigor, y cuando impliquen nuevas finalidades, se solicitará una nueva autorización.',
+  },
+  {
+    id: 'canal-contacto',
+    number: '20',
+    icon: 'mail',
+    title: 'Canal de atención y contacto',
+    content: 'Para el ejercicio de los derechos descritos en esta Política, los titulares podrán dirigirse a:',
+    items: [
+      'Secretaría de Agricultura y TICs — canal institucional de atención al ciudadano.',
+      'Teclook — Partner Tecnológico, a través de los canales de soporte técnico de la plataforma AgroUp.',
+      'Se recomienda designar formalmente un Oficial o responsable de Protección de Datos Personales, con datos de contacto públicos, conforme a las buenas prácticas exigidas por la SIC.',
+    ],
+  },
+  {
+    id: 'aceptacion',
+    number: '21',
+    icon: 'check',
+    title: 'Aceptación y vigencia',
+    content:
+      'La presente Política rige a partir de su publicación en los canales oficiales de AgroUp y aplica a toda la información personal recolectada desde dicha fecha, así como a las bases de datos existentes con anterioridad, respecto de las cuales se gestionará la autorización correspondiente conforme al régimen de transición previsto en la Ley 1581 de 2012.',
+  },
+];
+---
+
+<BaseLayout title="Política de Tratamiento de Datos Personales - AgroUp" navVariant="light">
+  <!-- Hero Section -->
+  <section class="relative overflow-hidden">
+    <img
+      src="/images/Privacidad-banner.webp"
+      alt=""
+      class="absolute inset-0 w-full h-full object-cover object-center"
+      aria-hidden="true"
+    />
+    <div class="absolute inset-0 bg-black/60"></div>
+
+    <div class="absolute top-8 right-12 text-white/5">
+      <svg width="160" height="160" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M3 21h18M9 21V10l6-6M9 21l6-12M9 21l4-8M15 21l-2 8M15 21l2-4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="absolute bottom-8 left-12 text-white/5 rotate-45">
+      <svg width="120" height="120" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M3 21h18M9 21V10l6-6M9 21l6-12M9 21l4-8M15 21l-2 8M15 21l2-4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-40 md:py-56">
+      <div class="flex flex-col items-center text-center">
+        <div class="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-gold-400 to-gold-600 rounded-2xl flex items-center justify-center shadow-lg shadow-gold-900/20 mb-6">
+          <svg class="w-8 h-8 md:w-10 md:h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+          </svg>
+        </div>
+
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
+          Política de Tratamiento de Datos Personales
+        </h1>
+        <p class="mt-4 text-lg md:text-xl text-white/90 font-light max-w-2xl drop-shadow-[0_1px_4px_rgba(0,0,0,0.4)]">
+          Ecosistema y Marketplace "AgroUp" desarrollada por Teclook.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Content Sections -->
+  <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+    <div class="space-y-8">
+      {
+        sections.map((section) => (
+          <article
+            id={section.id}
+            class="group bg-white rounded-2xl border border-[#E8E0D8] shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden"
+          >
+            <div class="flex gap-6 p-6 md:p-8">
+              <div class="hidden md:flex flex-col items-center gap-2">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-campo-50 to-campo-100 border border-campo-200 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
+                  <span class="text-sm font-bold text-campo-700">{section.number}</span>
+                </div>
+                <div class="w-px flex-1 bg-gradient-to-b from-campo-200 to-transparent"></div>
+              </div>
+
+              <div class="flex-1 min-w-0">
+                <div class="flex items-start gap-4 mb-4">
+                  <div class="w-10 h-10 rounded-lg bg-gold-50 border border-gold-200 flex items-center justify-center flex-shrink-0 md:hidden">
+                    <span class="text-xs font-bold text-gold-700">{section.number}</span>
+                  </div>
+                  <div class="flex-1">
+                    <h2 class="text-xl md:text-2xl font-display font-semibold text-campo-900">
+                      {section.title}
+                    </h2>
+                    <div class="h-0.5 w-12 bg-gradient-to-r from-gold-400 to-gold-500 rounded-full mt-2"></div>
+                  </div>
+                  <div class="hidden sm:flex w-10 h-10 rounded-lg bg-campo-50 border border-campo-200 items-center justify-center flex-shrink-0 group-hover:bg-campo-100 transition-colors">
+                    {
+                      section.icon === 'clipboard' && (
+                        <svg class="w-5 h-5 text-campo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15a2.25 2.25 0 012.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
+                        </svg>
+                      )
+                    }
+                    {
+                      section.icon === 'search' && (
+                        <svg class="w-5 h-5 text-campo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                        </svg>
+                      )
+                    }
+                    {
+                      section.icon === 'shield' && (
+                        <svg class="w-5 h-5 text-campo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                        </svg>
+                      )
+                    }
+                    {
+                      section.icon === 'server' && (
+                        <svg class="w-5 h-5 text-campo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
+                        </svg>
+                      )
+                    }
+                    {
+                      section.icon === 'check' && (
+                        <svg class="w-5 h-5 text-campo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      )
+                    }
+                    {
+                      section.icon === 'cookie' && (
+                        <svg class="w-5 h-5 text-campo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-2.625 6a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm3.75 5.25a.75.75 0 100-1.5.75.75 0 000 1.5zm3-1.5a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                        </svg>
+                      )
+                    }
+                    {
+                      section.icon === 'mail' && (
+                        <svg class="w-5 h-5 text-campo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                        </svg>
+                      )
+                    }
+                    {
+                      section.icon === 'user' && (
+                        <svg class="w-5 h-5 text-campo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                        </svg>
+                      )
+                    }
+                  </div>
+                </div>
+
+                {section.content && (
+                  <p class="text-muted leading-relaxed">{section.content}</p>
+                )}
+
+                {section.items && (
+                  <ul class="space-y-2.5 mt-3">
+                    {section.items.map((item) => {
+                      const colonIdx = item.indexOf(':');
+                      const hasLabel = colonIdx > 0 && colonIdx < 55;
+                      return (
+                        <li class="flex items-start gap-3 text-muted">
+                          <svg class="w-5 h-5 text-campo-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                          </svg>
+                          {hasLabel ? (
+                            <span class="leading-relaxed">
+                              <strong class="text-[#2D2D2D]">{item.slice(0, colonIdx + 1)}</strong>
+                              {item.slice(colonIdx + 1)}
+                            </span>
+                          ) : (
+                            <span class="leading-relaxed">{item}</span>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+
+                {section.quote && (
+                  <blockquote class="mt-5 p-5 bg-campo-50/60 border-l-4 border-campo-500 rounded-r-xl text-sm text-[#2D2D2D] italic leading-relaxed">
+                    {section.quote}
+                  </blockquote>
+                )}
+              </div>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+
+    <!-- Contact CTA -->
+    <div class="mt-8 bg-gradient-to-br from-campo-900 to-campo-800 rounded-2xl overflow-hidden shadow-xl">
+      <div class="relative p-8 md:p-10">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+        <div class="absolute bottom-0 left-0 w-48 h-48 bg-gold-500/5 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+
+        <div class="relative flex flex-col md:flex-row items-center gap-6">
+          <div class="w-16 h-16 bg-gradient-to-br from-gold-400 to-gold-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
+            </svg>
+          </div>
+
+          <div class="flex-1 text-center md:text-left">
+            <h3 class="text-2xl font-display font-bold text-white">¿Dudas sobre el tratamiento de tus datos?</h3>
+            <p class="text-white/80 mt-2">
+              Escríbenos y te atenderemos a la brevedad. También puedes ejercer tus derechos como titular de la información.
+            </p>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-3">
+            <a
+              href="https://wa.me/573001234567"
+              class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gold-500 hover:bg-gold-600 text-campo-900 font-bold rounded-xl transition-all duration-200 active:scale-[0.98] shadow-lg shadow-gold-900/20"
+            >
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+              </svg>
+              WhatsApp
+            </a>
+            <a
+              href="mailto:agroup.campo@gmail.com"
+              class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl transition-all duration-200 border border-white/20 active:scale-[0.98]"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+              </svg>
+              Correo Electrónico
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer note -->
+    <div class="mt-8 text-center">
+      <p class="text-sm text-[#9CA3AF]">
+        Al utilizar AgroUp, aceptas el tratamiento de tus datos según la Política de Tratamiento de Datos Personales.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style is:global>
+  nav#main-nav[data-variant="light"]:not(.scrolled) {
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    background: transparent;
+  }
+  body:has(nav#main-nav[data-variant="light"]) main {
+    padding-top: 0;
+  }
+</style>

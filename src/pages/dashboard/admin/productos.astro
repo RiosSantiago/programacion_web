@@ -1,0 +1,757 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout navVariant="perfil">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+      <div>
+        <div class="flex items-center gap-2 text-sm text-slate-500">
+          <a href="/dashboard" class="hover:text-emerald-600">Mi Hacienda</a>
+          <span>/</span>
+          <a href="/admin" class="hover:text-emerald-600">Admin</a>
+          <span>/</span>
+          <span class="text-slate-900 font-medium">Productos</span>
+        </div>
+        <h1 class="text-2xl font-bold text-slate-900 mt-2">Gestión de Productos</h1>
+        <p class="text-sm text-slate-500 mt-1">Administra todos los productos publicados en el marketplace</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <span id="role-badge" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-500 text-red-700 rounded-full text-xs font-bold">
+          <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+          Root
+        </span>
+        <a href="/admin" class="inline-flex items-center gap-2 px-4 py-2 border border-slate-300 text-slate-700 text-sm font-semibold rounded-lg hover:bg-slate-50 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+          Volver a Admin
+        </a>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-8">
+      <div class="bg-white rounded-xl border border-slate-200 p-4">
+        <p class="text-sm text-slate-500">Total</p>
+        <p class="text-2xl font-bold text-slate-900 mt-1" id="stats-total">0</p>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-200 p-4">
+        <p class="text-sm text-slate-500">Disponibles</p>
+        <p class="text-2xl font-bold text-emerald-600 mt-1" id="stats-disponibles">0</p>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-200 p-4">
+        <p class="text-sm text-slate-500">Vendidos</p>
+        <p class="text-2xl font-bold text-red-600 mt-1" id="stats-vendidos">0</p>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-200 p-4">
+        <p class="text-sm text-slate-500">Reservados</p>
+        <p class="text-2xl font-bold text-amber-600 mt-1" id="stats-reservados">0</p>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading-state" class="text-center py-12">
+      <svg class="animate-spin w-8 h-8 text-emerald-600 mx-auto mb-3" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+      </svg>
+      <p class="text-slate-500">Cargando productos...</p>
+    </div>
+
+    <!-- Error -->
+    <div id="error-state" class="hidden text-center py-12">
+      <svg class="w-16 h-16 text-red-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+      </svg>
+      <h3 class="text-lg font-semibold text-slate-900 mb-2">Acceso denegado</h3>
+      <p class="text-slate-500 mb-4" id="error-message">Solo administradores.</p>
+      <a href="/admin" class="inline-flex items-center px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700">Ir a Admin</a>
+    </div>
+
+    <!-- Table -->
+    <div id="table-container" class="hidden bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-slate-50 border-b border-slate-200">
+            <tr>
+              <th class="text-left px-4 py-3 font-semibold text-slate-600">Producto</th>
+              <th class="text-left px-4 py-3 font-semibold text-slate-600">Vendedor</th>
+              <th class="text-left px-4 py-3 font-semibold text-slate-600">Categoría</th>
+              <th class="text-right px-4 py-3 font-semibold text-slate-600">Precio</th>
+              <th class="text-center px-4 py-3 font-semibold text-slate-600">Stock</th>
+              <th class="text-center px-4 py-3 font-semibold text-slate-600">Estado</th>
+              <th class="text-right px-4 py-3 font-semibold text-slate-600">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="productos-tbody" class="divide-y divide-slate-500"></tbody>
+        </table>
+      </div>
+      <div id="productos-paginacion"></div>
+      <div id="empty-state" class="hidden text-center py-12">
+        <p class="text-slate-500">No hay productos en el marketplace.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Ver Detalles -->
+  <div id="view-modal" class="hidden fixed inset-0 z-50">
+    <div class="absolute inset-0 bg-black/50" onclick="cerrarViewModal()"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] sm:w-full max-w-lg bg-white rounded-2xl p-5 sm:p-6 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-bold text-slate-900">Detalles del Producto</h3>
+        <button onclick="cerrarViewModal()" class="p-1 hover:bg-slate-500 rounded">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div id="view-content" class="space-y-4"></div>
+    </div>
+  </div>
+
+  <!-- Modal Editar -->
+  <div id="edit-modal" class="hidden fixed inset-0 z-50">
+    <div class="absolute inset-0 bg-black/50" onclick="cerrarEditModal()"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] sm:w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-xl p-5 sm:p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-slate-900">Editar Producto</h2>
+        <button onclick="cerrarEditModal()" class="p-1 hover:bg-slate-500 rounded">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div id="edit-form-container"></div>
+    </div>
+  </div>
+
+</BaseLayout>
+
+<script>
+  let productos: any[] = [];
+  let editandoId: number | null = null;
+  let currentUserRole: string | null = null;
+  let editMediaState: any = null;
+
+  const PAGINA_SIZE = 20;
+  let productosTotal = 0;
+  let productosPage = 1;
+  let productosTotalPages = 1;
+  let productosReqSeq = 0;
+
+  function getHeaders(): Record<string, string> {
+    const t = localStorage.getItem('agroup_token');
+    return t ? { 'Authorization': `Bearer ${t}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
+  }
+
+  function escapeHtml(text: string) {
+    if (!text) return '';
+    const d = document.createElement('div');
+    d.textContent = text;
+    return d.innerHTML;
+  }
+
+  const estadoClass: Record<string, string> = {
+    disponible: 'bg-emerald-500 text-emerald-700',
+    vendido: 'bg-red-500 text-red-700',
+    reservado: 'bg-amber-500 text-amber-700',
+    engorde: 'bg-blue-500 text-blue-700',
+    produccion: 'bg-emerald-500 text-emerald-700',
+    levante: 'bg-purple-500 text-purple-700',
+    cria: 'bg-amber-500 text-amber-700',
+    reproduccion: 'bg-pink-500 text-pink-700',
+  };
+
+  async function checkAccess() {
+    try {
+      const res = await fetch('/api/admin/check', { headers: getHeaders() });
+      const data = await res.json();
+      if (data.admin) {
+        currentUserRole = data.user?.rol || null;
+        const badge = document.getElementById('role-badge');
+        if (badge) {
+          if (currentUserRole === 'root') {
+            badge.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-500 text-red-700 rounded-full text-xs font-bold';
+            badge.innerHTML = '<span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> Root';
+          } else {
+            badge.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-500 text-purple-700 rounded-full text-xs font-bold';
+            badge.innerHTML = '<span class="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></span> Admin';
+          }
+        }
+        cargarProductos();
+      } else {
+        document.getElementById('loading-state')!.classList.add('hidden');
+        document.getElementById('error-state')!.classList.remove('hidden');
+        document.getElementById('error-message')!.textContent = 'Solo administradores.';
+      }
+    } catch {
+      document.getElementById('loading-state')!.classList.add('hidden');
+      document.getElementById('error-state')!.classList.remove('hidden');
+      document.getElementById('error-message')!.textContent = 'Error de conexión.';
+    }
+  }
+
+  async function cargarProductos(page = productosPage) {
+    document.getElementById('loading-state')!.classList.remove('hidden');
+    document.getElementById('error-state')!.classList.add('hidden');
+    document.getElementById('table-container')!.classList.add('hidden');
+
+    try {
+      productosPage = Math.max(1, Math.floor(Number(page)) || 1);
+      const req = ++productosReqSeq;
+      const offset = (productosPage - 1) * PAGINA_SIZE;
+      const res = await fetch(`/api/admin/productos?limit=${PAGINA_SIZE}&offset=${offset}`, { headers: getHeaders() });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Error');
+      }
+      const data = await res.json();
+      if (req !== productosReqSeq) return;
+      productos = data.productos || [];
+
+      productosTotal = Number(data.total ?? productos.length);
+      productosTotalPages = Math.max(1, Math.ceil(productosTotal / PAGINA_SIZE));
+      if (productosPage > productosTotalPages) {
+        productosPage = productosTotalPages;
+        cargarProductos(productosPage);
+        return;
+      }
+
+      document.getElementById('loading-state')!.classList.add('hidden');
+
+      if (productos.length === 0) {
+        document.getElementById('table-container')!.classList.remove('hidden');
+        document.getElementById('empty-state')!.classList.remove('hidden');
+        renderProductosPaginacion();
+        return;
+      }
+      document.getElementById('empty-state')!.classList.add('hidden');
+
+      const tbody = document.getElementById('productos-tbody')!;
+      tbody.innerHTML = '';
+      productos.forEach(p => {
+        const img = p.imagenes?.[0] || p.imagen || '/images/ganado.svg';
+        const estado: string = p.estado || 'disponible';
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 transition-colors';
+        tr.innerHTML = `
+          <td class="px-4 py-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-slate-500 rounded-lg shrink-0 overflow-hidden">
+<img src="${img}" alt="" class="w-full h-full object-contain" />
+              </div>
+              <div class="min-w-0">
+                <p class="font-medium text-slate-900 truncate max-w-[220px]">${escapeHtml(p.nombre)}</p>
+                ${p.descripcion ? `<p class="text-xs text-slate-400 truncate max-w-[220px]">${escapeHtml(p.descripcion)}</p>` : ''}
+              </div>
+            </div>
+          </td>
+          <td class="px-4 py-3 text-slate-600">${escapeHtml(p.vendedor || '—')}</td>
+          <td class="px-4 py-3 text-slate-600 capitalize">${p.categoria || '—'}</td>
+          <td class="px-4 py-3 text-right font-semibold text-slate-900">$${(p.precio || 0).toLocaleString('es-CO')}</td>
+          <td class="px-4 py-3 text-center text-slate-600">${p.stock || 1}</td>
+          <td class="px-4 py-3 text-center">
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold capitalize ${estadoClass[estado] || 'bg-slate-500 text-slate-700'}">${estado}</span>
+          </td>
+          <td class="px-4 py-3 text-right">
+            <div class="flex items-center justify-end gap-1">
+              <button class="btn-view p-1.5 text-slate-400 hover:text-blue-600 transition-colors" title="Ver detalles" data-id="${p.id}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </button>
+              <button class="btn-edit p-1.5 text-slate-400 hover:text-amber-600 transition-colors" title="Editar" data-id="${p.id}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </button>
+              <a href="/marketplace/${p.id}" target="_blank" class="p-1.5 text-slate-400 hover:text-emerald-600 transition-colors" title="Ver en marketplace">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+              ${currentUserRole === 'root'
+                ? `<button class="btn-delete p-1.5 text-red-400 hover:text-red-600 transition-colors" title="Eliminar producto" data-id="${p.id}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>`
+                : `<button class="p-1.5 text-slate-300 cursor-not-allowed" title="Los administradores no pueden eliminar productos" disabled>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>`}
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.querySelectorAll('.btn-view').forEach(btn => btn.addEventListener('click', () => abrirViewModal(parseInt((btn as HTMLElement).dataset.id ?? ''))));
+      document.querySelectorAll('.btn-edit').forEach(btn => btn.addEventListener('click', () => abrirEditModal(parseInt((btn as HTMLElement).dataset.id ?? ''))));
+      document.querySelectorAll('.btn-delete').forEach(btn => btn.addEventListener('click', async () => {
+        if (!confirm('¿Eliminar este producto? Esta acción no se puede deshacer.')) return;
+        const id = parseInt((btn as HTMLElement).dataset.id ?? '');
+        try {
+          const res = await fetch(`/api/productos/${id}`, { method: 'DELETE', headers: getHeaders() });
+          if (!res.ok) { const err = await res.json(); alert(err.error || 'Error'); return; }
+          checkAccess();
+          cargarStatsProductos();
+        } catch { alert('Error al eliminar'); }
+      }));
+      document.getElementById('table-container')!.classList.remove('hidden');
+      renderProductosPaginacion();
+    } catch (err) {
+      document.getElementById('loading-state')!.classList.add('hidden');
+      document.getElementById('error-state')!.classList.remove('hidden');
+      document.getElementById('error-message')!.textContent = (err as Error).message;
+    }
+  }
+
+  async function cargarStatsProductos() {
+    // Excepción: las tarjetas de estadísticas (total/disponibles/vendidos/reservados)
+    // requieren el listado completo. El backend no soporta "todos" de forma explícita
+    // y limita `limit` a 100 (máximo por página), así que se pide ese máximo en lugar
+    // de paginar con offset. La tabla sí se pagina aparte con offset.
+    try {
+      const res = await fetch('/api/admin/productos?limit=100', { headers: getHeaders() });
+      if (!res.ok) return;
+      const data = await res.json();
+      const todos = (data.productos || []) as any[];
+      document.getElementById('stats-total')!.textContent = String(todos.length);
+      document.getElementById('stats-disponibles')!.textContent = String(todos.filter(p => p.estado === 'disponible' || !p.estado).length);
+      document.getElementById('stats-vendidos')!.textContent = String(todos.filter(p => p.estado === 'vendido').length);
+      document.getElementById('stats-reservados')!.textContent = String(todos.filter(p => p.estado === 'reservado').length);
+    } catch {}
+  }
+
+  function renderProductosPaginacion() {
+    const container = document.getElementById('productos-paginacion');
+    if (!container) return;
+    if (productosTotalPages <= 1) {
+      container.innerHTML = '';
+      return;
+    }
+
+    const startIdx = (productosPage - 1) * PAGINA_SIZE;
+    const endIdx = Math.min(startIdx + PAGINA_SIZE, productosTotal);
+
+    const pageButtons = Array.from({ length: productosTotalPages }, (_, i) => i + 1).map(pageNum => {
+      const isCurrent = pageNum === productosPage;
+      return `
+        <button data-page="${pageNum}" class="relative inline-flex items-center rounded-xl px-3.5 py-2 text-sm font-bold transition-all duration-200 font-sans ${
+          isCurrent
+            ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/15 border border-emerald-600'
+            : 'text-slate-700 hover:text-emerald-700 hover:bg-emerald-50 border border-slate-300 hover:border-emerald-300'
+        }">${pageNum}</button>
+      `;
+    }).join('');
+
+    const prevBtn = productosPage > 1
+      ? `<button data-page="${productosPage - 1}" class="relative inline-flex items-center rounded-xl px-3 py-2 text-slate-600 hover:text-emerald-700 hover:bg-emerald-50 border border-slate-300 hover:border-emerald-300 transition-all duration-200 text-sm font-semibold font-sans">
+          <svg class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.83 10l3.94 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
+          </svg>
+          Anterior
+        </button>`
+      : '';
+
+    const nextBtn = productosPage < productosTotalPages
+      ? `<button data-page="${productosPage + 1}" class="relative inline-flex items-center rounded-xl px-3 py-2 text-slate-600 hover:text-emerald-700 hover:bg-emerald-50 border border-slate-300 hover:border-emerald-300 transition-all duration-200 text-sm font-semibold font-sans">
+          Siguiente
+          <svg class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.17 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+          </svg>
+        </button>`
+      : '';
+
+    container.innerHTML = `
+      <div class="px-4 py-4 border-t border-slate-200">
+        <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+          <div>
+            <p class="text-sm text-slate-500 font-sans">
+              Mostrando <span class="font-bold text-emerald-700">${startIdx + 1}</span> a <span class="font-bold text-emerald-700">${endIdx}</span> de{' '}
+              <span class="font-bold text-emerald-700">${productosTotal}</span> productos
+            </p>
+          </div>
+          <div class="inline-flex -space-x-px rounded-xl gap-1.5">
+            ${prevBtn}
+            ${pageButtons}
+            ${nextBtn}
+          </div>
+        </div>
+        <div class="flex flex-1 justify-between sm:hidden items-center font-sans">
+          ${productosPage > 1 ? `<button data-page="${productosPage - 1}" class="relative inline-flex items-center rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all">Anterior</button>` : '<div />'}
+          <span class="text-sm text-slate-500 font-semibold">Página ${productosPage} de ${productosTotalPages}</span>
+          ${productosPage < productosTotalPages ? `<button data-page="${productosPage + 1}" class="relative inline-flex items-center rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all">Siguiente</button>` : '<div />'}
+        </div>
+      </div>
+    `;
+
+    container.querySelectorAll('button[data-page]').forEach(btn => {
+      btn.addEventListener('click', () => cargarProductos(parseInt((btn as HTMLElement).dataset.page ?? '')));
+    });
+  }
+
+  // View
+  function abrirViewModal(id: number) {
+    const p = productos.find(x => x.id === id);
+    if (!p) return;
+    const img = p.imagenes?.[0] || p.imagen || '/images/ganado.svg';
+    document.getElementById('view-content')!.innerHTML = `
+      <div class="flex gap-4">
+        <div class="w-24 h-24 bg-slate-500 rounded-xl shrink-0 overflow-hidden">
+          <img src="${img}" alt="" class="w-full h-full object-contain" />
+        </div>
+        <div class="flex-1">
+          <h4 class="text-xl font-bold text-slate-900">${escapeHtml(p.nombre)}</h4>
+          <p class="text-sm text-slate-500 capitalize mt-1">${p.categoria || '—'} ${p.raza ? '· ' + p.raza : ''}</p>
+          <p class="text-xs text-slate-400 mt-1">Vendedor: ${escapeHtml(p.vendedor || '—')} ${p.vendedor_id ? '(ID: ' + p.vendedor_id + ')' : ''}</p>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+        <div class="bg-slate-50 rounded-lg p-3">
+          <p class="text-slate-500 text-xs">Precio</p>
+          <p class="font-bold text-slate-900">$${(p.precio || 0).toLocaleString('es-CO')}</p>
+        </div>
+        <div class="bg-slate-50 rounded-lg p-3">
+          <p class="text-slate-500 text-xs">Stock</p>
+          <p class="font-semibold text-slate-700">${p.stock || 1} cabezas</p>
+        </div>
+        <div class="bg-slate-50 rounded-lg p-3">
+          <p class="text-slate-500 text-xs">Ubicación</p>
+          <p class="font-semibold text-slate-700">${escapeHtml(p.ubicacion || '—')}, ${escapeHtml(p.departamento || '—')}</p>
+        </div>
+        <div class="bg-slate-50 rounded-lg p-3">
+          <p class="text-slate-500 text-xs">Estado</p>
+          <p class="font-semibold text-slate-700 capitalize">${p.estado || 'disponible'}</p>
+        </div>
+        <div class="bg-slate-50 rounded-lg p-3">
+          <p class="text-slate-500 text-xs">Categoría</p>
+          <p class="font-semibold text-slate-700 capitalize">${p.categoria || '—'}</p>
+        </div>
+        <div class="bg-slate-50 rounded-lg p-3">
+          <p class="text-slate-500 text-xs">Peso</p>
+          <p class="font-semibold text-slate-700">${p.peso ? p.peso + ' kg' : '—'}</p>
+        </div>
+        ${p.salud ? `<div class="bg-slate-50 rounded-lg p-3"><p class="text-slate-500 text-xs">Salud</p><p class="font-semibold text-slate-700">${escapeHtml(p.salud)}</p></div>` : ''}
+        ${p.descripcion ? `<div class="col-span-2 bg-slate-50 rounded-lg p-3"><p class="text-slate-500 text-xs">Descripción</p><p class="text-slate-700 text-left">${escapeHtml(p.descripcion)}</p></div>` : ''}
+        ${p.video ? `<div class="col-span-2 bg-slate-50 rounded-lg p-3"><p class="text-slate-500 text-xs">Video</p><video src="${p.video}" controls class="w-full rounded-lg mt-1 max-h-48 object-cover"></video></div>` : ''}
+      </div>
+      <a href="/marketplace/${p.id}" target="_blank" class="block w-full text-center py-2.5 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 text-sm">Ver en Marketplace</a>
+    `;
+    document.getElementById('view-modal')!.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+  function cerrarViewModal() {
+    document.getElementById('view-modal')!.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+  (window as any).cerrarViewModal = cerrarViewModal;
+
+  // Edit
+  async function abrirEditModal(id: number) {
+    editandoId = id;
+    const container = document.getElementById('edit-form-container')!;
+    const p = productos.find(x => x.id === id);
+    if (!p) {
+      container.innerHTML = '<p class="text-red-500">Producto no encontrado</p>';
+      document.getElementById('edit-modal')!.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      return;
+    }
+
+    container.innerHTML = `
+      <form id="edit-form" class="space-y-6">
+        <div id="edit-error" class="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-600 hidden"></div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Nombre *</label>
+          <input type="text" id="e-nombre" required value="${escapeHtml(p.nombre)}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500" />
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Categoría</label>
+            <select id="e-categoria" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
+              <option value="bovinos" ${p.categoria === 'bovinos' ? 'selected' : ''}>Bovinos</option>
+              <option value="equinos" ${p.categoria === 'equinos' ? 'selected' : ''}>Equinos</option>
+              <option value="porcinos" ${p.categoria === 'porcinos' ? 'selected' : ''}>Porcinos</option>
+              <option value="ovinos" ${p.categoria === 'ovinos' ? 'selected' : ''}>Ovinos</option>
+              <option value="avicolas" ${p.categoria === 'avicolas' ? 'selected' : ''}>Avicolas</option>
+              <option value="cultivos" ${p.categoria === 'cultivos' ? 'selected' : ''}>Cultivos</option>
+              <option value="servicios" ${p.categoria === 'servicios' ? 'selected' : ''}>Servicios</option>
+              <option value="agricultura" ${p.categoria === 'agricultura' ? 'selected' : ''}>Agricultura</option>
+              <option value="insumos" ${p.categoria === 'insumos' ? 'selected' : ''}>Insumos</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Raza</label>
+            <input type="text" id="e-raza" value="${escapeHtml(p.raza || '')}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500" />
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Sexo</label>
+            <select id="e-sexo" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
+              <option value="">Seleccionar</option>
+              <option value="macho" ${(p.sexo || '') === 'macho' ? 'selected' : ''}>Macho</option>
+              <option value="hembra" ${p.sexo === 'hembra' ? 'selected' : ''}>Hembra</option>
+              <option value="mixto" ${p.sexo === 'mixto' ? 'selected' : ''}>Mixto</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Precio (COP) *</label>
+            <input type="number" id="e-precio" required value="${p.precio || ''}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Stock *</label>
+            <input type="number" id="e-stock" required value="${p.stock || '1'}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500" />
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Ubicación</label>
+            <input type="text" id="e-ubicacion" value="${escapeHtml(p.ubicacion || '')}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Departamento</label>
+            <input type="text" id="e-departamento" value="${escapeHtml(p.departamento || '')}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500" />
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Peso (kg)</label>
+            <input type="number" id="e-peso" value="${p.peso || ''}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Salud</label>
+            <select id="e-salud" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
+              <option value="Bueno" ${(p.salud || 'Bueno') === 'Bueno' ? 'selected' : ''}>Bueno</option>
+              <option value="Regular" ${p.salud === 'Regular' ? 'selected' : ''}>Regular</option>
+              <option value="Excelente" ${p.salud === 'Excelente' ? 'selected' : ''}>Excelente</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Estado</label>
+          <select id="e-estado" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
+            <option value="disponible" ${(p.estado || 'disponible') === 'disponible' ? 'selected' : ''}>Disponible</option>
+            <option value="reservado" ${p.estado === 'reservado' ? 'selected' : ''}>Reservado</option>
+            <option value="vendido" ${p.estado === 'vendido' ? 'selected' : ''}>Vendido</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Descripción <span class="text-slate-400 font-normal">(máx. 500 caracteres)</span></label>
+          <textarea id="e-descripcion" maxlength="500" rows="3" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 resize-none">${escapeHtml(p.descripcion || '')}</textarea>
+          <p class="text-xs text-slate-400 text-right mt-1" id="e-desc-count">${(p.descripcion || '').length}/500</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Fotos <span class="text-slate-400 font-normal">(opcional, máximo 5)</span></label>
+          <div id="e-existing-photos" class="flex gap-2 mb-2 flex-wrap"></div>
+          <input type="file" id="e-photos" accept="image/*" multiple class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+          <div id="e-new-photos-preview" class="flex gap-2 mt-2 flex-wrap"></div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Video <span class="text-slate-400 font-normal">(opcional)</span></label>
+          <div id="e-existing-video" class="mb-2"></div>
+          <input type="file" id="e-video" accept="video/*" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+          <div id="e-new-video-preview" class="mt-2"></div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Vendedor</label>
+            <input type="text" value="${escapeHtml(p.vendedor || '')}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-slate-50 text-slate-500" readonly />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">ID Vendedor</label>
+            <input type="text" value="${p.vendedor_id || '—'}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-slate-50 text-slate-500" readonly />
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <button type="submit" class="flex-1 py-3 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 transition-colors" id="edit-submit-btn">Guardar Cambios</button>
+          <button type="button" onclick="cerrarEditModal()" class="px-6 py-3 border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition-colors">Cancelar</button>
+        </div>
+      </form>
+    `;
+
+    document.getElementById('edit-form')!.addEventListener('submit', guardarEdicion);
+    const desc = document.getElementById('e-descripcion');
+    if (desc) {
+      desc.addEventListener('input', () => {
+        const count = document.getElementById('e-desc-count');
+        if (count) count.textContent = `${(desc as HTMLTextAreaElement).value.length}/500`;
+      });
+    }
+
+    editMediaState = {
+      existingPhotos: p.imagenes || [],
+      deletedIndices: new Set(),
+      existingVideo: p.video || '',
+      videoRemoved: false,
+    };
+
+    const exPhotosEl = document.getElementById('e-existing-photos');
+    if (exPhotosEl) {
+      exPhotosEl.innerHTML = '';
+      editMediaState.existingPhotos.forEach((url: string, i: number) => {
+        const div = document.createElement('div');
+        div.className = 'relative w-20 h-20 rounded-lg overflow-hidden border border-slate-200 group';
+        div.dataset.index = String(i);
+        div.innerHTML = '<img src="' + url + '" alt="" class="w-full h-full object-contain bg-slate-50" />' +
+          '<button type="button" class="absolute top-0.5 right-0.5 w-6 h-6 sm:w-5 sm:h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity hover:bg-red-600" data-remove-index="' + i + '">×</button>';
+        div.querySelector('[data-remove-index]')!.addEventListener('click', (e: Event) => {
+          e.stopPropagation();
+          const idx = parseInt((e.currentTarget as HTMLElement).dataset.removeIndex ?? '');
+          editMediaState.deletedIndices.add(idx);
+          div.classList.add('hidden');
+        });
+        exPhotosEl.appendChild(div);
+      });
+    }
+
+    const exVideoEl = document.getElementById('e-existing-video');
+    if (exVideoEl) {
+      exVideoEl.innerHTML = '';
+      if (editMediaState.existingVideo) {
+        exVideoEl.innerHTML = '<div class="relative rounded-lg overflow-hidden border border-slate-200 group inline-block max-w-xs">' +
+          '<video src="' + editMediaState.existingVideo + '" controls class="w-full max-h-32 object-contain bg-slate-50"></video>' +
+          '<button type="button" id="e-btn-remove-video" class="absolute top-1 right-1 w-7 h-7 sm:w-6 sm:h-6 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity hover:bg-red-600">×</button></div>';
+        document.getElementById('e-btn-remove-video')!.addEventListener('click', function() {
+          editMediaState.videoRemoved = true;
+          exVideoEl.innerHTML = '<p class="text-xs text-slate-400 italic">Video eliminado</p>';
+        });
+      }
+    }
+
+    const ePhotoInput = document.getElementById('e-photos') as HTMLInputElement;
+    if (ePhotoInput) {
+      ePhotoInput.addEventListener('change', () => {
+        const preview = document.getElementById('e-new-photos-preview')!;
+        preview.innerHTML = '';
+        Array.from(ePhotoInput.files || []).forEach(function(f) {
+          const url = URL.createObjectURL(f);
+          const div = document.createElement('div');
+          div.className = 'w-20 h-20 rounded-lg overflow-hidden border border-slate-200';
+          div.innerHTML = '<img src="' + url + '" alt="" class="w-full h-full object-contain bg-slate-50" />';
+          preview.appendChild(div);
+        });
+      });
+    }
+
+    const eVideoInput = document.getElementById('e-video') as HTMLInputElement;
+    if (eVideoInput) {
+      eVideoInput.addEventListener('change', () => {
+        const preview = document.getElementById('e-new-video-preview')!;
+        preview.innerHTML = '';
+        if (eVideoInput.files && eVideoInput.files[0]) {
+          const url = URL.createObjectURL(eVideoInput.files[0]);
+          preview.innerHTML = '<video src="' + url + '" controls class="w-full max-h-32 object-contain bg-slate-50 rounded-lg"></video>';
+        }
+      });
+    }
+
+    document.getElementById('edit-modal')!.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function cerrarEditModal() {
+    document.getElementById('edit-modal')!.classList.add('hidden');
+    document.body.style.overflow = '';
+    editandoId = null;
+    editMediaState = null;
+  }
+  (window as any).cerrarEditModal = cerrarEditModal;
+
+  async function guardarEdicion(e: Event) {
+    e.preventDefault();
+    const btn = document.getElementById('edit-submit-btn') as HTMLButtonElement;
+    const errorEl = document.getElementById('edit-error') as HTMLElement;
+    btn.disabled = true;
+    btn.textContent = 'Guardando...';
+    errorEl.classList.add('hidden');
+
+    let uploadedPhotoUrls = [];
+    let uploadedVideoUrl = '';
+
+    const photoInput = document.getElementById('e-photos') as HTMLInputElement;
+    const videoInput = document.getElementById('e-video') as HTMLInputElement;
+
+    if ((photoInput.files && photoInput.files.length > 0) || (videoInput.files && videoInput.files.length > 0)) {
+      try {
+        const uploadFormData = new FormData();
+        if (photoInput.files) {
+          for (const f of Array.from(photoInput.files).slice(0, 5)) {
+            uploadFormData.append('photos', f);
+          }
+        }
+        if (videoInput.files && videoInput.files[0]) {
+          uploadFormData.append('video', videoInput.files[0]);
+        }
+        const uploadRes = await fetch('/api/upload', { method: 'POST', body: uploadFormData });
+        if (uploadRes.ok) {
+          const uploadData = await uploadRes.json();
+          uploadedPhotoUrls = uploadData.urls || [];
+          uploadedVideoUrl = uploadData.videoUrl || '';
+        }
+      } catch (uploadErr) {
+        console.log('Error uploading files:', uploadErr);
+      }
+    }
+
+    const keptExistingPhotos = editMediaState
+      ? editMediaState.existingPhotos.filter((_: string, i: number) => !editMediaState.deletedIndices.has(i))
+      : [];
+
+    const finalImagenes = [...keptExistingPhotos, ...uploadedPhotoUrls];
+
+    let finalVideo = '';
+    if (editMediaState && editMediaState.existingVideo && !editMediaState.videoRemoved) {
+      finalVideo = editMediaState.existingVideo;
+    }
+    if (uploadedVideoUrl) {
+      finalVideo = uploadedVideoUrl;
+    }
+
+    const data = {
+      nombre: (document.getElementById('e-nombre') as HTMLInputElement).value,
+      categoria: (document.getElementById('e-categoria') as HTMLSelectElement).value,
+      raza: (document.getElementById('e-raza') as HTMLInputElement).value,
+      sexo: (document.getElementById('e-sexo') as HTMLSelectElement).value,
+      precio: parseFloat((document.getElementById('e-precio') as HTMLInputElement).value),
+      stock: parseInt((document.getElementById('e-stock') as HTMLInputElement).value),
+      ubicacion: (document.getElementById('e-ubicacion') as HTMLInputElement).value,
+      departamento: (document.getElementById('e-departamento') as HTMLInputElement).value,
+      peso: (document.getElementById('e-peso') as HTMLInputElement).value ? parseFloat((document.getElementById('e-peso') as HTMLInputElement).value) : null,
+      salud: (document.getElementById('e-salud') as HTMLSelectElement).value,
+      estado: (document.getElementById('e-estado') as HTMLSelectElement).value,
+      descripcion: ((document.getElementById('e-descripcion') as HTMLTextAreaElement)?.value || '').slice(0, 500),
+      imagenes: finalImagenes,
+      video: finalVideo,
+    };
+
+    try {
+      const res = await fetch(`/api/productos/${editandoId}`, {
+        method: 'PUT',
+        headers: getHeaders(),
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || 'Error al guardar');
+      }
+      cerrarEditModal();
+      cargarProductos();
+      cargarStatsProductos();
+    } catch (err) {
+      errorEl.textContent = (err as Error).message;
+      errorEl.classList.remove('hidden');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Guardar Cambios';
+    }
+  }
+
+  cargarProductos();
+  cargarStatsProductos();
+</script>

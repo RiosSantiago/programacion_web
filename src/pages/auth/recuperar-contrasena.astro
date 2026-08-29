@@ -1,0 +1,113 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Recuperar Contraseña - AgroUp" hideNav>
+  <div class="min-h-screen bg-[#FFFDF7] flex items-center justify-center px-4">
+    <div class="w-full max-w-md">
+      <div class="bg-white rounded-2xl border border-[#E8E0D8] shadow-sm overflow-hidden animate-card-rise">
+        <!-- Header -->
+        <div class="px-8 pt-8 pb-6 text-center border-b border-[#E8E0D8]">
+          <div class="w-14 h-14 mx-auto bg-campo-100 rounded-2xl flex items-center justify-center mb-4">
+            <svg class="w-7 h-7 text-campo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+            </svg>
+          </div>
+          <h1 class="text-xl font-bold text-[#1A0E08]">Recuperar contraseña</h1>
+          <p class="text-sm text-muted mt-2">Ingresa tu correo registrado y te enviaremos un enlace para restablecer tu contraseña.</p>
+        </div>
+
+        <!-- Form -->
+        <div class="p-8">
+          <!-- Success message (hidden by default) -->
+          <div id="success-msg" class="hidden bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center">
+            <svg class="w-10 h-10 text-emerald-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            <h3 class="text-lg font-bold text-[#1A0E08] mb-1">Correo enviado</h3>
+            <p class="text-sm text-muted" id="success-text">Si el correo está registrado, recibirás un enlace para restablecer tu contraseña.</p>
+            <a href="/auth/login" class="inline-block mt-4 text-sm font-semibold text-gold-700 hover:text-gold-800 hover:underline">Volver al inicio de sesión</a>
+          </div>
+
+          <!-- Error message -->
+          <div id="error-msg" class="hidden bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-red-600 mb-4"></div>
+
+          <!-- Email form -->
+          <form id="recovery-form" class="space-y-5">
+            <div>
+              <label class="block text-sm font-medium text-[#2D2D2D] mb-1.5">Correo electrónico</label>
+              <input
+                type="email"
+                id="recovery-email"
+                required
+                placeholder="tu@email.com"
+                class="w-full px-4 py-2.5 border border-[#E8E0D8] rounded-xl text-sm focus:ring-2 focus:ring-gold-500 focus:border-gold-500 transition-all bg-[#FFFDF7]"
+              />
+            </div>
+
+            <button
+              type="submit"
+              id="btn-submit"
+              class="w-full py-3 bg-campo-600 text-white font-semibold rounded-xl hover:bg-campo-700 transition-all active:scale-[0.98]"
+            >
+              Enviar enlace de recuperación
+            </button>
+
+            <div class="text-center">
+              <a href="/auth/login" class="text-sm text-muted hover:text-gold-700 hover:underline transition-colors">
+                ← Volver al inicio de sesión
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style is:global>
+  footer { display: none; }
+  @keyframes card-rise {
+    0% { opacity: 0; transform: translateY(40px) scale(0.97); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .animate-card-rise { animation: card-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+</style>
+
+<script>
+  document.getElementById('recovery-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = (document.getElementById('recovery-email') as HTMLInputElement).value.trim();
+    const btn = document.getElementById('btn-submit') as HTMLButtonElement;
+    const errorEl = document.getElementById('error-msg');
+    const successEl = document.getElementById('success-msg');
+    const form = document.getElementById('recovery-form');
+
+    if (!email) return;
+
+    errorEl?.classList.add('hidden');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="flex items-center justify-center gap-2"><svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> Enviando...</span>';
+
+    try {
+      const res = await fetch('/api/auth/recuperar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Error al enviar el correo');
+      }
+
+      form?.classList.add('hidden');
+      successEl?.classList.remove('hidden');
+    } catch (err: any) {
+      errorEl!.textContent = err.message;
+      errorEl?.classList.remove('hidden');
+      btn.disabled = false;
+      btn.textContent = 'Enviar enlace de recuperación';
+    }
+  });
+</script>

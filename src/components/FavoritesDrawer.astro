@@ -1,0 +1,41 @@
+---
+---
+
+<div id="favoritos-overlay" class="fixed inset-0 bg-black/40 z-40 hidden backdrop-blur-sm" onclick="cerrarFavoritos()"></div>
+
+<div id="favoritos-drawer" class="fixed top-0 right-0 h-full w-full sm:w-[28rem] bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
+  <div class="flex items-center justify-between p-5 border-b border-[#E8E0D8] bg-gradient-to-r from-campo-850 to-campo-900">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 bg-coral-500 rounded-xl flex items-center justify-center">
+        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+      </div>
+      <div>
+        <h3 class="text-lg font-display font-bold text-white">Mis Favoritos</h3>
+        <span id="favoritos-count" class="text-sm text-coral-200 font-medium">0 productos guardados</span>
+      </div>
+    </div>
+    <button onclick="cerrarFavoritos()" class="w-10 h-10 flex items-center justify-center rounded-xl text-coral-200 hover:bg-campo-800 hover:text-white transition-colors" aria-label="Cerrar favoritos">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <div id="favoritos-items" class="flex-1 overflow-y-auto p-5 space-y-4">
+    <div id="favoritos-empty" class="flex flex-col items-center justify-center h-full text-center py-12">
+      <div class="w-24 h-24 bg-[#FFFDF7] rounded-2xl flex items-center justify-center mb-6 border border-[#E8E0D8]">
+        <svg class="w-12 h-12 text-[#C4B09C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+      </div>
+      <h4 class="text-lg font-display font-bold text-[#2D2D2D] mb-2">No tienes favoritos</h4>
+      <p class="text-sm text-muted mb-6">Guarda productos que te interesen para compararlos después</p>
+      <a href="/marketplace" onclick="cerrarFavoritos()" class="btn-primary">
+        Explorar Productos
+      </a>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,419 @@
+import { queryAll, queryGet, queryRun } from '../db';
+import { generarSlug, getCategorias } from './categorias';
+
+export interface Producto {
+  id: number;
+  nombre: string;
+  categoria: string;
+  categoria_id?: number | null;
+  raza?: string | null;
+  peso?: number | null;
+  peso_unitario?: number | null;
+  ubicacion: string;
+  departamento: string;
+  precio: number;
+  precio_unitario?: number | null;
+  precio_anterior?: number | null;
+  precioAnterior?: number | null;
+  stock: number;
+  vendedor: string;
+  vendedor_id?: number | null;
+  vendedor_rating?: number | null;
+  vendedorRating?: number | null;
+  imagenes?: any;
+  imagen?: string;
+  estado?: string | null;
+  salud?: string | null;
+  envio?: boolean;
+  destacado?: boolean;
+  oferta?: boolean;
+  trazabilidad?: boolean;
+  tipo_precio?: string;
+  sexo?: string;
+  fecha_nacimiento?: string;
+  descripcion?: string;
+  created_at?: string;
+  video?: string;
+  finca?: string;
+  vereda?: string;
+  referencia_ubicacion?: string;
+  certificaciones?: string[];
+  transporte?: string;
+}
+
+function getPlaceholderImagen(categoria: string): string {
+  const imagenesCategoria: Record<string, string> = {
+    bovinos:    '/images/ganado.svg',
+    equinos:    '/images/caballo.svg',
+    porcinos:   '/images/cerdo.svg',
+    ovinos:     '/images/ganado.svg',
+    avicolas:   '/images/gallina.svg',
+    cultivos:   '/images/cultivos.svg',
+    servicios:  '/images/default.svg',
+    agricultura: '/images/cultivos.svg',
+    insumos:     '/images/default.svg',
+  };
+  return imagenesCategoria[categoria] || '/images/default.svg';
+}
+
+const ALIASES_CATEGORIA: Record<string, string> = {
+  bovino: 'bovinos',
+  equino: 'equinos',
+  porcino: 'porcinos',
+  ovino: 'ovinos',
+  avicola: 'avicolas',
+};
+
+const REVERSE_ALIASES: Record<string, string> = {};
+for (const [singular, plural] of Object.entries(ALIASES_CATEGORIA)) {
+  REVERSE_ALIASES[plural] = singular;
+}
+
+function normalizarSlugCategoria(val: unknown): string {
+  const raw = String(val ?? '').trim();
+  if (!raw) return '';
+  const base = raw.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return ALIASES_CATEGORIA[base] || base;
+}
+
+export async function getImagenesMap(productoIds: number[]): Promise<Record<number, string[]>> {
+  if (!productoIds || productoIds.length === 0) return {};
+  const rows = await queryAll<{ producto_id: number; url: string }>(
+    `SELECT producto_id, url FROM imagenes_producto WHERE producto_id IN (${productoIds.map(() => '?').join(',')}) ORDER BY orden ASC`,
+    productoIds
+  );
+  const map: Record<number, string[]> = {};
+  for (const r of rows) {
+    if (!map[r.producto_id]) map[r.producto_id] = [];
+    map[r.producto_id].push(r.url);
+  }
+  return map;
+}
+
+export async function getImagenesByProductoId(productoId: number): Promise<string[]> {
+  const rows = await queryAll<{ url: string }>(
+    'SELECT url FROM imagenes_producto WHERE producto_id = ? ORDER BY orden ASC',
+    [productoId]
+  );
+  return rows.map(r => r.url);
+}
+
+function transformarProducto(row: any, imagenesTabulares?: string[]): Producto {
+  try {
+    const imagenes: string[] = (imagenesTabulares && imagenesTabulares.length > 0) ? imagenesTabulares : [];
+    const categoria = normalizarSlugCategoria(row.categoria) || 'bovinos';
+    const { ica_pdf, ...rest } = row;
+    return {
+      ...rest,
+      categoria,
+      destacado:    Boolean(row.destacado),
+      oferta:       Boolean(row.oferta),
+      trazabilidad: Boolean(row.trazabilidad),
+      envio:        Boolean(row.envio),
+      imagenes,
+      imagen: imagenes[0] || getPlaceholderImagen(categoria),
+      video: row.video || '',
+      precioAnterior:  row.precio_anterior ?? row.precioAnterior ?? null,
+      vendedorRating:  row.vendedor_rating  ?? row.vendedorRating  ?? 4.5,
+      vendedor_id:     row.vendedor_id      ?? null,
+      certificaciones: parseCertificaciones(ica_pdf),
+    };
+  } catch {
+    return {
+      ...row,
+      categoria: normalizarSlugCategoria(row.categoria) || 'bovinos',
+      destacado: false, oferta: false, trazabilidad: false, envio: false,
+      imagenes: [],
+      imagen: getPlaceholderImagen(normalizarSlugCategoria(row.categoria) || 'bovinos'),
+      video: '',
+      precioAnterior: row.precio_anterior ?? null,
+      vendedorRating: row.vendedor_rating  ?? 4.5,
+      vendedor_id:    row.vendedor_id       ?? null,
+      certificaciones: [],
+    };
+  }
+}
+
+function parseCertificaciones(val: unknown): string[] {
+  if (!val) return [];
+  if (Array.isArray(val)) return val;
+  try {
+    const parsed = JSON.parse(String(val));
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+async function attachImagenes(rows: any[]): Promise<Producto[]> {
+  if (!rows || rows.length === 0) return [];
+  const ids = rows.map(r => r.id);
+  const imgMap = await getImagenesMap(ids);
+  return rows.map(r => transformarProducto(r, imgMap[r.id]));
+}
+
+// ---------------------------------------------------------------------------
+// SLUG → ID map (dinámico desde DB)
+// ---------------------------------------------------------------------------
+let _slugMap: Record<string, number> | null = null;
+
+async function getMapSlugToId(): Promise<Record<string, number>> {
+  if (_slugMap) return _slugMap;
+  const rows = await queryAll<{ slug: string; nombre: string; id: number }>('SELECT slug, nombre, id FROM categorias');
+  _slugMap = {};
+  for (const r of rows) {
+    const slugs = new Set<string>([r.slug, generarSlug(r.nombre)]);
+    for (const slug of slugs) {
+      if (!slug) continue;
+      _slugMap[slug] = r.id;
+      _slugMap[slug.replace(/-/g, '')] = r.id;
+    }
+  }
+  return _slugMap;
+}
+
+// ---------------------------------------------------------------------------
+// LECTURAS
+// ---------------------------------------------------------------------------
+const PRODUCTO_COLS = `
+  p.id, p.nombre, p.categoria_id, p.raza, p.peso, p.peso_unitario,
+  p.ubicacion, p.departamento, p.precio, p.precio_anterior, p.stock,
+  p.vendedor_id, p.vendedor_rating, p.estado, p.salud, p.envio,
+  p.destacado, p.oferta, p.trazabilidad, p.tipo_precio, p.sexo,
+  p.fecha_nacimiento, p.descripcion, p.video, p.finca, p.vereda,
+  p.referencia_ubicacion, p.ica_pdf, p.transporte, p.created_at
+`;
+
+export async function getProductos(): Promise<Producto[]> {
+  const rows = await queryAll(
+    `SELECT ${PRODUCTO_COLS}, u.nombre AS vendedor, COALESCE(c.slug, p.categoria) AS categoria, c.nombre AS categoria_nombre
+     FROM productos p
+     LEFT JOIN usuarios u ON p.vendedor_id = u.id
+     LEFT JOIN categorias c ON p.categoria_id = c.id
+     ORDER BY p.id DESC`
+  );
+  return attachImagenes(rows);
+}
+
+export async function getProductosDestacados(limit: number = 6): Promise<Producto[]> {
+  const rows = await queryAll(
+    `SELECT ${PRODUCTO_COLS}, u.nombre AS vendedor, COALESCE(c.slug, p.categoria) AS categoria, c.nombre AS categoria_nombre
+     FROM productos p
+     LEFT JOIN usuarios u ON p.vendedor_id = u.id
+     LEFT JOIN categorias c ON p.categoria_id = c.id
+     WHERE p.destacado = true
+     ORDER BY p.id DESC
+     LIMIT ?`,
+    [limit]
+  );
+  return attachImagenes(rows);
+}
+
+export async function getProductosRecientes(limit: number = 4): Promise<Producto[]> {
+  const rows = await queryAll(
+    `SELECT ${PRODUCTO_COLS}, u.nombre AS vendedor, COALESCE(c.slug, p.categoria) AS categoria, c.nombre AS categoria_nombre
+     FROM productos p
+     LEFT JOIN usuarios u ON p.vendedor_id = u.id
+     LEFT JOIN categorias c ON p.categoria_id = c.id
+     ORDER BY p.created_at DESC NULLS LAST, p.id DESC
+     LIMIT ?`,
+    [limit]
+  );
+  return attachImagenes(rows);
+}
+
+export async function getProductoById(id: number): Promise<Producto | undefined> {
+  if (!Number.isSafeInteger(id) || id < 1 || id > 2147483647) return undefined;
+  const row = await queryGet(
+    `SELECT ${PRODUCTO_COLS}, u.nombre AS vendedor, COALESCE(c.slug, p.categoria) AS categoria, c.nombre AS categoria_nombre
+     FROM productos p
+     LEFT JOIN usuarios u ON p.vendedor_id = u.id
+     LEFT JOIN categorias c ON p.categoria_id = c.id
+     WHERE p.id = ?`,
+    [id]
+  );
+  if (!row) return undefined;
+  const imgs = await getImagenesByProductoId(id);
+  return transformarProducto(row, imgs);
+}
+
+export async function getTotalProductos(): Promise<number> {
+  const result = await queryGet<{ count: string }>('SELECT COUNT(*) as count FROM productos');
+  return Number(result?.count ?? 0);
+}
+
+export async function getProductosByVendedorId(vendedorId: number): Promise<Producto[]> {
+  const rows = await queryAll(
+    `SELECT ${PRODUCTO_COLS}, u.nombre AS vendedor, COALESCE(c.slug, p.categoria) AS categoria, c.nombre AS categoria_nombre
+     FROM productos p
+     LEFT JOIN usuarios u ON p.vendedor_id = u.id
+     LEFT JOIN categorias c ON p.categoria_id = c.id
+     WHERE p.vendedor_id = ?
+     ORDER BY p.id DESC`,
+    [vendedorId]
+  );
+  return attachImagenes(rows);
+}
+
+// ---------------------------------------------------------------------------
+// FILTRADO
+// ---------------------------------------------------------------------------
+export async function filtrarProductos(options: {
+  categoria?:        string;
+  municipio?:        string;
+  departamento?:     string;
+  precioMin?:        number;
+  precioMax?:        number;
+  busqueda?:         string;
+  raza?:             string;
+  sexo?:             string;
+  edad?:             string;
+  tipoPrecio?:       string;
+  trazabilidad?:     string;
+  destacados?:       string;
+  fechaPublicacion?: string;
+  sortBy?:           string;
+}): Promise<Producto[]> {
+  let baseQuery = `
+    SELECT ${PRODUCTO_COLS}, u.nombre AS vendedor, COALESCE(c.slug, p.categoria) AS categoria, c.nombre AS categoria_nombre
+    FROM productos p
+    LEFT JOIN usuarios u ON p.vendedor_id = u.id
+    LEFT JOIN categorias c ON p.categoria_id = c.id
+    WHERE 1=1
+  `;
+  let query = baseQuery;
+  const params: any[] = [];
+
+  if (options.categoria && options.categoria !== 'todos') {
+    const cats = options.categoria.split(',').map(s => s.trim()).filter(Boolean);
+    if (cats.length > 0) {
+      const categorias = await getCategorias();
+      const slugTargets = cats.map(c => c.toLowerCase().replace(/-/g, ''));
+      const numericIds: number[] = [];
+      const matches = categorias.filter(c => {
+        const slugC = (c.slug || generarSlug(c.nombre)).toLowerCase().replace(/-/g, '');
+        const nombreC = (c.nombre || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        return slugTargets.includes(slugC) || slugTargets.includes(nombreC);
+      });
+      matches.forEach(m => numericIds.push(m.id));
+      const nameVariants: string[] = [];
+      matches.forEach(m => {
+        const lower = (m.nombre || '').toLowerCase();
+        const plain = lower.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        if (!nameVariants.includes(lower)) nameVariants.push(lower);
+        if (!nameVariants.includes(plain)) nameVariants.push(plain);
+        const singular = REVERSE_ALIASES[plain] || REVERSE_ALIASES[lower];
+        if (singular && !nameVariants.includes(singular)) nameVariants.push(singular);
+      });
+      const clauses: string[] = [];
+      const clauseParams: any[] = [];
+      if (numericIds.length > 0) {
+        clauses.push(`p.categoria_id IN (${numericIds.map(() => '?').join(',')})`);
+        clauseParams.push(...numericIds);
+      }
+      if (nameVariants.length > 0) {
+        clauses.push(`LOWER(p.categoria) IN (${nameVariants.map(() => '?').join(',')})`);
+        clauseParams.push(...nameVariants);
+        clauses.push(`LOWER(c.nombre) IN (${nameVariants.map(() => '?').join(',')})`);
+        clauseParams.push(...nameVariants);
+      }
+      if (clauses.length > 0) {
+        query += ` AND (${clauses.join(' OR ')})`;
+        params.push(...clauseParams);
+      } else {
+        query += ' AND 1 = 0';
+      }
+    }
+  }
+
+  if (options.municipio) {
+    const muns = options.municipio.split(',').map(s => s.trim().replace(/\s*\(capital\)/i, '')).filter(Boolean);
+    if (muns.length > 0) {
+      query += ` AND (${muns.map(() => 'p.ubicacion ILIKE ?').join(' OR ')})`;
+      muns.forEach(m => params.push(`%${m}%`));
+    }
+  }
+
+  if (options.departamento) {
+    query += ' AND p.departamento ILIKE ?';
+    params.push(`%${options.departamento}%`);
+  }
+
+  if (options.precioMin) { query += ' AND p.precio >= ?'; params.push(options.precioMin); }
+  if (options.precioMax) { query += ' AND p.precio <= ?'; params.push(options.precioMax); }
+
+  if (options.raza) {
+    query += ' AND p.raza ILIKE ?';
+    params.push(`%${options.raza}%`);
+  }
+
+  if (options.sexo) {
+    const sexos = options.sexo.split(',').map(s => s.trim()).filter(Boolean);
+    if (sexos.length > 0) {
+      query += ` AND p.sexo IN (${sexos.map(() => '?').join(',')})`;
+      params.push(...sexos);
+    }
+  }
+
+  if (options.tipoPrecio) {
+    const tipos = options.tipoPrecio.split(',').map(s => s.trim()).filter(Boolean);
+    if (tipos.length > 0) {
+      query += ` AND p.tipo_precio IN (${tipos.map(() => '?').join(',')})`;
+      params.push(...tipos);
+    }
+  }
+
+  if (options.trazabilidad === 'true') { query += ' AND p.trazabilidad = true'; }
+  if (options.destacados   === 'true') { query += ' AND p.destacado = true'; }
+
+  if (options.fechaPublicacion) {
+    const fechas = options.fechaPublicacion.split(',').map(s => s.trim()).filter(Boolean);
+    if (fechas.length > 0) {
+      const now = new Date();
+      const dateClauses: string[] = [];
+      for (const f of fechas) {
+        let dateFrom: Date | null = null;
+        if      (f === 'hoy')    dateFrom = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        else if (f === 'semana') dateFrom = new Date(now.getTime() - 7  * 24 * 60 * 60 * 1000);
+        else if (f === 'mes')    dateFrom = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        if (dateFrom) { dateClauses.push('p.created_at >= ?'); params.push(dateFrom.toISOString()); }
+      }
+      if (dateClauses.length > 0) query += ` AND (${dateClauses.join(' OR ')})`;
+    }
+  }
+
+  if (options.busqueda) {
+    const searchTerm = `%${options.busqueda.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')}%`;
+    query += ` AND (
+      p.nombre ILIKE ? OR
+      COALESCE(p.raza, '') ILIKE ? OR
+      u.nombre ILIKE ? OR
+      p.ubicacion ILIKE ? OR
+      c.nombre ILIKE ? OR
+      COALESCE(p.descripcion, '') ILIKE ?
+    )`;
+    params.push(searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm);
+  }
+
+  switch (options.sortBy) {
+    case 'precio-asc':  query += ' ORDER BY p.precio ASC';       break;
+    case 'precio-desc': query += ' ORDER BY p.precio DESC';      break;
+    case 'recientes':   query += ' ORDER BY p.created_at DESC';  break;
+    default:            query += ' ORDER BY p.id DESC';
+  }
+
+  const rows = await queryAll(query, params);
+  return attachImagenes(rows);
+}
+
+// ---------------------------------------------------------------------------
+// ESCRITURA — Gestiona exclusivamente desde los endpoints API:
+//   - publicar.ts   (creación con withTransaction)
+//   - [id].ts PUT   (edición con precio_unitario)
+// NO crear funciones de escritura en este modelo sin transacciones.
+// ---------------------------------------------------------------------------
+
+export async function eliminarProducto(id: number): Promise<boolean> {
+  const result = await queryRun('DELETE FROM productos WHERE id = ?', [id]);
+  return result.changes > 0;
+}

@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AuthPage from '../../components/auth/AuthPage';
+---
+
+<BaseLayout title="Crear Cuenta - AgroUp" hideNav>
+  <AuthPage client:load initialMode="register" googleClientId={import.meta.env.GOOGLE_CLIENT_ID} />
+</BaseLayout>
+
+<style is:global>
+  footer { display: none; }
+
+  @keyframes card-rise {
+    0% { opacity: 0; transform: translateY(40px) scale(0.97); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .animate-card-rise { animation: card-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+  @media (max-width: 767px) {
+    .max-w-\[880px\] { max-width: 400px; min-height: auto; }
+    .max-w-\[880px\] > div { transform: none !important; width: 100% !important; flex-direction: column; }
+    .max-w-\[880px\] > div > div { width: 100% !important; flex-direction: column; }
+    .max-w-\[880px\] > div > div > div:first-child { width: 100% !important; }
+    .max-w-\[880px\] > div > div > div:last-child { display: none !important; }
+  }
+</style>

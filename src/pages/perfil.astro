@@ -1,0 +1,336 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PerfilInfoForm from '../components/auth/PerfilInfoForm';
+import PasswordForm from '../components/auth/PasswordForm';
+---
+
+<BaseLayout title="Mi Perfil - AgroUp" navVariant="perfil">
+  <div class="min-h-screen bg-stone-100">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div id="perfil-content" class="hidden">
+
+        <!-- Fila superior: Mi Perfil + Contraseña (unificado) -->
+        <div class="bg-white rounded-2xl border border-[#1b3928] shadow-sm overflow-hidden mb-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0">
+
+            <!-- Mi Perfil (izquierda) -->
+            <div>
+              <div class="px-6 py-4 bg-[#1b3928] border-b border-[#1b3928]">
+                <h1 class="text-xl font-bold text-white">Mi Perfil</h1>
+                <p class="text-sm text-white/70 mt-1">Tu información pública</p>
+              </div>
+              <div class="p-8 pt-12 text-center flex flex-col items-center justify-center min-h-[320px]">
+                <div id="user-role-badge" class="hidden mb-5"></div>
+                <div class="relative w-48 h-48 mx-auto" id="avatar-wrapper">
+                  <div class="relative w-full h-full rounded-full flex items-center justify-center overflow-hidden group cursor-pointer border-4 border-white shadow-md bg-gradient-to-br from-gold-500 to-gold-700" id="avatar-container">
+                    <span class="text-6xl font-bold text-white" id="user-avatar-initial">?</span>
+                    <img id="user-avatar-img" class="hidden w-full h-full object-cover" alt="Avatar" />
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1 rounded-full" id="avatar-overlay">
+                      <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                      <span class="text-[10px] text-white font-medium">Cambiar foto</span>
+                    </div>
+                  </div>
+                  <!-- Botón eliminar foto: verde -> rojo al hover -->
+                  <button
+                    id="btn-delete-avatar"
+                    type="button"
+                    class="hidden absolute -top-1.5 -right-1.5 w-10 h-10 rounded-full text-white flex items-center justify-center shadow-md transition-all hover:scale-110 z-10"
+                    style="background-color: #1b3928;"
+                    onmouseover="this.style.backgroundColor='#DC2626'"
+                    onmouseout="this.style.backgroundColor='#1b3928'"
+                    title="Eliminar foto de perfil"
+                  >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </button>
+                </div>
+                <input type="file" accept="image/*" id="avatar-file-input" class="hidden" />
+                <h2 class="text-2xl font-bold text-[#1A0E08] mt-5" id="user-name-display"></h2>
+                <p class="text-sm text-muted mt-1" id="user-email-display"></p>
+              </div>
+            </div>
+
+            <!-- Contraseña (derecha) -->
+            <div>
+              <div class="px-6 py-4 bg-[#1b3928] border-b border-[#1b3928]">
+                <h2 class="text-lg font-bold text-white">Contraseña</h2>
+                <p class="text-sm text-white/70 mt-1">Actualiza tu contraseña de acceso</p>
+              </div>
+              <div class="p-6">
+                <PasswordForm client:load />
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Editar Información (ancho completo) -->
+        <div class="bg-white rounded-2xl border border-[#1b3928] shadow-sm overflow-hidden mb-6">
+          <div class="px-6 py-4 bg-[#1b3928] border-b border-[#1b3928]">
+            <h2 class="text-lg font-bold text-white">Editar Información</h2>
+            <p class="text-sm text-white/70 mt-1">Datos personales y de tu hacienda</p>
+          </div>
+          <div class="p-6">
+            <PerfilInfoForm client:load />
+          </div>
+        </div>
+
+        <!-- Panel de Administración (solo root/admin) -->
+        <div id="admin-section" class="hidden">
+          <div class="bg-white rounded-2xl border border-[#1b3928] shadow-sm overflow-hidden">
+            <div class="px-6 py-4 bg-[#1b3928] border-b border-[#1b3928]">
+              <h2 class="text-lg font-bold text-white">Panel de Administración</h2>
+              <p class="text-sm text-white/70 mt-1">Gestiona el marketplace</p>
+            </div>
+            <div class="p-6">
+              <a href="/admin" class="inline-flex items-center gap-2 px-5 py-2.5 bg-campo-600 text-white text-sm font-bold rounded-xl hover:bg-campo-700 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Ir a Administración
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Crop Modal -->
+  <div id="crop-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl shadow-2xl p-6 w-[90vw] max-w-md">
+      <h3 class="text-lg font-semibold text-[#1A0E08] mb-4">Ajustar foto de perfil</h3>
+      <div class="relative w-64 h-64 mx-auto rounded-2xl overflow-hidden border-2 border-[#1b3928] bg-slate-900 cursor-grab active:cursor-grabbing" id="crop-viewport">
+        <img id="crop-image" class="absolute select-none" alt="Recortar" draggable="false" />
+      </div>
+      <p class="text-xs text-muted text-center mt-3">Arrastra para mover, usa el deslizador para ajustar el tamaño</p>
+      <div class="mt-4 flex items-center gap-3">
+        <svg class="w-4 h-4 text-muted shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"/></svg>
+        <input type="range" id="crop-zoom" min="0.5" max="3" step="0.01" value="1" class="flex-1 accent-campo-600" />
+        <svg class="w-4 h-4 text-muted shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/></svg>
+      </div>
+      <div class="flex gap-3 mt-5">
+        <button id="crop-cancel" class="flex-1 py-2.5 border border-[#1b3928] text-muted font-semibold rounded-xl hover:bg-slate-50 transition-colors text-sm">Cancelar</button>
+        <button id="crop-apply" class="flex-1 py-2.5 bg-campo-600 text-white font-semibold rounded-xl hover:bg-campo-700 transition-colors text-sm">Aplicar</button>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  import { updateUser } from '../stores/auth';
+
+  const VIEWPORT_SIZE = 256;
+  let cropImgX = 0, cropImgY = 0, cropImgScale = 1;
+  let cropDragging = false, cropDragStartX = 0, cropDragStartY = 0, cropImgStartX = 0, cropImgStartY = 0;
+
+  function applyCropTransform() {
+    const img = document.getElementById('crop-image') as HTMLImageElement;
+    if (!img || !img.naturalWidth) return;
+    img.style.left = `${cropImgX}px`;
+    img.style.top = `${cropImgY}px`;
+    img.style.width = `${img.naturalWidth * cropImgScale}px`;
+    img.style.height = `${img.naturalHeight * cropImgScale}px`;
+  }
+
+  function openCropModal(src: string) {
+    const modal = document.getElementById('crop-modal');
+    const img = document.getElementById('crop-image') as HTMLImageElement;
+    const zoom = document.getElementById('crop-zoom') as HTMLInputElement;
+    if (!modal || !img) return;
+
+    img.src = src;
+    img.onload = () => {
+      const minDim = Math.min(img.naturalWidth, img.naturalHeight);
+      cropImgScale = VIEWPORT_SIZE / minDim;
+      cropImgX = (VIEWPORT_SIZE - img.naturalWidth * cropImgScale) / 2;
+      cropImgY = (VIEWPORT_SIZE - img.naturalHeight * cropImgScale) / 2;
+      zoom.value = String(cropImgScale);
+      zoom.min = String(cropImgScale * 0.3);
+      zoom.max = String(cropImgScale * 3);
+      applyCropTransform();
+    };
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeCropModal() {
+    const modal = document.getElementById('crop-modal');
+    if (modal) modal.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  function setAvatar(dataUrl: string) {
+    const img = document.getElementById('user-avatar-img') as HTMLImageElement;
+    const inicial = document.getElementById('user-avatar-initial');
+    const btnDel = document.getElementById('btn-delete-avatar');
+    if (img) { img.src = dataUrl; img.classList.remove('hidden'); }
+    if (inicial) inicial.classList.add('hidden');
+    if (btnDel) btnDel.classList.remove('hidden');
+
+    try {
+      const user = JSON.parse(localStorage.getItem('agroup_user') || '{}');
+      user.avatar = dataUrl;
+      user.logo = dataUrl;
+      localStorage.setItem('agroup_user', JSON.stringify(user));
+      updateUser(user);
+      const token = localStorage.getItem('agroup_token');
+      if (token) {
+        fetch('/api/auth/perfil', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify(user),
+        }).then(r => r.json()).then(data => {
+          if (data.token) localStorage.setItem('agroup_token', data.token);
+        }).catch(() => {});
+      }
+    } catch {}
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const raw = localStorage.getItem('agroup_user');
+    if (!raw) { window.location.href = '/auth/login'; return; }
+
+    const user = JSON.parse(raw);
+    document.getElementById('perfil-content')?.classList.remove('hidden');
+
+    // Avatar
+    const avatarEl = document.getElementById('user-avatar-initial');
+    if (avatarEl && user.nombre) avatarEl.textContent = user.nombre.charAt(0).toUpperCase();
+
+    const imgEl = document.getElementById('user-avatar-img') as HTMLImageElement;
+    const btnDeleteAvatar = document.getElementById('btn-delete-avatar');
+    if (user.avatar && imgEl) {
+      imgEl.src = user.avatar;
+      imgEl.classList.remove('hidden');
+      if (avatarEl) avatarEl.classList.add('hidden');
+      if (btnDeleteAvatar) btnDeleteAvatar.classList.remove('hidden');
+    }
+
+    // Eliminar foto de perfil
+    btnDeleteAvatar?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!confirm('¿Deseas eliminar tu foto de perfil?')) return;
+      const img = document.getElementById('user-avatar-img') as HTMLImageElement;
+      const inicial = document.getElementById('user-avatar-initial');
+      if (img) { img.src = ''; img.classList.add('hidden'); }
+      if (inicial) inicial.classList.remove('hidden');
+      btnDeleteAvatar.classList.add('hidden');
+      try {
+        const user = JSON.parse(localStorage.getItem('agroup_user') || '{}');
+        delete user.avatar;
+        delete user.logo;
+        localStorage.setItem('agroup_user', JSON.stringify(user));
+        updateUser(user);
+        const token = localStorage.getItem('agroup_token');
+        if (token) {
+          fetch('/api/auth/perfil', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify(user),
+          }).then(r => r.json()).then(data => {
+            if (data.token) localStorage.setItem('agroup_token', data.token);
+          }).catch(() => {});
+        }
+      } catch {}
+    });
+
+    // Name & email
+    const nameEl = document.getElementById('user-name-display');
+    if (nameEl) nameEl.textContent = user.nombre;
+    const emailEl = document.getElementById('user-email-display');
+    if (emailEl) emailEl.textContent = user.email;
+
+    // Role badge - solo admin/root
+    const badge = document.getElementById('user-role-badge');
+    if (badge && (user.rol === 'root' || user.rol === 'admin')) {
+      badge.classList.remove('hidden');
+      if (user.rol === 'root') {
+        badge.innerHTML = `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide text-white bg-gradient-to-r from-amber-500 to-orange-600 shadow-sm">
+          <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9.293 2.293a1 1 0 011.414 0l7 7a1 1 0 010 1.414l-7 7a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+          Root</span>`;
+      } else {
+        badge.innerHTML = `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide text-white bg-gradient-to-r from-purple-500 to-purple-700 shadow-sm">
+          <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9.293 2.293a1 1 0 011.414 0l7 7a1 1 0 010 1.414l-7 7a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+          Admin</span>`;
+      }
+    }
+
+    // Admin section - solo root/admin
+    if (user.rol === 'root' || user.rol === 'admin') {
+      document.getElementById('admin-section')?.classList.remove('hidden');
+    }
+
+    // Avatar click -> file input -> crop modal
+    const avatarContainer = document.getElementById('avatar-container');
+    const avatarInput = document.getElementById('avatar-file-input') as HTMLInputElement;
+    avatarContainer?.addEventListener('click', () => avatarInput?.click());
+    avatarInput?.addEventListener('change', () => {
+      const file = avatarInput.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => openCropModal(e.target?.result as string);
+      reader.readAsDataURL(file);
+    });
+
+    // Crop modal
+    const viewport = document.getElementById('crop-viewport');
+    const cropImg = document.getElementById('crop-image') as HTMLImageElement;
+    const zoomSlider = document.getElementById('crop-zoom') as HTMLInputElement;
+
+    viewport?.addEventListener('mousedown', (e) => {
+      cropDragging = true;
+      cropDragStartX = e.clientX; cropDragStartY = e.clientY;
+      cropImgStartX = cropImgX; cropImgStartY = cropImgY;
+      e.preventDefault();
+    });
+    document.addEventListener('mousemove', (e) => {
+      if (!cropDragging) return;
+      cropImgX = cropImgStartX + (e.clientX - cropDragStartX);
+      cropImgY = cropImgStartY + (e.clientY - cropDragStartY);
+      applyCropTransform();
+    });
+    document.addEventListener('mouseup', () => { cropDragging = false; });
+
+    viewport?.addEventListener('touchstart', (e) => {
+      cropDragging = true;
+      cropDragStartX = e.touches[0].clientX; cropDragStartY = e.touches[0].clientY;
+      cropImgStartX = cropImgX; cropImgStartY = cropImgY;
+      e.preventDefault();
+    }, { passive: false });
+    document.addEventListener('touchmove', (e) => {
+      if (!cropDragging) return;
+      cropImgX = cropImgStartX + (e.touches[0].clientX - cropDragStartX);
+      cropImgY = cropImgStartY + (e.touches[0].clientY - cropDragStartY);
+      applyCropTransform();
+    });
+    document.addEventListener('touchend', () => { cropDragging = false; });
+
+    zoomSlider?.addEventListener('input', () => {
+      const newScale = parseFloat(zoomSlider.value);
+      const centerX = VIEWPORT_SIZE / 2, centerY = VIEWPORT_SIZE / 2;
+      const imgCenterX = (centerX - cropImgX) / cropImgScale;
+      const imgCenterY = (centerY - cropImgY) / cropImgScale;
+      cropImgScale = newScale;
+      cropImgX = centerX - imgCenterX * cropImgScale;
+      cropImgY = centerY - imgCenterY * cropImgScale;
+      applyCropTransform();
+    });
+
+    document.getElementById('crop-cancel')?.addEventListener('click', closeCropModal);
+    document.getElementById('crop-apply')?.addEventListener('click', () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = VIEWPORT_SIZE; canvas.height = VIEWPORT_SIZE;
+      const ctx = canvas.getContext('2d');
+      if (!ctx || !cropImg) return;
+      const sx = -cropImgX / cropImgScale;
+      const sy = -cropImgY / cropImgScale;
+      const sw = VIEWPORT_SIZE / cropImgScale;
+      const sh = VIEWPORT_SIZE / cropImgScale;
+      ctx.drawImage(cropImg, sx, sy, sw, sh, 0, 0, VIEWPORT_SIZE, VIEWPORT_SIZE);
+      setAvatar(canvas.toDataURL('image/webp', 0.9));
+      closeCropModal();
+    });
+  });
+</script>

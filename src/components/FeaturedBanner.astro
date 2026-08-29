@@ -1,0 +1,60 @@
+---
+const ofertas = [
+  {
+    titulo: 'Oferta de la Semana',
+    subtitulo: 'Lotes de Bovinos Angus',
+    descuento: '-15%',
+    precio: 'Desde $3.800.000',
+    cta: 'Ver Ofertas',
+    href: '/?oferta=true',
+    bg: 'from-emerald-600 to-emerald-800',
+  },
+  {
+    titulo: 'Nuevos en el Marketplace',
+    subtitulo: 'Equinos de raza verificada',
+    descuento: 'NUEVO',
+    precio: 'Garanones y yeguas disponibles',
+    cta: 'Explorar',
+    href: '/?categoria=equino',
+    bg: 'from-slate-700 to-slate-900',
+  },
+  {
+    titulo: 'Cosecha Fresca',
+    subtitulo: 'Maiz y cultivos del Eje Cafetero',
+    descuento: 'DIRECTO',
+    precio: 'Sin intermediarios',
+    cta: 'Comprar Ahora',
+    href: '/?categoria=cultivos',
+    bg: 'from-amber-600 to-amber-800',
+  },
+];
+---
+
+<section class="relative overflow-hidden">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {ofertas.map((oferta, i) => (
+        <a
+          href={oferta.href}
+          class={`relative group rounded-2xl overflow-hidden bg-gradient-to-r ${oferta.bg} p-6 md:p-8 text-white hover:shadow-xl transition-all duration-300`}
+        >
+          <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-8 translate-x-8 group-hover:scale-150 transition-transform duration-500"></div>
+          <div class="relative">
+            <span class="inline-block px-3 py-1 bg-white/20 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
+              {oferta.descuento}
+            </span>
+            <h3 class="text-xl md:text-2xl font-bold">{oferta.titulo}</h3>
+            <p class="text-white/80 text-sm mt-1">{oferta.subtitulo}</p>
+            <p class="text-lg font-semibold mt-3">{oferta.precio}</p>
+            <div class="flex items-center gap-1 mt-4 text-sm font-medium text-white/90 group-hover:text-white transition-colors">
+              {oferta.cta}
+              <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>

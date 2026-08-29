@@ -1,0 +1,824 @@
+---
+// ═══════════════════════════════════════════════════════════════
+// PÁGINA DE DETALLE DE PRODUCTO — Marketplace Agroup
+// Lógica de backend intacta. Solo se rediseñó el HTML/CSS.
+// Estilo: Verde natural / agrícola colombiano con fondo cálido y texto amplio
+// ═══════════════════════════════════════════════════════════════
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PhotoCarousel from '../../components/marketplace/PhotoCarousel';
+import TraceabilityBlock from '../../components/marketplace/TraceabilityBlock';
+import QRTrazabilidad from '../../components/marketplace/QRTrazabilidad';
+import WhatsAppButton from '../../components/marketplace/WhatsAppButton';
+import '../../lib/db';
+import { getProductos, getProductoById } from '../../lib/models/productos.js';
+
+const slug = Astro.params.slug;
+const producto = slug ? await getProductoById(parseInt(slug)) : undefined;
+
+const vendedorNombre = producto?.vendedor || 'Hacienda Verde';
+const vendedorInicial = vendedorNombre[0] || 'H';
+const vendedorRating = producto?.vendedorRating || 4.5;
+const hashVendedor = vendedorNombre.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+const ventasDemo = 5 + (hashVendedor % 200);
+const badgeDemo = ventasDemo > 100 ? 'top' : ventasDemo > 20 ? 'verificado' : 'nuevo';
+
+const tieneDescuento = producto?.precioAnterior && producto.precioAnterior > producto.precio;
+const descuento = tieneDescuento ? Math.round((1 - producto.precio / producto.precioAnterior!) * 100) : 0;
+
+const esLote = (producto?.stock || 1) > 1;
+const precioUnitario = producto?.precio_unitario || (esLote && producto?.precio ? Math.round(producto.precio / (producto.stock || 1)) : producto?.precio);
+
+const badgeInfo: Record<string, { label: string; class: string; icon: string }> = {
+  top: { label: 'Top Vendedor', class: 'bg-gradient-to-r from-gold-400 to-gold-500 text-white shadow-sm', icon: '★' },
+  verificado: { label: 'Verificado', class: 'bg-campo-600 text-white', icon: '✓' },
+  nuevo: { label: 'Nuevo', class: 'bg-blue-500 text-white', icon: '◆' },
+};
+
+const catLower = producto?.categoria?.toLowerCase() || 'bovinos';
+
+const categoriaLabels: Record<string, string> = {
+  bovinos: 'Bovinos',
+  equinos: 'Equinos',
+  porcinos: 'Porcinos',
+  ovinos: 'Ovinos',
+  avicolas: 'Avícolas',
+  agricultura: 'Agricultura',
+  insumos: 'Insumos',
+};
+const categoriaLabel = categoriaLabels[catLower] || producto?.categoria || 'Bovino';
+
+const esAgricola = ['agricultura', 'insumos'].includes(catLower);
+const tipsSeguridad = esAgricola ? [
+  { titulo: 'Verificación del Producto', texto: 'Solicita fotos o video recientes y verifica la fecha de cosecha o procesamiento y el estado del empaque antes de cerrar la compra.' },
+  { titulo: 'Calidad y Trazabilidad', texto: 'Pregunta por certificaciones de origen, registros sanitarios y análisis de calidad del café, cacao o aguacate antes del pago.' },
+  { titulo: 'Condiciones de Pago y Entrega', texto: 'Acuerda el método de envío y prefiere el pago contra entrega; evita consignaciones completas por adelantado.' },
+] : [
+  { titulo: 'Verificación de Finca', texto: 'Visita el predio o solicita una videollamada para comprobar el estado real del animal.' },
+  { titulo: 'Guías de Movilización', texto: 'Asegúrate de revisar los registros de vacunación, guías sanitarias e ICA oficiales antes del traslado.' },
+  { titulo: 'Condiciones de Pago', texto: 'No realices transacciones completas hasta pactar la entrega física del ganado.' },
+];
+---
+
+<BaseLayout navVariant="market">
+  {producto ? (
+
+  <div
+    class="min-h-screen font-sans"
+    style="background: linear-gradient(160deg, #FDFBF7 0%, #F5ECE0 50%, #EAE0CD 100%);"
+    data-producto-id={producto.id}
+    data-producto-nombre={producto.nombre}
+    data-vendedor-id={producto.vendedor_id || ''}
+  >
+
+    <!-- ══ Franja verde superior decorativa ══ -->
+    <div class="h-2 w-full" style="background: linear-gradient(90deg, #1A3828, #2D5A3D, #4A7C5A, #C9A84C, #2D5A3D, #1A3828);"></div>
+
+    <!-- ══ Breadcrumb ══ -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-2">
+      <nav class="flex items-center gap-2 text-base" aria-label="Breadcrumb">
+        <a href="/" class="text-[#2D5A3D] hover:text-[#1A3828] font-semibold transition-colors">Inicio</a>
+        <span class="text-[#A8C4A8]">/</span>
+        <a href="/marketplace" class="text-[#2D5A3D] hover:text-[#1A3828] font-semibold transition-colors">Marketplace</a>
+        <span class="text-[#A8C4A8]">/</span>
+        <span class="text-[#1A3828] font-bold truncate max-w-[180px] sm:max-w-xs">{producto.nombre}</span>
+      </nav>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════
+         GRID PRINCIPAL
+    ══════════════════════════════════════════════════ -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-5 pb-8">
+      <div class="grid grid-cols-1 xl:grid-cols-[1fr_440px] gap-8 items-start">
+
+        <!-- ════ IZQUIERDA: Galería ════ -->
+        <div class="space-y-4">
+          <!-- Card galería con borde verde sutil -->
+          <div class="bg-white rounded-2xl overflow-hidden shadow-md" style="border: 1.5px solid #C8DCC8;">
+            <!-- Cabecera de la galería -->
+            <div class="flex items-center justify-between px-5 py-3" style="background: linear-gradient(90deg, #1A3828, #2D5A3D); border-bottom: 1px solid #1A3828;">
+              <div class="flex items-center gap-2">
+                <div class="w-5 h-5 text-[#C9A84C]">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                  </svg>
+                </div>
+                <span class="text-white text-sm font-bold tracking-wider uppercase">Galería multimedia</span>
+              </div>
+              <span class="text-[#A8C4A8] text-xs font-semibold">Desliza para ver más</span>
+            </div>
+            <!-- Carousel con padding interior -->
+            <div class="p-5">
+              <PhotoCarousel
+                client:load
+                fotos={producto.imagenes || [producto.imagen || '/images/ganado.svg']}
+                videoUrl={producto.video || undefined}
+                productoId={producto.id}
+                nombre={producto.nombre}
+                precio={producto.precio}
+                vendedor={vendedorNombre}
+                ubicacion={producto.ubicacion || ''}
+                categoria={producto.categoria || ''}
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- ════ DERECHA: Panel de detalles ════ -->
+        <div class="space-y-5">
+
+          <!-- ── Badges de estado ── -->
+          <div class="flex items-center gap-2 flex-wrap">
+            <!-- Estado del animal -->
+            <span
+              class={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-extrabold tracking-wide uppercase ${
+                producto.estado === 'reservado' ? 'text-amber-900' :
+                producto.estado === 'vendido'   ? 'text-red-900'   :
+                'text-[#1A3828]'
+              }`}
+              style={`background: ${
+                producto.estado === 'reservado' ? '#FEF3C7' :
+                producto.estado === 'vendido'   ? '#FEE2E2' :
+                '#D1EDCF'
+              }; border: 1.5px solid ${
+                producto.estado === 'reservado' ? '#F59E0B' :
+                producto.estado === 'vendido'   ? '#EF4444' :
+                '#2D5A3D'
+              };`}
+            >
+              <!-- Punto de estado animado -->
+              <span
+                class="w-2 h-2 rounded-full animate-pulse inline-block"
+                style={`background: ${
+                  producto.estado === 'reservado' ? '#F59E0B' :
+                  producto.estado === 'vendido'   ? '#EF4444' :
+                  '#2D5A3D'
+                };`}
+              ></span>
+              {producto.estado === 'reservado' ? 'Reservado' :
+               producto.estado === 'vendido'   ? 'Vendido'   : 'Disponible'}
+            </span>
+
+            <!-- Categoría con ícono de animal — silueta de perfil -->
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-lg text-xs font-extrabold text-[#2D5A3D] uppercase tracking-wide" style="border: 1.5px solid #C8DCC8;">
+
+              {['bovinos', 'equinos', 'porcinos', 'ovinos', 'avicolas'].includes(catLower) ? (
+                <img
+                  src={`/images/categories/${catLower}.webp`}
+                  alt={producto.categoria}
+                  class="w-6 h-6 object-contain shrink-0"
+                />
+              ) : catLower === 'agricultura' ? (
+                <svg width="22" height="22" viewBox="0 0 64 64" fill="none" stroke="#2D5A3D" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0">
+                  <path d="M32 56 L32 28"/>
+                  <path d="M32 40 Q20 34 12 20 Q26 16 36 28"/>
+                  <path d="M32 32 Q44 26 52 12 Q38 8 28 20"/>
+                </svg>
+              ) : (
+                <svg width="22" height="22" viewBox="0 0 64 64" fill="none" stroke="#2D5A3D" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0">
+                  <path d="M32 8 L56 20 L56 44 L32 56 L8 44 L8 20 Z"/>
+                  <path d="M8 20 L32 32 L56 20"/>
+                  <path d="M32 32 L32 56"/>
+                </svg>
+              )}
+
+              {categoriaLabel}
+            </span>
+
+            <!-- Destacado -->
+            {producto.destacado && (
+              <span class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-bold text-[#6B4A0A]" style="background: #FEF3C7; border: 1.5px solid #C9A84C;">
+                <svg class="w-3.5 h-3.5 text-[#C9A84C]" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                </svg>
+                Destacado
+              </span>
+            )}
+
+            <!-- Oferta -->
+            {producto.oferta && tieneDescuento && (
+              <span class="inline-flex items-center gap-1 px-3.5 py-2 rounded-lg text-xs font-extrabold text-white" style="background: #C0392B;">
+                -{descuento}% OFF
+              </span>
+            )}
+
+            <!-- Trazabilidad -->
+            {producto.trazabilidad && (
+              <span class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-bold text-[#1A3828]" style="background: #D1EDCF; border: 1px solid #4A7C5A;">
+                <svg class="w-3.5 h-3.5 text-[#2D5A3D]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Con trazabilidad
+              </span>
+            )}
+          </div>
+
+          <!-- ── Nombre del producto — letra aumentada ── -->
+          <div style="border-left: 5px solid #2D5A3D; padding-left: 16px;">
+            <h1 class="text-4xl md:text-5xl font-black leading-tight tracking-tight" style="color: #1A3828;">
+              {producto.nombre}
+            </h1>
+            {(producto.raza || producto.departamento) && (
+              <p class="mt-2 text-base md:text-lg font-semibold" style="color: #4A7C5A;">
+                {[producto.raza, producto.departamento].filter(Boolean).join(' · ')}
+              </p>
+            )}
+          </div>
+
+          <!-- ── Precio — fondo verde oscuro ── -->
+          <div class="rounded-2xl p-6 text-white relative overflow-hidden" style="background: linear-gradient(135deg, #1A3828 0%, #2D5A3D 60%, #1E4430 100%); box-shadow: 0 4px 15px rgba(26,56,40,0.15);">
+            <!-- Textura de hoja decorativa -->
+            <div class="absolute -right-6 -top-6 w-32 h-32 rounded-full opacity-5" style="background: #C9A84C;"></div>
+            <div class="absolute -left-4 -bottom-8 w-24 h-24 rounded-full opacity-5" style="background: #C9A84C;"></div>
+            <!-- Línea decorativa dorada -->
+            <div class="absolute top-0 left-0 right-0 h-0.5" style="background: linear-gradient(90deg, transparent, #C9A84C, transparent);"></div>
+
+            <div class="relative flex items-end justify-between gap-4">
+              <div>
+                <p class="text-sm font-bold uppercase tracking-widest mb-1.5" style="color: #C9A84C;">Precio de venta</p>
+                {tieneDescuento && (
+                  <p class="text-white/40 text-base line-through mb-0.5">${producto.precioAnterior?.toLocaleString('es-CO')}</p>
+                )}
+                <p class="text-5xl font-black tracking-tight leading-none">
+                  ${producto.precio.toLocaleString('es-CO')}
+                </p>
+                <p class="text-white/50 text-sm mt-2">Pesos colombianos · COP</p>
+              </div>
+              <!-- Stock -->
+              <div class="shrink-0 text-center rounded-xl px-5 py-3.5" style="background: rgba(255,255,255,0.08); border: 1.5px solid rgba(255,255,255,0.12);">
+                <p class="text-3xl font-black leading-none" style="color: #C9A84C;">{producto.stock || 1}</p>
+                <p class="text-white/55 text-xs mt-1.5 leading-tight font-medium">
+                  {producto.stock === 1 ? 'cabeza' : 'cabezas'}<br/>
+                  disponible{(producto.stock || 1) !== 1 ? 's' : ''}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── Precio Unitario por Animal (solo para lotes) ── -->
+          {esLote && (
+            <div class="rounded-2xl p-4 bg-[#F4F9F4] flex items-center justify-between transition-all" style="border: 1.5px solid #C8DCC8; box-shadow: 0 2px 8px rgba(26,56,40,0.04);">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background: rgba(45,90,61,0.1); color: #2D5A3D;">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                  </svg>
+                </div>
+                <div>
+                  <p class="text-xs font-bold uppercase tracking-wider text-[#4A7C5A]">Precio por animal / cabeza</p>
+                  <p class="text-xs text-[#2D5A3D]/70 font-medium">Lote de {producto.stock} cabezas</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <p class="text-2xl font-black tracking-tight" style="color: #1A3828;">
+                  ${precioUnitario?.toLocaleString('es-CO')}
+                </p>
+                <p class="text-[11px] font-semibold text-[#4A7C5A]">COP / cabeza</p>
+              </div>
+            </div>
+          )}
+
+          <!-- ── Vendedor ── -->
+          <div class="bg-white rounded-2xl p-5" style="border: 1.5px solid #C8DCC8; box-shadow: 0 3px 10px rgba(26,56,40,0.07);">
+            <div class="flex items-center gap-4">
+              <!-- Avatar -->
+              <div class="w-14 h-14 rounded-xl flex items-center justify-center text-white text-2xl font-bold shrink-0 shadow-sm" style="background: linear-gradient(135deg, #2D5A3D, #1A3828);">
+                {vendedorInicial}
+              </div>
+              <!-- Datos -->
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h3 class="font-extrabold text-base" style="color: #1A3828;">{vendedorNombre}</h3>
+                  <span class={`px-2 py-0.5 rounded text-[10px] font-bold ${badgeInfo[badgeDemo].class}`}>
+                    {badgeInfo[badgeDemo].icon} {badgeInfo[badgeDemo].label}
+                  </span>
+                </div>
+                <div class="flex items-center gap-2 mt-1.5">
+                  <div class="flex gap-0.5">
+                    {[...Array(5)].map((_, i) => (
+                      <svg
+                        class="w-4 h-4"
+                        fill={i < Math.floor(vendedorRating) ? '#C9A84C' : '#D8E8D4'}
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                      </svg>
+                    ))}
+                  </div>
+                  <span class="text-base font-bold" style="color: #1A3828;">{vendedorRating.toFixed(1)}</span>
+                  <span class="text-sm font-medium" style="color: #4A7C5A;">({ventasDemo} ventas)</span>
+                </div>
+              </div>
+              <!-- Verificado -->
+              <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0 shadow-sm" style="background: #D1EDCF; border: 1.5px solid #4A7C5A;">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="#2D5A3D" viewBox="0 0 24 24" stroke-width="2.8">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── Botones de acción ── -->
+          <div class="flex gap-3">
+            <!-- Agregar al carrito -->
+            <button
+              id="btn-agregar-carrito"
+              class="agregar-carrito-btn group flex-1 inline-flex items-center justify-center gap-2.5 px-6 py-4 font-bold rounded-xl text-white text-base shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl active:scale-[0.97]"
+              style="background: linear-gradient(135deg, #1A3828, #2D5A3D);"
+              data-id={producto.id}
+              data-nombre={producto.nombre}
+              data-precio={producto.precio}
+              data-imagen={producto.imagen || '/images/ganado.svg'}
+              data-vendedor={vendedorNombre}
+            >
+              <svg class="w-5 h-5 group-hover:scale-110 transition-transform duration-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+              </svg>
+              Agregar al carrito
+            </button>
+            <!-- WhatsApp -->
+            <WhatsAppButton client:load nombreProducto={producto.nombre} precio={producto.precio} />
+          </div>
+
+          <!-- ── Especificaciones técnicas con íconos SVG ── -->
+          <div class="bg-white rounded-2xl overflow-hidden" style="border: 1.5px solid #C8DCC8; box-shadow: 0 3px 10px rgba(26,56,40,0.06);">
+            <!-- Cabecera -->
+            <div class="flex items-center gap-2.5 px-5 py-4" style="background: linear-gradient(90deg, #f0f7f0, #fff); border-bottom: 1px solid #C8DCC8;">
+              <svg class="w-5 h-5" fill="none" stroke="#2D5A3D" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+              </svg>
+              <h3 class="font-extrabold text-base" style="color: #1A3828;">Ficha técnica</h3>
+            </div>
+
+            <!-- Filas de especificaciones -->
+            <div class="divide-y" style="divide-color: #EDF5ED;">
+
+              <!-- Raza -->
+              {producto.raza && (
+                <div class="flex items-center gap-3.5 px-5 py-4 group hover:bg-[#F5FBF5] transition-colors">
+                  <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background: #EAF4EA; border: 1px solid #C8DCC8;">
+                    <svg class="w-5 h-5" fill="none" stroke="#2D5A3D" viewBox="0 0 24 24" stroke-width="1.8">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                    </svg>
+                  </div>
+                  <span class="text-sm font-bold w-16 shrink-0" style="color: #4A7C5A;">Raza</span>
+                  <span class="font-bold text-base ml-auto text-right max-w-[55%]" style="color: #1A3828;">{producto.raza}</span>
+                </div>
+              )}
+
+              <!-- Sexo -->
+              {producto.sexo && (
+                <div class="flex items-center gap-3.5 px-5 py-4 group hover:bg-[#F5FBF5] transition-colors">
+                  <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background: #EAF4EA; border: 1px solid #C8DCC8;">
+                    <svg class="w-5 h-5" fill="none" stroke="#2D5A3D" viewBox="0 0 24 24" stroke-width="1.8">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                  </div>
+                  <span class="text-sm font-bold w-16 shrink-0" style="color: #4A7C5A;">Sexo</span>
+                  <span class="font-bold text-base ml-auto capitalize" style="color: #1A3828;">{producto.sexo}</span>
+                </div>
+              )}
+
+              <!-- Certificaciones -->
+              {producto.certificaciones && producto.certificaciones.length > 0 && (
+                <div class="flex items-center gap-3.5 px-5 py-4 group hover:bg-[#F5FBF5] transition-colors">
+                  <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background: #EAF4EA; border: 1px solid #C8DCC8;">
+                    <svg class="w-5 h-5" fill="none" stroke="#2D5A3D" viewBox="0 0 24 24" stroke-width="1.8">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                  </div>
+                  <span class="text-sm font-bold w-24 shrink-0" style="color: #4A7C5A;">Certificaciones</span>
+                  <div class="flex flex-wrap gap-2 ml-auto">
+                    {producto.certificaciones.map((certUrl: string) => (
+                      <a href={certUrl} target="_blank" rel="noopener noreferrer" class="font-bold text-sm text-emerald-700 hover:text-emerald-600 underline truncate max-w-[180px]">
+                        Ver certificado
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <!-- Peso -->
+              {producto.peso && (
+                <div class="flex items-center gap-3.5 px-5 py-4 group hover:bg-[#F5FBF5] transition-colors">
+                  <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background: #EAF4EA; border: 1px solid #C8DCC8;">
+                    <svg class="w-5 h-5" fill="none" stroke="#2D5A3D" viewBox="0 0 24 24" stroke-width="1.8">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/>
+                    </svg>
+                  </div>
+                  <span class="text-sm font-bold w-16 shrink-0" style="color: #4A7C5A;">Peso</span>
+                  <span class="font-bold text-base ml-auto" style="color: #1A3828;">{producto.peso} kg</span>
+                </div>
+              )}
+
+              <!-- Estado -->
+              {producto.estado && (
+                <div class="flex items-center gap-3.5 px-5 py-4 group hover:bg-[#F5FBF5] transition-colors">
+                  <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background: #EAF4EA; border: 1px solid #C8DCC8;">
+                    <svg class="w-5 h-5" fill="none" stroke="#2D5A3D" viewBox="0 0 24 24" stroke-width="1.8">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                    </svg>
+                  </div>
+                  <span class="text-sm font-bold w-16 shrink-0" style="color: #4A7C5A;">Estado</span>
+                  <span class="font-bold text-base ml-auto capitalize" style="color: #1A3828;">{producto.estado}</span>
+                </div>
+              )}
+
+              <!-- Salud -->
+              {producto.salud && !esAgricola && (
+                <div class="flex items-center gap-3.5 px-5 py-4 group hover:bg-[#F5FBF5] transition-colors">
+                  <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background: #EAF4EA; border: 1px solid #C8DCC8;">
+                    <svg class="w-5 h-5" fill="none" stroke="#2D5A3D" viewBox="0 0 24 24" stroke-width="1.8">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                    </svg>
+                  </div>
+                  <span class="text-sm font-bold w-16 shrink-0" style="color: #4A7C5A;">Salud</span>
+                  <span class="font-bold text-base ml-auto" style="color: #1A3828;">{producto.salud}</span>
+                </div>
+              )}
+
+              <!-- Ubicación -->
+              {producto.ubicacion && (
+                <div class="flex items-center gap-3.5 px-5 py-4 group hover:bg-[#F5FBF5] transition-colors">
+                  <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background: #EAF4EA; border: 1px solid #C8DCC8;">
+                    <svg class="w-5 h-5" fill="none" stroke="#2D5A3D" viewBox="0 0 24 24" stroke-width="1.8">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                  </div>
+                  <span class="text-sm font-bold w-16 shrink-0" style="color: #4A7C5A;">Ubicación</span>
+                  <span class="font-bold text-base ml-auto text-right max-w-[60%]" style="color: #1A3828;">{producto.ubicacion}, {producto.departamento || 'Caldas'}</span>
+                </div>
+              )}
+
+              <!-- Finca -->
+              {producto.finca && (
+                <div class="flex items-center gap-3.5 px-5 py-4 group hover:bg-[#F5FBF5] transition-colors">
+                  <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background: #EAF4EA; border: 1px solid #C8DCC8;">
+                    <svg class="w-5 h-5" fill="none" stroke="#2D5A3D" viewBox="0 0 24 24" stroke-width="1.8">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                  </div>
+                  <span class="text-sm font-bold w-16 shrink-0" style="color: #4A7C5A;">Finca</span>
+                  <span class="font-bold text-base ml-auto text-right max-w-[60%]" style="color: #1A3828;">{producto.finca}</span>
+                </div>
+              )}
+
+              <!-- Vereda -->
+              {producto.vereda && (
+                <div class="flex items-center gap-3.5 px-5 py-4 group hover:bg-[#F5FBF5] transition-colors">
+                  <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background: #EAF4EA; border: 1px solid #C8DCC8;">
+                    <svg class="w-5 h-5" fill="none" stroke="#2D5A3D" viewBox="0 0 24 24" stroke-width="1.8">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+                    </svg>
+                  </div>
+                  <span class="text-sm font-bold w-16 shrink-0" style="color: #4A7C5A;">Vereda</span>
+                  <span class="font-bold text-base ml-auto text-right max-w-[60%]" style="color: #1A3828;">{producto.vereda}</span>
+                </div>
+              )}
+
+              <!-- Referencia -->
+              {producto.referencia_ubicacion && (
+                <div class="flex items-center gap-3.5 px-5 py-4 group hover:bg-[#F5FBF5] transition-colors">
+                  <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background: #EAF4EA; border: 1px solid #C8DCC8;">
+                    <svg class="w-5 h-5" fill="none" stroke="#2D5A3D" viewBox="0 0 24 24" stroke-width="1.8">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                  </div>
+                  <span class="text-sm font-bold w-16 shrink-0" style="color: #4A7C5A;">Referencia</span>
+                  <span class="font-bold text-base ml-auto text-right max-w-[60%]" style="color: #1A3828;">{producto.referencia_ubicacion}</span>
+                </div>
+              )}
+
+              <!-- Envío -->
+              {producto.envio && (
+                <div class="flex items-center gap-3.5 px-5 py-4 group hover:bg-[#F5FBF5] transition-colors">
+                  <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background: #EAF4EA; border: 1px solid #C8DCC8;">
+                    <svg class="w-5 h-5" fill="none" stroke="#2D5A3D" viewBox="0 0 24 24" stroke-width="1.8">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M8 6H5a2 2 0 00-2 2v6a2 2 0 002 2h1m14-8h-5m0 0l-3-3m3 3v8m0 0H9m0 0H8m1 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"/>
+                    </svg>
+                  </div>
+                  <span class="text-sm font-bold w-16 shrink-0" style="color: #4A7C5A;">Envío</span>
+                  <span class="font-bold text-base ml-auto" style="color: #2D5A3D;">Disponible</span>
+                </div>
+              )}
+
+              <!-- Transporte -->
+              <div class="flex items-center gap-3.5 px-5 py-4 group hover:bg-[#F5FBF5] transition-colors">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background: #EAF4EA; border: 1px solid #C8DCC8;">
+                  <svg class="w-5 h-5" fill="none" stroke="#2D5A3D" viewBox="0 0 24 24" stroke-width="1.8">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0zM14.5 8V5a1 1 0 00-1-1H3a1 1 0 00-1 1v9a1 1 0 001 1h2.05M14.5 8h3.55a1 1 0 01.95.68l1.32 3.95a1 1 0 01.05.32V17a1 1 0 01-1 1h-1.4M14.5 8v9m0 0H9.95"/>
+                  </svg>
+                </div>
+                <span class="text-sm font-bold w-16 shrink-0" style="color: #4A7C5A;">Transporte</span>
+                <span class="font-bold text-base ml-auto" style="color: #2D5A3D;">
+                  {producto.transporte === 'agroup' ? 'AgroUp lo transporta' : 'El vendedor lo transporta'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── Widget de calificación ── -->
+          <div class="rounded-2xl p-5" style="background: linear-gradient(135deg, #f5fbf5, #eef6ee); border: 1.5px solid #C8DCC8;">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background: #D1EDCF; border: 1px solid #4A7C5A;">
+                <svg class="w-6 h-6" fill="#C9A84C" viewBox="0 0 24 24">
+                  <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-extrabold text-sm" style="color: #1A3828;">¿Completaste una transacción?</h3>
+                <p class="text-xs mt-0.5 font-medium" style="color: #4A7C5A;">Califica al vendedor y ayuda a la comunidad</p>
+              </div>
+            </div>
+
+            <!-- Estrellas -->
+            <div id="rating-section" class="flex items-center gap-3">
+              <div class="flex items-center gap-1.5" id="rating-stars">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    class="rating-star w-9 h-9 hover:scale-110 active:scale-95 transition-all duration-150"
+                    style="color: #D8E8D4;"
+                    data-star={star}
+                    aria-label={`Calificar con ${star} estrella${star > 1 ? 's' : ''}`}
+                  >
+                    <svg class="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                    </svg>
+                  </button>
+                ))}
+              </div>
+              <span id="rating-text" class="text-xs font-semibold italic" style="color: #4A7C5A;">Toca para calificar</span>
+            </div>
+
+            <!-- Agradecimiento -->
+            <div id="rating-thanks" class="hidden bg-white rounded-xl p-5 text-center mt-2" style="border: 1px solid #C8DCC8;">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2.5" style="background: #D1EDCF;">
+                <svg class="w-6 h-6 shrink-0" fill="none" stroke="#2D5A3D" viewBox="0 0 24 24" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+              </div>
+              <p class="font-extrabold text-sm" style="color: #1A3828;">Gracias por tu calificación</p>
+              <p class="text-xs font-medium mt-1.5" style="color: #4A7C5A;">Tu opinión construye la comunidad ganadera.</p>
+            </div>
+          </div>
+
+          <!-- ── Reportar ── -->
+          <div class="text-center pb-2">
+            <button id="btn-reportar" class="inline-flex items-center gap-2 text-xs font-semibold transition-colors duration-200" style="color: rgba(74,124,90,0.6);"
+              onmouseover="this.style.color='#C0392B'" onmouseout="this.style.color='rgba(74,124,90,0.6)'">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+              </svg>
+              Reportar publicación
+            </button>
+          </div>
+
+        </div><!-- FIN columna derecha -->
+      </div><!-- FIN grid -->
+    </div>
+
+    <!-- ══════════════════════════════════════════════════
+         DESCRIPCIÓN — Sección de ancho completo — Rediseño Premium
+    ══════════════════════════════════════════════════ -->
+    {producto.descripcion && (
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
+        <div class="bg-white rounded-3xl p-6 md:p-10 shadow-md relative overflow-hidden" style="border: 1.5px solid #C8DCC8;">
+          
+          {/* Círculo decorativo de fondo */}
+          <div class="absolute -right-16 -bottom-16 w-48 h-48 rounded-full opacity-5 pointer-events-none" style="background: #2D5A3D;"></div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 items-start relative">
+            
+            {/* Columna Izquierda: Texto de la descripción */}
+            <div class="space-y-6">
+              <div class="flex items-center gap-3">
+                <div class="w-1.5 h-8 rounded-full bg-[#2D5A3D]"></div>
+                <h2 class="text-2xl md:text-3xl font-black tracking-tight" style="color: #1A3828;">
+                  Descripción
+                </h2>
+              </div>
+              
+              <div class="prose max-w-none">
+                <p class="leading-relaxed text-base md:text-lg font-medium whitespace-pre-line max-w-4xl" style="color: #2A3D2A;">
+                  {producto.descripcion}
+                </p>
+              </div>
+            </div>
+
+            {/* Columna Derecha: Consejos de Seguridad */}
+            <div class="rounded-2xl p-6 space-y-4" style="background: linear-gradient(135deg, #FBF8F3 0%, #F5ECE0 100%); border: 1px solid #C8DCC8;">
+              <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-[#8B6545]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/>
+                </svg>
+                <h3 class="font-extrabold text-xs uppercase tracking-widest text-[#8B6545]">Consejos de Seguridad</h3>
+              </div>
+              
+              <div class="space-y-3">
+                {tipsSeguridad.map((tip) => (
+                  <div class="flex items-start gap-2.5">
+                    <div class="w-2 h-2 rounded-full bg-[#8B6545] shrink-0 mt-2"></div>
+                    <div>
+                      <p class="text-xs font-bold text-[#1A3828]">{tip.titulo}</p>
+                      <p class="text-[11px] text-[#5C3A1E] mt-0.5">{tip.texto}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div class="pt-3 border-t border-[#C8DCC8] text-center">
+                <p class="text-[9px] text-[#8B6545] font-extrabold uppercase tracking-widest">Compra Responsable</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    )}
+
+    <!-- ══ Trazabilidad ══ -->
+    {producto.trazabilidad && (
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 space-y-6">
+        <TraceabilityBlock client:visible data={{
+          pesoActual: producto.peso ?? undefined,
+          ultimaVacuna: producto.salud || 'Aftosa',
+          fechaNacimiento: producto.fecha_nacimiento || '2024-01',
+          verificacion: producto.trazabilidad ? 'verificado' : 'basico',
+          categoria: producto.categoria,
+          historialPeso: [
+            { fecha: 'Ene 26', peso: Math.round((producto.peso || 400) * 0.75) },
+            { fecha: 'Feb 26', peso: Math.round((producto.peso || 400) * 0.82) },
+            { fecha: 'Mar 26', peso: Math.round((producto.peso || 400) * 0.88) },
+            { fecha: 'Abr 26', peso: Math.round((producto.peso || 400) * 0.94) },
+            { fecha: 'May 26', peso: producto.peso || 445 },
+          ],
+          vacunas: [
+            { fecha: '2026-01-15', nombre: 'Aftosa', tipo: 'Obligatoria' },
+            { fecha: '2026-02-20', nombre: 'Brucelosis', tipo: 'Obligatoria' },
+            { fecha: '2026-03-10', nombre: 'Carbunco', tipo: 'Recomendada' },
+          ],
+          genealogia: (producto.categoria === 'bovinos' || producto.categoria === 'equinos') ? {
+            padre: producto.raza ? `Toro ${producto.raza}` : 'Toro Angus',
+            padreRaza: producto.raza || 'Angus Negro',
+            madre: producto.raza ? `Vaca ${producto.raza}` : 'Vaca Angus',
+            madreRaza: producto.raza || 'Angus Negro',
+            abueloPaterno: 'Campeón Nacional',
+            abuelaPaterna: 'Vaca Premium',
+            abueloMaterno: 'Reproductor Élite',
+            abuelaMaterna: 'Vaca Lechera Record',
+          } : undefined,
+          id: producto.id,
+        }} />
+        <QRTrazabilidad client:load productoId={producto.id} nombre={producto.nombre} />
+      </div>
+    )}
+
+    <!-- ══ Modal de Reporte ══ -->
+    <div id="reportar-modal" class="hidden fixed inset-0 z-50">
+      <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"
+           onclick="document.getElementById('reportar-modal').classList.add('hidden')"></div>
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white rounded-2xl p-6 shadow-2xl" style="border: 1.5px solid #C8DCC8;">
+        <div class="flex items-center justify-between mb-5">
+          <h3 class="text-lg font-bold" style="color: #1A3828;">Reportar Publicación</h3>
+          <button onclick="document.getElementById('reportar-modal').classList.add('hidden')"
+                  class="p-1.5 rounded-lg transition-colors hover:bg-[#F0F7F0]">
+            <svg class="w-5 h-5" fill="none" stroke="#4A7C5A" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        <form id="reportar-form" class="space-y-4">
+          <div>
+            <label class="block text-sm font-semibold mb-2" style="color: #1A3828;">Motivo del reporte</label>
+            <select id="reportar-motivo"
+                    class="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none"
+                    style="border: 1.5px solid #C8DCC8; background: #F5FBF5; color: #1A3828;"
+                    required>
+              <option value="">Selecciona un motivo</option>
+              <option value="fraudulento">Anuncio fraudulento</option>
+              <option value="informacion_incorrecta">Información incorrecta</option>
+              <option value="precio_enganoso">Precio engañoso</option>
+              <option value="animal_no_corresponde">El animal no corresponde a la descripción</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-2" style="color: #1A3828;">Comentario adicional</label>
+            <textarea id="reportar-comentario" rows={3}
+                      class="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none resize-none"
+                      style="border: 1.5px solid #C8DCC8; background: #F5FBF5; color: #1A3828;"
+                      placeholder="Describe el problema..."></textarea>
+          </div>
+          <button type="submit"
+                  class="w-full py-3 font-bold rounded-xl text-white transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98]"
+                  style="background: #C0392B;">
+            Enviar Reporte
+          </button>
+        </form>
+        <div id="reportar-gracias" class="hidden text-center py-6">
+          <div class="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3" style="background: #D1EDCF;">
+            <svg class="w-7 h-7" fill="none" stroke="#2D5A3D" viewBox="0 0 24 24" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
+          <p class="font-bold text-lg" style="color: #1A3828;">Reporte enviado</p>
+          <p class="text-sm mt-1" style="color: #4A7C5A;">Gracias por mantener la calidad del marketplace.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ Franja inferior decorativa ══ -->
+    <div class="h-1" style="background: linear-gradient(90deg, #1A3828, #2D5A3D, #4A7C5A, #C9A84C, #2D5A3D, #1A3828);"></div>
+
+  </div><!-- FIN página producto -->
+
+  ) : (
+
+  <!-- ══ PRODUCTO NO ENCONTRADO ══ -->
+  <div class="max-w-4xl mx-auto px-4 py-16 text-center">
+    <div class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style="background: #D1EDCF;">
+      <svg class="w-8 h-8" fill="none" stroke="#4A7C5A" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+    </div>
+    <h2 class="text-xl font-bold mb-2" style="color: #1A3828;">Producto no encontrado</h2>
+    <p class="mb-6" style="color: #4A7C5A;">Este producto no está disponible en el marketplace.</p>
+    <a href="/marketplace" class="inline-flex items-center px-4 py-2 rounded-lg font-semibold text-white" style="background: #2D5A3D;">Explorar Marketplace</a>
+  </div>
+
+  )}
+</BaseLayout>
+
+<!-- ════════════════════════════════════════════
+     SCRIPTS — Lógica sin cambios
+════════════════════════════════════════════ -->
+<script>
+  (function() {
+    const mainDiv = document.querySelector('[data-producto-id]');
+    const productoId = mainDiv ? parseInt(mainDiv.getAttribute('data-producto-id') || '0') : 0;
+    const vendedorId = mainDiv ? parseInt(mainDiv.getAttribute('data-vendedor-id') || '0') : 0;
+    if (productoId && vendedorId) {
+      const token = localStorage.getItem('agroup_token');
+      fetch('/api/vendor/vistas', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ vendedor_id: vendedorId, producto_id: productoId }),
+      }).catch(() => {});
+    }
+  })();
+
+  // ── Calificación de estrellas ──
+  const productoIdEl = document.querySelector('[data-producto-id]') as HTMLElement;
+  const curProductoId = productoIdEl ? parseInt(productoIdEl.dataset.productoId) : null;
+  const curProductoNombre = productoIdEl ? productoIdEl.dataset.productoNombre : '';
+
+  const ratingStars   = document.querySelectorAll('.rating-star');
+  const ratingText    = document.getElementById('rating-text');
+  const ratingSection = document.getElementById('rating-section');
+  const ratingThanks  = document.getElementById('rating-thanks');
+
+  ratingStars.forEach((star) => {
+    star.addEventListener('click', () => {
+      const valor = parseInt((star as HTMLElement).dataset.star);
+      ratingStars.forEach((s, i) => {
+        (s as HTMLElement).style.color = i < valor ? '#C9A84C' : '#D8E8D4';
+      });
+      if (ratingText) ratingText.textContent = `Calificaste con ${valor} estrella${valor > 1 ? 's' : ''}`;
+      setTimeout(() => {
+        if (ratingSection) ratingSection.classList.add('hidden');
+        if (ratingThanks)  ratingThanks.classList.remove('hidden');
+        const calif = JSON.parse(localStorage.getItem('agroup_calificaciones') || '[]');
+        calif.push({ producto: curProductoId, rating: valor, fecha: new Date().toISOString() });
+        localStorage.setItem('agroup_calificaciones', JSON.stringify(calif));
+      }, 800);
+    });
+  });
+
+  // ── Modal de reporte ──
+  const btnReportar     = document.getElementById('btn-reportar');
+  const reportarModal   = document.getElementById('reportar-modal');
+  const reportarForm    = document.getElementById('reportar-form');
+  const reportarGracias = document.getElementById('reportar-gracias');
+
+  btnReportar?.addEventListener('click', () => reportarModal?.classList.remove('hidden'));
+
+  reportarForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const motivo = (document.getElementById('reportar-motivo') as HTMLSelectElement).value;
+    if (!motivo) return;
+    reportarForm.classList.add('hidden');
+    reportarGracias?.classList.remove('hidden');
+    const reportes = JSON.parse(localStorage.getItem('agroup_reportes') || '[]');
+    reportes.push({ productoId: curProductoId, productoNombre: curProductoNombre, motivo, fecha: new Date().toISOString() });
+    localStorage.setItem('agroup_reportes', JSON.stringify(reportes));
+    setTimeout(() => {
+      reportarModal?.classList.add('hidden');
+      reportarForm?.classList.remove('hidden');
+      reportarGracias?.classList.add('hidden');
+      (document.getElementById('reportar-form') as HTMLFormElement)?.reset();
+    }, 2000);
+  });
+</script>

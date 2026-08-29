@@ -1,0 +1,205 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const rawOrdenId = Astro.url.searchParams.get('orden') || Astro.url.searchParams.get('orden_id') || '';
+const ordenId = (rawOrdenId === 'undefined' || rawOrdenId === 'null' || !rawOrdenId.trim()) ? '' : rawOrdenId;
+const metodo = Astro.url.searchParams.get('metodo') || 'pse';
+const transactionId = Astro.url.searchParams.get('id') || Astro.url.searchParams.get('transaction_id') || Astro.url.searchParams.get('idTransaccion') || '';
+const reference = Astro.url.searchParams.get('reference') || '';
+
+const isDirecto = metodo === 'whatsapp' || metodo === 'efectivo';
+---
+
+<BaseLayout title="Estado del Pedido - AgroUp">
+  <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 text-center">
+      
+      <!-- Icono de estado -->
+      <div id="status-icon-wrapper" class="w-20 h-20 bg-gold-100 rounded-full flex items-center justify-center mx-auto mb-6">
+        {isDirecto ? (
+          <svg class="w-10 h-10 text-gold-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+        ) : (
+          <>
+            <svg id="icon-pending" class="w-10 h-10 text-gold-700 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+            <svg id="icon-success" class="w-10 h-10 text-green-600 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <svg id="icon-error" class="w-10 h-10 text-red-600 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </>
+        )}
+      </div>
+
+      <!-- Título de Estado -->
+      <h1 id="status-title" class="text-2xl font-bold text-slate-900 mb-2">
+        {isDirecto ? '¡Pedido Confirmado!' : 'Verificando pago...'}
+      </h1>
+
+      <!-- Mensaje descriptivo -->
+      <p id="status-message" class="text-slate-600 mb-6">
+        {metodo === 'whatsapp'
+          ? 'Tu solicitud fue enviada. Te contactaremos pronto por WhatsApp para coordinar el despacho.'
+          : metodo === 'efectivo'
+          ? 'Tu pedido está guardado. El vendedor te contactará para coordinar el pago en efectivo y la entrega.'
+          : 'Estamos confirmando el estado de tu transacción con la pasarela Wompi.'
+        }
+      </p>
+
+      <!-- Número de Orden -->
+      {ordenId ? (
+        <div id="orden-box" class="bg-slate-50 rounded-xl p-4 mb-6">
+          <p class="text-sm text-slate-500 mb-1">Número de orden</p>
+          <p id="orden-id-display" class="text-xl font-mono font-bold text-gold-700">{ordenId}</p>
+        </div>
+      ) : (
+        <div id="orden-box" class="hidden bg-slate-50 rounded-xl p-4 mb-6">
+          <p class="text-sm text-slate-500 mb-1">Número de orden</p>
+          <p id="orden-id-display" class="text-xl font-mono font-bold text-gold-700"></p>
+        </div>
+      )}
+
+      <!-- Indicador de verificación Wompi -->
+      {!isDirecto && (
+        <div id="polling-info" class="mb-6">
+          <div class="inline-flex items-center gap-2 text-sm text-slate-500 bg-slate-50 rounded-full px-4 py-2">
+            <span class="w-2 h-2 bg-gold-500 rounded-full animate-pulse"></span>
+            <span id="polling-text">Consultando estado en Wompi... (<span id="poll-count">1</span>/25)</span>
+          </div>
+        </div>
+      )}
+
+      <!-- Botones de Acción -->
+      <div id="action-buttons" class={`space-y-3 mb-8 ${isDirecto ? '' : 'hidden'}`}>
+        <a href="/marketplace" class="block w-full py-3 bg-campo-600 text-white font-semibold rounded-xl hover:bg-campo-700 transition-colors shadow">
+          Continuar Comprando
+        </a>
+        <a href="/hacienda/pedidos" class="block w-full py-3 border border-slate-300 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 transition-colors">
+          Ver Mis Pedidos
+        </a>
+      </div>
+
+      <div class="flex items-center justify-center gap-2 text-sm text-slate-500">
+        <svg class="w-5 h-5 text-gold-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        </svg>
+        ¿Tienes dudas con tu pago? <a href="https://wa.me/573001234567" target="_blank" rel="noopener noreferrer" class="text-gold-700 hover:underline">Escríbenos</a>
+      </div>
+    </div>
+  </div>
+
+  {!isDirecto && (
+    <script define:vars={{ transactionId, ordenId, reference }}>
+      const MAX_ATTEMPTS = 25;
+      const POLL_INTERVAL = 3000;
+      let attempts = 0;
+      let pollTimer = null;
+
+      const iconWrapper = document.getElementById('status-icon-wrapper');
+      const iconPending = document.getElementById('icon-pending');
+      const iconSuccess = document.getElementById('icon-success');
+      const iconError = document.getElementById('icon-error');
+      const statusTitle = document.getElementById('status-title');
+      const statusMessage = document.getElementById('status-message');
+      const pollingInfo = document.getElementById('polling-info');
+      const pollCount = document.getElementById('poll-count');
+      const actionButtons = document.getElementById('action-buttons');
+      const ordenBox = document.getElementById('orden-box');
+      const ordenIdDisplay = document.getElementById('orden-id-display');
+
+      function showState(state, info) {
+        iconPending?.classList.add('hidden');
+        iconSuccess?.classList.add('hidden');
+        iconError?.classList.add('hidden');
+        pollingInfo?.classList.add('hidden');
+        actionButtons?.classList.remove('hidden');
+
+        if (info?.ordenId && ordenBox && ordenIdDisplay) {
+          ordenIdDisplay.textContent = info.ordenId;
+          ordenBox.classList.remove('hidden');
+        }
+
+        switch (state) {
+          case 'APPROVED':
+          case 'pagado':
+            if (iconWrapper) iconWrapper.className = 'w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6';
+            iconSuccess?.classList.remove('hidden');
+            if (statusTitle) statusTitle.textContent = '¡Pago Aprobado!';
+            if (statusMessage) statusMessage.textContent = 'Tu transacción fue procesada con éxito por Wompi. Tu pedido ya está en preparación.';
+            break;
+
+          case 'DECLINED':
+          case 'rechazado':
+          case 'VOIDED':
+          case 'anulado':
+            if (iconWrapper) iconWrapper.className = 'w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6';
+            iconError?.classList.remove('hidden');
+            if (statusTitle) statusTitle.textContent = 'Pago Rechazado';
+            if (statusMessage) statusMessage.textContent = 'La transacción no pudo ser aprobada por el banco o la pasarela. Puedes intentar nuevamente con otro medio de pago.';
+            break;
+
+          case 'ERROR':
+          case 'error':
+            if (iconWrapper) iconWrapper.className = 'w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6';
+            iconError?.classList.remove('hidden');
+            if (statusTitle) statusTitle.textContent = 'Error en el Pago';
+            if (statusMessage) statusMessage.textContent = 'Ocurrió un inconveniente al procesar el pago. Si se debitó dinero de tu cuenta, será reembolsado automáticamente.';
+            break;
+
+          case 'timeout':
+            if (iconWrapper) iconWrapper.className = 'w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6';
+            iconPending?.classList.remove('hidden');
+            if (statusTitle) statusTitle.textContent = 'Pago en Verificación';
+            if (statusMessage) statusMessage.textContent = 'Wompi aún está procesando tu transacción. Te notificaremos por correo electrónico una vez finalice.';
+            break;
+        }
+      }
+
+      async function checkStatus() {
+        if (attempts >= MAX_ATTEMPTS) {
+          showState('timeout');
+          return;
+        }
+
+        attempts++;
+        if (pollCount) pollCount.textContent = attempts;
+
+        try {
+          const params = new URLSearchParams();
+          if (transactionId) params.append('transaction_id', transactionId);
+          if (ordenId) params.append('orden_id', ordenId);
+          if (reference) params.append('reference', reference);
+
+          const res = await fetch(`/api/wompi/verificar?${params.toString()}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.status && data.status !== 'PENDING') {
+              showState(data.status, data.transaction || data.pedido);
+              return;
+            }
+          }
+        } catch (err) {
+          console.error('[STATUS_CHECK] Error polling:', err);
+        }
+
+        pollTimer = setTimeout(checkStatus, POLL_INTERVAL);
+      }
+
+      if (transactionId || (ordenId && ordenId !== 'undefined') || reference) {
+        checkStatus();
+      } else {
+        showState('error');
+        if (statusMessage) statusMessage.textContent = 'No se encontró una referencia de pedido válida.';
+      }
+
+      window.addEventListener('beforeunload', () => {
+        if (pollTimer) clearTimeout(pollTimer);
+      });
+    </script>
+  )}
+</BaseLayout>

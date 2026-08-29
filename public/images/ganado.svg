@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 160" fill="none">
+  <rect width="200" height="160" fill="#D1FAE5"/>
+  <text x="100" y="75" text-anchor="middle" font-size="64" dominant-baseline="middle">🐄</text>
+  <text x="100" y="130" text-anchor="middle" font-size="14" fill="#065F46" font-family="sans-serif">Bovino</text>
+</svg>

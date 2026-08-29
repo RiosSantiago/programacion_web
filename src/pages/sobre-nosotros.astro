@@ -1,0 +1,352 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Sobre Nosotros - AgroUp" navVariant="light">
+  <!-- ══════════════════ HERO BANNER ══════════════════ -->
+  <section class="relative overflow-hidden">
+    <img
+      src="/images/Privacidad-banner.webp"
+      alt=""
+      class="absolute inset-0 w-full h-full object-cover object-center"
+      aria-hidden="true"
+    />
+    <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80"></div>
+
+    <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-36 md:py-48 text-center">
+      <h1 class="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white leading-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]">
+        Sobre Nosotros
+      </h1>
+      <p class="mt-4 text-base sm:text-lg md:text-xl text-white/90 font-light max-w-2xl mx-auto leading-relaxed drop-shadow-[0_1px_6px_rgba(0,0,0,0.5)]">
+        El ecosistema digital que une la gestión operativa y el comercio directo para el campo colombiano.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════════════════ CONTENIDO PRINCIPAL ══════════════════ -->
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 space-y-16 md:space-y-20">
+
+    <!-- SECCIÓN 1: NUESTRA HISTORIA -->
+    <section class="bg-white rounded-3xl border border-[#E8E0D8] shadow-sm p-8 sm:p-10 md:p-12 relative overflow-hidden">
+      <div class="absolute top-0 right-0 w-40 h-40 bg-campo-50 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+
+      <div class="relative">
+        <h2 class="text-2xl sm:text-3xl font-display font-bold text-campo-900 leading-snug">
+          El Campo Merece Modernizarse sin Perder su Esencia
+        </h2>
+        <div class="h-1 w-16 bg-gradient-to-r from-campo-600 to-gold-500 rounded-full my-6"></div>
+
+        <div class="space-y-5 text-stone-600 leading-relaxed text-base sm:text-lg">
+          <p>
+            AgroUp nació en el corazón de los Andes colombianos, en Manizales (Caldas), al ver una realidad que se repite en todo el país: el trabajo ganadero y agrícola es uno de los motores más nobles y exigentes de nuestra economía, pero sigue enfrentando barreras que frenan su crecimiento.
+          </p>
+          <p>
+            La falta de registros claros, la dependencia de intermediarios informales, la incertidumbre en los precios y el papeleo engorroso hacen que producir sea más difícil de lo que debería. Muchos productores trabajan con excelencia, pero no tienen cómo demostrarlo fácilmente ante un comprador o una entidad.
+          </p>
+          <p>
+            Decidimos crear AgroUp para cerrar esa brecha. Construimos una plataforma que une la gestión operativa diaria del predio con un mercado digital directo, poniendo la tecnología al servicio de quien trabaja la tierra y cría el ganado.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 2: LO QUE HACEMOS -->
+    <section class="space-y-8">
+      <div class="text-center max-w-2xl mx-auto">
+        <h2 class="text-2xl sm:text-3xl font-display font-bold text-campo-900 mb-3">
+          Lo Que Hacemos: Un Ecosistema 360° para el Agro
+        </h2>
+        <p class="text-stone-600 text-base sm:text-lg">
+          No somos solo una página de clasificados ni solo un software administrativo. AgroUp es un ecosistema integral que acompaña al productor en cada etapa:
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <!-- 2.1 Trazabilidad -->
+        <div class="bg-white rounded-2xl border border-[#E8E0D8] shadow-sm p-7 sm:p-8 flex flex-col justify-between hover:border-campo-300 hover:shadow-md transition-all duration-300">
+          <div>
+            <div class="w-12 h-12 rounded-xl bg-campo-100 border border-campo-200 flex items-center justify-center text-campo-800 mb-5">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-display font-bold text-campo-900 mb-3">
+              Trazabilidad y Control Operativo
+            </h3>
+            <p class="text-stone-600 text-sm sm:text-base leading-relaxed">
+              Permitimos registrar el historial completo de cada lote y animal: peso, raza, vacunación, tratamientos y eventos sanitarios. Con un simple clic o mediante código QR, el productor tiene la radiografía de su predio en el bolsillo, lista para presentar a compradores, veterinarios o entidades reguladoras.
+            </p>
+          </div>
+        </div>
+
+        <!-- 2.2 Marketplace Directo -->
+        <div class="bg-white rounded-2xl border border-[#E8E0D8] shadow-sm p-7 sm:p-8 flex flex-col justify-between hover:border-gold-300 hover:shadow-md transition-all duration-300">
+          <div>
+            <div class="w-12 h-12 rounded-xl bg-gold-50 border border-gold-200 flex items-center justify-center text-gold-700 mb-5">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-display font-bold text-campo-900 mb-3">
+              Marketplace Directo y Transparente
+            </h3>
+            <p class="text-stone-600 text-sm sm:text-base leading-relaxed">
+              Conectamos a vendedores y compradores sin intermediarios innecesarios. Las publicaciones incluyen datos reales y verificables, fotos de calidad, ubicación por municipios de Caldas y contacto directo por WhatsApp o llamada, para que cada negocio se cierre con confianza y al precio justo.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 3: MISIÓN Y VISIÓN -->
+    <section class="grid md:grid-cols-2 gap-6 sm:gap-8">
+      <!-- Misión -->
+      <div class="bg-white rounded-3xl border border-[#E8E0D8] p-8 sm:p-10 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden flex flex-col justify-between">
+        <div>
+          <div class="w-12 h-12 rounded-xl bg-gold-50 border border-gold-200 flex items-center justify-center mb-6 text-gold-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <h3 class="text-2xl font-display font-bold text-campo-900 mb-4">Nuestra Misión</h3>
+          <p class="text-stone-600 leading-relaxed text-sm sm:text-base">
+            Impulsar la transformación digital del sector agropecuario mediante herramientas tecnológicas accesibles y funcionales que optimicen la gestión en finca, garanticen la trazabilidad de los animales y faciliten un comercio justo, directo y rentable para todos los actores de la cadena.
+          </p>
+        </div>
+      </div>
+
+      <!-- Visión -->
+      <div class="bg-white rounded-3xl border border-[#E8E0D8] p-8 sm:p-10 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden flex flex-col justify-between">
+        <div>
+          <div class="w-12 h-12 rounded-xl bg-gold-50 border border-gold-200 flex items-center justify-center mb-6 text-gold-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+          </div>
+          <h3 class="text-2xl font-display font-bold text-campo-900 mb-4">Nuestra Visión</h3>
+          <p class="text-stone-600 leading-relaxed text-sm sm:text-base">
+            Consolidarnos como el ecosistema tecnológico de referencia para el campo en la región, liderando la transición hacia una ganadería y agricultura más eficiente, transparente, sostenible y conectada con los mercados del futuro.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 4: VALORES -->
+    <section class="bg-white rounded-3xl border border-[#E8E0D8] shadow-sm p-8 sm:p-10 md:p-12">
+      <div class="text-center max-w-xl mx-auto mb-10">
+        <h2 class="text-2xl sm:text-3xl font-display font-bold text-campo-900">
+          Los Valores que Nos Mueven
+        </h2>
+        <div class="h-1 w-16 bg-gradient-to-r from-campo-600 to-gold-500 rounded-full mx-auto mt-4"></div>
+      </div>
+
+      <div class="grid gap-6 sm:gap-8">
+        <!-- 1. Transparencia -->
+        <div class="flex items-start gap-4 p-4 rounded-2xl hover:bg-campo-50/50 transition-colors">
+          <div class="w-10 h-10 rounded-xl bg-campo-100 text-campo-800 flex items-center justify-center shrink-0 mt-1 font-bold text-sm">
+            1
+          </div>
+          <div>
+            <h4 class="text-lg font-bold text-campo-900">Transparencia</h4>
+            <p class="text-stone-600 text-sm sm:text-base leading-relaxed mt-1">
+              Creemos que la información clara sobre el origen, la salud y las condiciones de cada producto o animal es la base de cualquier negocio próspero y duradero.
+            </p>
+          </div>
+        </div>
+
+        <!-- 2. Simplicidad y Accesibilidad -->
+        <div class="flex items-start gap-4 p-4 rounded-2xl hover:bg-campo-50/50 transition-colors">
+          <div class="w-10 h-10 rounded-xl bg-campo-100 text-campo-800 flex items-center justify-center shrink-0 mt-1 font-bold text-sm">
+            2
+          </div>
+          <div>
+            <h4 class="text-lg font-bold text-campo-900">Simplicidad y Accesibilidad</h4>
+            <p class="text-stone-600 text-sm sm:text-base leading-relaxed mt-1">
+              Diseñamos tecnología fácil de usar, pensada para el día a día en el campo, sin curvas de aprendizaje complejas ni requisitos técnicos innecesarios.
+            </p>
+          </div>
+        </div>
+
+        <!-- 3. Comercio Justo -->
+        <div class="flex items-start gap-4 p-4 rounded-2xl hover:bg-campo-50/50 transition-colors">
+          <div class="w-10 h-10 rounded-xl bg-campo-100 text-campo-800 flex items-center justify-center shrink-0 mt-1 font-bold text-sm">
+            3
+          </div>
+          <div>
+            <h4 class="text-lg font-bold text-campo-900">Comercio Justo</h4>
+            <p class="text-stone-600 text-sm sm:text-base leading-relaxed mt-1">
+              Trabajamos para que el valor generado se quede en manos de quien produce, reduciendo la intermediación que castiga el bolsillo del campesino.
+            </p>
+          </div>
+        </div>
+
+        <!-- 4. Innovación Útil -->
+        <div class="flex items-start gap-4 p-4 rounded-2xl hover:bg-campo-50/50 transition-colors">
+          <div class="w-10 h-10 rounded-xl bg-campo-100 text-campo-800 flex items-center justify-center shrink-0 mt-1 font-bold text-sm">
+            4
+          </div>
+          <div>
+            <h4 class="text-lg font-bold text-campo-900">Innovación Útil</h4>
+            <p class="text-stone-600 text-sm sm:text-base leading-relaxed mt-1">
+              No creamos tecnología por moda; cada funcionalidad responde a una necesidad real que hemos escuchado directamente de los productores.
+            </p>
+          </div>
+        </div>
+
+        <!-- 5. Compromiso con el Desarrollo Rural -->
+        <div class="flex items-start gap-4 p-4 rounded-2xl hover:bg-campo-50/50 transition-colors">
+          <div class="w-10 h-10 rounded-xl bg-campo-100 text-campo-800 flex items-center justify-center shrink-0 mt-1 font-bold text-sm">
+            5
+          </div>
+          <div>
+            <h4 class="text-lg font-bold text-campo-900">Compromiso con el Desarrollo Rural</h4>
+            <p class="text-stone-600 text-sm sm:text-base leading-relaxed mt-1">
+              Creemos firmemente en el potencial del campo colombiano y en el talento de su gente. Nuestro éxito se mide por el progreso de cada hacienda que confía en nosotros.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 5: ¿POR QUÉ ELEGIR AGROUP? -->
+    <section class="space-y-10">
+      <div class="text-center max-w-xl mx-auto">
+        <h2 class="text-2xl sm:text-3xl font-display font-bold text-campo-900">
+          ¿Por qué Elegir AgroUp?
+        </h2>
+      </div>
+
+      <!-- Cita Destacada -->
+      <div class="relative bg-gradient-to-r from-campo-50 via-white to-gold-50/40 rounded-2xl border-l-4 border-gold-500 border-y border-r border-[#E8E0D8] p-6 sm:p-8 shadow-sm">
+        <svg class="w-10 h-10 text-gold-300 absolute top-4 right-4 opacity-50" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
+        </svg>
+        <p class="font-display italic text-lg sm:text-xl md:text-2xl text-campo-900 leading-relaxed max-w-2xl">
+          "No cambiamos tu forma de trabajar el campo; te damos las herramientas para que tu trabajo rinda y valga más."
+        </p>
+      </div>
+
+      <!-- 4 Puntos Clave -->
+      <div class="grid sm:grid-cols-2 gap-6">
+        <!-- 1 -->
+        <div class="bg-white rounded-2xl border border-[#E8E0D8] shadow-sm p-6 flex gap-4 items-start hover:shadow-md transition-shadow">
+          <div class="w-10 h-10 rounded-xl bg-campo-100 text-campo-700 flex items-center justify-center shrink-0 mt-0.5">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <div>
+            <h4 class="font-bold text-campo-900 text-base mb-1">Tu finca en el bolsillo</h4>
+            <p class="text-stone-600 text-sm leading-relaxed">
+              Registros claros, historial sanitario y control de inventario accesibles desde cualquier celular o computador.
+            </p>
+          </div>
+        </div>
+
+        <!-- 2 -->
+        <div class="bg-white rounded-2xl border border-[#E8E0D8] shadow-sm p-6 flex gap-4 items-start hover:shadow-md transition-shadow">
+          <div class="w-10 h-10 rounded-xl bg-gold-50 text-gold-600 flex items-center justify-center shrink-0 mt-0.5">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+          </div>
+          <div>
+            <h4 class="font-bold text-campo-900 text-base mb-1">Mayor valor por tus animales</h4>
+            <p class="text-stone-600 text-sm leading-relaxed">
+              Un animal con trazabilidad demostrable y registro sanitario vale más y se vende más rápido.
+            </p>
+          </div>
+        </div>
+
+        <!-- 3 -->
+        <div class="bg-white rounded-2xl border border-[#E8E0D8] shadow-sm p-6 flex gap-4 items-start hover:shadow-md transition-shadow">
+          <div class="w-10 h-10 rounded-xl bg-campo-100 text-campo-700 flex items-center justify-center shrink-0 mt-0.5">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </div>
+          <div>
+            <h4 class="font-bold text-campo-900 text-base mb-1">Tratos directos</h4>
+            <p class="text-stone-600 text-sm leading-relaxed">
+              Sin comisiones ocultas ni terceros que distorsionen el precio. El contacto es directo entre productor y comprador.
+            </p>
+          </div>
+        </div>
+
+        <!-- 4 -->
+        <div class="bg-white rounded-2xl border border-[#E8E0D8] shadow-sm p-6 flex gap-4 items-start hover:shadow-md transition-shadow">
+          <div class="w-10 h-10 rounded-xl bg-gold-50 text-gold-600 flex items-center justify-center shrink-0 mt-0.5">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </div>
+          <div>
+            <h4 class="font-bold text-campo-900 text-base mb-1">Seguridad garantizada</h4>
+            <p class="text-stone-600 text-sm leading-relaxed">
+              Publicaciones verificadas, información transparente y canales de soporte dedicados para acompañarte.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════ BANNER CTA INFERIOR ══════════════════ -->
+    <div class="bg-gradient-to-br from-campo-900 to-campo-800 rounded-2xl overflow-hidden shadow-xl">
+      <div class="relative p-8 md:p-10">
+        <!-- Textura decorativa de fondo -->
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+        <div class="absolute bottom-0 left-0 w-48 h-48 bg-gold-500/5 rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
+
+        <div class="relative flex flex-col md:flex-row items-center gap-6">
+          <!-- Ícono con fondo dorado -->
+          <div class="w-16 h-16 bg-gradient-to-br from-gold-400 to-gold-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+            </svg>
+          </div>
+
+          <!-- Textos -->
+          <div class="flex-1 text-center md:text-left">
+            <h3 class="text-2xl font-display font-bold text-white">
+              Únete a la Nueva Era del Campo Colombiano
+            </h3>
+            <p class="text-white/80 mt-2 text-sm sm:text-base leading-relaxed">
+              Ya sea que busques comprar ganado con trazabilidad o vender tus animales y cosechas al precio justo, AgroUp es tu aliado.
+            </p>
+          </div>
+
+          <!-- Botones -->
+          <div class="flex flex-col sm:flex-row gap-3 flex-shrink-0">
+            <a
+              href="/marketplace"
+              class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gold-500 hover:bg-gold-600 text-campo-900 font-bold rounded-xl transition-all duration-200 active:scale-[0.98] shadow-lg shadow-gold-900/20 text-sm"
+            >
+              Explorar Marketplace
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </a>
+            <a
+              href="/publicar"
+              class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl border border-white/20 transition-all duration-200 active:scale-[0.98] text-sm"
+            >
+              Publicar mi Ganado
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</BaseLayout>
+
+<style is:global>
+  nav#main-nav[data-variant="light"]:not(.scrolled) {
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    background: transparent;
+  }
+  body:has(nav#main-nav[data-variant="light"]) main {
+    padding-top: 0;
+  }
+</style>

@@ -1,0 +1,16 @@
+node_modules
+dist
+.DS_Store
+.astro/
+database/*.db
+database/*.db-shm
+database/*.db-wal
+.env
+.env.*
+!.env.example
+*.db.bak*
+database/*.bak*
+database/backup_*.sql
+database/agroup_pgdata/
+*.ts.tmp
+public/uploads/

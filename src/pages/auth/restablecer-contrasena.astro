@@ -1,0 +1,157 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Restablecer Contraseña - AgroUp" hideNav>
+  <div class="min-h-screen bg-[#FFFDF7] flex items-center justify-center px-4">
+    <div class="w-full max-w-md">
+      <div class="bg-white rounded-2xl border border-[#E8E0D8] shadow-sm overflow-hidden animate-card-rise">
+        <!-- Header -->
+        <div class="px-8 pt-8 pb-6 text-center border-b border-[#E8E0D8]">
+          <div class="w-14 h-14 mx-auto bg-campo-100 rounded-2xl flex items-center justify-center mb-4">
+            <svg class="w-7 h-7 text-campo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </div>
+          <h1 class="text-xl font-bold text-[#1A0E08]">Nueva contraseña</h1>
+          <p class="text-sm text-muted mt-2">Ingresa tu nueva contraseña para acceder a tu cuenta.</p>
+        </div>
+
+        <!-- Form -->
+        <div class="p-8">
+          <!-- Invalid token message -->
+          <div id="invalid-token-msg" class="hidden text-center py-4">
+            <svg class="w-12 h-12 text-red-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <h3 class="text-lg font-bold text-[#1A0E08] mb-1">Enlace no válido</h3>
+            <p class="text-sm text-muted">El enlace ha expirado o ya fue utilizado.</p>
+            <a href="/auth/recuperar-contrasena" class="inline-block mt-4 text-sm font-semibold text-gold-700 hover:text-gold-800 hover:underline">Solicitar un nuevo enlace</a>
+          </div>
+
+          <!-- Error message -->
+          <div id="error-msg" class="hidden bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-red-600 mb-4"></div>
+
+          <!-- Success message -->
+          <div id="success-msg" class="hidden text-center py-4">
+            <svg class="w-12 h-12 text-emerald-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h3 class="text-lg font-bold text-[#1A0E08] mb-1">¡Contraseña actualizada!</h3>
+            <p class="text-sm text-muted">Tu contraseña ha sido cambiada exitosamente.</p>
+            <a href="/auth/login" class="inline-block mt-4 px-6 py-2.5 bg-campo-600 text-white font-semibold rounded-xl hover:bg-campo-700 transition-colors text-sm">Iniciar sesión</a>
+          </div>
+
+          <!-- Reset form -->
+          <form id="reset-form" class="space-y-5">
+            <div>
+              <label class="block text-sm font-medium text-[#2D2D2D] mb-1.5">Nueva contraseña</label>
+              <input
+                type="password"
+                id="new-password"
+                required
+                placeholder="Mínimo 6 caracteres"
+                minlength="6"
+                class="w-full px-4 py-2.5 border border-[#E8E0D8] rounded-xl text-sm focus:ring-2 focus:ring-gold-500 focus:border-gold-500 transition-all bg-[#FFFDF7]"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-[#2D2D2D] mb-1.5">Confirmar contraseña</label>
+              <input
+                type="password"
+                id="confirm-password"
+                required
+                placeholder="Repite la nueva contraseña"
+                minlength="6"
+                class="w-full px-4 py-2.5 border border-[#E8E0D8] rounded-xl text-sm focus:ring-2 focus:ring-gold-500 focus:border-gold-500 transition-all bg-[#FFFDF7]"
+              />
+            </div>
+
+            <button
+              type="submit"
+              id="btn-reset"
+              class="w-full py-3 bg-campo-600 text-white font-semibold rounded-xl hover:bg-campo-700 transition-all active:scale-[0.98]"
+            >
+              Restablecer contraseña
+            </button>
+
+            <div class="text-center">
+              <a href="/auth/login" class="text-sm text-muted hover:text-gold-700 hover:underline transition-colors">
+                ← Volver al inicio de sesión
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style is:global>
+  footer { display: none; }
+  @keyframes card-rise {
+    0% { opacity: 0; transform: translateY(40px) scale(0.97); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .animate-card-rise { animation: card-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    const form = document.getElementById('reset-form');
+    const invalidMsg = document.getElementById('invalid-token-msg');
+
+    if (!token) {
+      form?.classList.add('hidden');
+      invalidMsg?.classList.remove('hidden');
+    }
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const password = (document.getElementById('new-password') as HTMLInputElement).value;
+      const confirm = (document.getElementById('confirm-password') as HTMLInputElement).value;
+      const errorEl = document.getElementById('error-msg');
+      const btn = document.getElementById('btn-reset') as HTMLButtonElement;
+
+      errorEl?.classList.add('hidden');
+
+      if (password !== confirm) {
+        errorEl!.textContent = 'Las contraseñas no coinciden';
+        errorEl?.classList.remove('hidden');
+        return;
+      }
+
+      if (password.length < 6) {
+        errorEl!.textContent = 'La contraseña debe tener al menos 6 caracteres';
+        errorEl?.classList.remove('hidden');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="flex items-center justify-center gap-2"><svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> Procesando...</span>';
+
+      try {
+        const res = await fetch('/api/auth/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, password }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Error al restablecer la contraseña');
+        }
+
+        form.classList.add('hidden');
+        document.getElementById('success-msg')?.classList.remove('hidden');
+      } catch (err: any) {
+        errorEl!.textContent = err.message;
+        errorEl?.classList.remove('hidden');
+        btn.disabled = false;
+        btn.textContent = 'Restablecer contraseña';
+      }
+    });
+  });
+</script>

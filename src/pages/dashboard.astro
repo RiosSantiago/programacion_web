@@ -1,0 +1,1225 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CartDrawer from '../components/CartDrawer.astro';
+import '../lib/db';
+
+const campos = [
+  { label: 'NOMBRE', key: 'nombre' },
+  { label: 'CORREO ELECTRÓNICO', key: 'email' },
+  { label: 'CELULAR', key: 'celular' },
+];
+---
+
+<BaseLayout navVariant="market">
+  <div class="min-h-screen bg-stone-100">
+
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4">
+      <nav class="flex items-center gap-2 text-sm" style="color: #9CA3AF">
+        <a href="/" class="hover:opacity-80 transition-opacity font-medium">Marketplace</a>
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+        <span style="color: #1b3928; font-weight: 600;">Mi Hacienda</span>
+      </nav>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 space-y-8">
+
+      <div class="flex flex-col lg:flex-row lg:items-end gap-6">
+        <div class="w-full lg:w-72 shrink-0">
+          <div class="relative bg-white rounded-2xl border border-[#E8E0D8] shadow-sm p-3 mx-auto lg:mx-0 max-w-[288px]">
+            <div class="aspect-square bg-gradient-to-br from-[#E8F5E9] to-[#C8E6C9] rounded-xl flex items-center justify-center overflow-hidden cursor-pointer group" id="hacienda-logo-container" onclick="document.getElementById('hacienda-logo-input').click()">
+              <svg class="w-28 h-28 text-[#A5D6A7] group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+              <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors rounded-xl flex items-center justify-center">
+                <span class="opacity-0 group-hover:opacity-100 transition-opacity text-white text-xs font-semibold bg-black/50 px-2 py-1 rounded-lg">Cambiar logo</span>
+              </div>
+            </div>
+            <input type="file" id="hacienda-logo-input" accept="image/*" class="hidden" />
+            <button id="btn-eliminar-logo" type="button" class="absolute bottom-5 left-5 w-9 h-9 rounded-full text-white flex items-center justify-center shadow-md transition-all cursor-pointer hidden hover:scale-105 z-10" style="background-color: #1b3928;" onmouseover="this.style.backgroundColor='#DC2626'" onmouseout="this.style.backgroundColor='#1b3928'" title="Eliminar foto">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+            </button>
+            <label for="hacienda-logo-input" class="absolute bottom-5 right-5 w-9 h-9 rounded-full flex items-center justify-center shadow-md transition-all cursor-pointer hover:scale-105 z-10" style="background-color: #1b3928; color: white;" title="Cambiar logo">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            </label>
+          </div>
+          <button id="btn-guardar-logo" class="mt-3 w-full px-4 py-2.5 text-sm font-semibold text-white rounded-xl transition-colors hidden" style="background-color: #1b3928;" onmouseover="this.style.backgroundColor='#0A5C43'" onmouseout="this.style.backgroundColor='#1b3928'">
+            Guardar logo de hacienda
+          </button>
+        </div>
+
+        <div class="flex-1">
+          <div class="bg-white rounded-xl border border-[#E8E0D8] shadow-sm p-6">
+            <div class="flex items-center justify-between mb-5">
+              <h2 class="text-xl font-semibold" style="font-family: 'Cormorant Garamond', Georgia, serif; color: #1A0E08;">Mi Información</h2>
+              <a href="/perfil" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors" style="color: #B8860B; background-color: #FFF8E1; border: 1px solid #FFE082;">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                Editar perfil
+              </a>
+            </div>
+
+            <div class="mb-5 pb-5 border-b border-[#E8E0D8]">
+              <label class="block text-[10px] font-semibold tracking-widest mb-1.5" style="color: #9CA3AF;">NOMBRE DE LA HACIENDA</label>
+              <div class="flex items-center gap-2">
+                <input type="text" id="input-hacienda-nombre" placeholder="Ej: Hacienda La Pradera" class="flex-1 px-4 py-3 text-3xl font-bold rounded-lg border border-[#E8E0D8] outline-none transition-colors" style="color: #1A0E08; background-color: #FDFBF7; font-family: 'Cormorant Garamond', Georgia, serif;" onfocus="this.style.borderColor='#1b3928'" onblur="this.style.borderColor='#E8E0D8'" />
+                <button id="btn-guardar-hacienda" class="px-3 py-3 rounded-lg text-sm font-semibold text-white transition-colors" style="background-color: #1b3928;" onmouseover="this.style.backgroundColor='#0A5C43'" onmouseout="this.style.backgroundColor='#1b3928'">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-5" id="info-grid">
+              {campos.map((campo) => (
+                <div>
+                  <p class="text-[10px] font-semibold tracking-widest mb-1" style="color: #9CA3AF;">{campo.label}</p>
+                  <p class="text-sm font-semibold" style="color: #2D2D2D;" id={`info-${campo.key}`}>—</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <section class="rounded-2xl p-6 sm:p-8 text-white" style="background-color: #1b3928;" id="seller-stats">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold">Mi Perfil como Vendedor</h3>
+              <p class="text-sm" style="color: rgba(255,255,255,0.6);">Resumen de tu actividad</p>
+            </div>
+          </div>
+          <a href="/publicar" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white text-sm font-bold rounded-xl hover:bg-gray-50 transition-colors" style="color: #1b3928;">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+            Nueva Publicación
+          </a>
+        </div>
+        <div class="grid grid-cols-4 gap-4" id="seller-stats-grid">
+          <div class="rounded-xl p-5 text-center" style="background: rgba(255,255,255,0.1);">
+            <p class="text-3xl font-extrabold" id="stat-publicaciones">0</p>
+            <p class="text-sm mt-1" style="color: rgba(255,255,255,0.6);">Publicaciones</p>
+          </div>
+          <div class="rounded-xl p-5 text-center" style="background: rgba(255,255,255,0.1);">
+            <p class="text-3xl font-extrabold" id="stat-ventas">0</p>
+            <p class="text-sm mt-1" style="color: rgba(255,255,255,0.6);">Ventas</p>
+          </div>
+          <div class="rounded-xl p-5 text-center" style="background: rgba(255,255,255,0.1);">
+            <p class="text-3xl font-extrabold" id="stat-vistas">0</p>
+            <p class="text-sm mt-1" style="color: rgba(255,255,255,0.6);">Vistas</p>
+          </div>
+          <div class="rounded-xl p-5 text-center" style="background: rgba(255,255,255,0.1);">
+            <p class="text-3xl font-extrabold flex items-center justify-center gap-1.5">
+              <span id="stat-rating">0</span>
+              <svg class="w-5 h-5" style="color: rgba(255,255,255,0.6);" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </p>
+            <p class="text-sm mt-1" style="color: rgba(255,255,255,0.6);">Rating</p>
+          </div>
+        </div>
+      </section>
+
+      <a href="/hacienda/pedidos" class="block bg-white rounded-2xl border border-[#E8E0D8] shadow-sm p-5 sm:p-6 hover:shadow-md transition-shadow">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background-color: #F0F7F0;">
+            <svg class="w-6 h-6" style="color: #1b3928;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-base font-bold" style="color: #1A0E08;">Mis Pedidos</h3>
+            <p class="text-sm" style="color: #6B6B6B;">Revisa el historial y estado de tus compras</p>
+          </div>
+          <svg class="w-5 h-5 flex-shrink-0" style="color: #9CA3AF;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+      </a>
+
+      <section id="mis-publicaciones-section">
+        <div class="bg-white rounded-xl border border-[#E8E0D8] shadow-sm">
+          <div class="px-6 py-4 border-b border-[#E8E0D8] flex items-center justify-between">
+            <div>
+              <h2 class="text-lg font-semibold" style="color: #1A0E08;">Mis Publicaciones</h2>
+              <p class="text-sm" style="color: #6B6B6B;">Productos que has publicado en el marketplace</p>
+            </div>
+            <span id="mi-publicaciones-count" class="text-sm font-semibold px-3 py-1 rounded-full" style="color: #B8860B; background-color: #FFF8E1;">0 publicados</span>
+          </div>
+          
+          <div id="mi-publicaciones-grid" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+          </div>
+
+          <div id="pagination-container" class="px-6 py-4 border-t border-[#E8E0D8] hidden">
+            <div class="flex items-center justify-center gap-2">
+              <button id="btn-pagina-anterior" class="px-3 py-1.5 text-sm font-medium rounded-lg border border-[#E8E0D8] transition-colors" style="color: #6B6B6B;" onmouseover="this.style.borderColor='#1b3928'; this.style.color='#1b3928'" onmouseout="this.style.borderColor='#E8E0D8'; this.style.color='#6B6B6B'">Anterior</button>
+              <div id="pagination-numbers" class="flex items-center gap-1"></div>
+              <button id="btn-pagina-siguiente" class="px-3 py-1.5 text-sm font-medium rounded-lg border border-[#E8E0D8] transition-colors" style="color: #6B6B6B;" onmouseover="this.style.borderColor='#1b3928'; this.style.color='#1b3928'" onmouseout="this.style.borderColor='#E8E0D8'; this.style.color='#6B6B6B'">Siguiente</button>
+            </div>
+          </div>
+          
+          <div id="sin-publicaciones" class="p-10 text-center" style="display: none;">
+            <div class="w-14 h-14 mx-auto mb-4 rounded-2xl flex items-center justify-center" style="background-color: #F5F0E8;">
+              <svg class="w-7 h-7" style="color: #C0B0A0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
+            </div>
+            <p class="font-medium" style="color: #6B6B6B;">No tienes publicaciones aún</p>
+            <a href="/publicar" class="text-sm mt-1 inline-block font-medium hover:underline" style="color: #B8860B;">Publicar tu primer producto</a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div id="detalles-modal" class="fixed inset-0 bg-black/50 z-50 hidden">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold" style="color: #1A0E08;" id="detalles-titulo">Detalles del Producto</h3>
+            <button id="btn-cerrar-detalles" class="hover:opacity-70 transition-opacity" style="color: #6B6B6B;">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+          <div id="detalles-contenido" class="space-y-4"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="eliminar-modal" class="fixed inset-0 bg-black/50 z-50 hidden">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-xl max-w-sm w-full p-6" onclick="event.stopPropagation()">
+        <div class="text-center">
+          <div class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style="background-color: #FFEBEE;">
+            <svg class="w-6 h-6" style="color: #E53935;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+          </div>
+          <h3 class="text-lg font-semibold mb-2" style="color: #1A0E08;">¿Eliminar publicación?</h3>
+          <p class="text-sm mb-6" style="color: #6B6B6B;">Esta acción no se puede deshacer. El producto ya no aparecerá en el marketplace.</p>
+          <div class="flex gap-3">
+            <button id="btn-cancelar-eliminar" class="flex-1 px-4 py-2 rounded-lg font-medium transition-colors" style="border: 1px solid #E8E0D8; color: #2D2D2D;" onmouseover="this.style.backgroundColor='#F5F0E8'" onmouseout="this.style.backgroundColor='transparent'">Cancelar</button>
+            <button id="btn-confirmar-eliminar" class="flex-1 px-4 py-2 text-white rounded-lg font-medium transition-colors" style="background-color: #E53935;" onmouseover="this.style.backgroundColor='#C62828'" onmouseout="this.style.backgroundColor='#E53935'">Eliminar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="editar-modal" class="fixed inset-0 bg-black/50 z-50 hidden">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+        <div class="p-6 sm:p-8">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold" style="font-family: 'Cormorant Garamond', Georgia, serif; color: #1A0E08;">Editar Publicación</h3>
+            <button id="btn-cerrar-editar" class="hover:opacity-70 transition-opacity" style="color: #6B6B6B;">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+          <form id="form-editar" class="space-y-5">
+            <input type="hidden" id="edit-id" />
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-[10px] font-semibold tracking-widest mb-1.5" style="color: #9CA3AF;">NOMBRE</label>
+                <input type="text" id="edit-nombre" class="w-full px-3 py-2.5 text-sm font-semibold rounded-lg border border-[#E8E0D8] outline-none transition-colors" style="color: #2D2D2D;" onfocus="this.style.borderColor='#1b3928'" onblur="this.style.borderColor='#E8E0D8'" />
+              </div>
+              <div>
+                <label class="block text-[10px] font-semibold tracking-widest mb-1.5" style="color: #9CA3AF;">CATEGORÍA</label>
+                <select id="edit-categoria" class="w-full px-3 py-2.5 text-sm font-semibold rounded-lg border border-[#E8E0D8] outline-none transition-colors" style="color: #2D2D2D; background-color: white;" onfocus="this.style.borderColor='#1b3928'" onblur="this.style.borderColor='#E8E0D8'">
+                </select>
+              </div>
+              <div>
+                <label class="block text-[10px] font-semibold tracking-widest mb-1.5" style="color: #9CA3AF;">RAZA</label>
+                <input type="text" id="edit-raza" class="w-full px-3 py-2.5 text-sm font-semibold rounded-lg border border-[#E8E0D8] outline-none transition-colors" style="color: #2D2D2D;" onfocus="this.style.borderColor='#1b3928'" onblur="this.style.borderColor='#E8E0D8'" />
+              </div>
+              <div>
+                <label class="block text-[10px] font-semibold tracking-widest mb-1.5" style="color: #9CA3AF;">PRECIO TOTAL ($) *</label>
+                <input type="number" id="edit-precio" step="0.01" class="w-full px-3 py-2.5 text-sm font-semibold rounded-lg border border-[#E8E0D8] outline-none transition-colors" style="color: #2D2D2D;" onfocus="this.style.borderColor='#1b3928'" onblur="this.style.borderColor='#E8E0D8'" />
+              </div>
+              <div>
+                <label class="block text-[10px] font-semibold tracking-widest mb-1.5" style="color: #9CA3AF;">PRECIO UNITARIO ($ / CABEZA)</label>
+                <input type="number" id="edit-precio-unitario" step="0.01" class="w-full px-3 py-2.5 text-sm font-semibold rounded-lg border border-[#E8E0D8] outline-none transition-colors" style="color: #2D2D2D;" onfocus="this.style.borderColor='#1b3928'" onblur="this.style.borderColor='#E8E0D8'" />
+              </div>
+              <div>
+                <div class="flex justify-between items-center mb-1.5">
+                  <label class="block text-[10px] font-semibold tracking-widest" style="color: #9CA3AF;">CANTIDAD DISPONIBLE (STOCK) *</label>
+                  <span id="edit-stock-max-hint" class="text-[10px] font-semibold text-emerald-800"></span>
+                </div>
+                <input type="number" id="edit-stock" min="0" class="w-full px-3 py-2.5 text-sm font-semibold rounded-lg border border-[#E8E0D8] outline-none transition-colors" style="color: #2D2D2D;" onfocus="this.style.borderColor='#1b3928'" onblur="this.style.borderColor='#E8E0D8'" />
+                <p class="text-[11px] text-[#6B6B6B] mt-1">Reduce el stock si vendiste animales por fuera.</p>
+              </div>
+              <div>
+                <label class="block text-[10px] font-semibold tracking-widest mb-1.5" style="color: #9CA3AF;">PESO (KG)</label>
+                <input type="number" id="edit-peso" class="w-full px-3 py-2.5 text-sm font-semibold rounded-lg border border-[#E8E0D8] outline-none transition-colors" style="color: #2D2D2D;" onfocus="this.style.borderColor='#1b3928'" onblur="this.style.borderColor='#E8E0D8'" />
+              </div>
+              <div>
+                <label class="block text-[10px] font-semibold tracking-widest mb-1.5" style="color: #9CA3AF;">MUNICIPIO</label>
+                <select id="edit-ubicacion" class="w-full px-3 py-2.5 text-sm font-semibold rounded-lg border border-[#E8E0D8] outline-none transition-colors bg-white" style="color: #2D2D2D;" onfocus="this.style.borderColor='#1b3928'" onblur="this.style.borderColor='#E8E0D8'">
+                  <option value="">Seleccionar Municipio</option>
+                  <option value="Aguadas">Aguadas</option>
+                  <option value="Anserma">Anserma</option>
+                  <option value="Aranzazu">Aranzazu</option>
+                  <option value="Belalcázar">Belalcázar</option>
+                  <option value="Chinchiná">Chinchiná</option>
+                  <option value="Filadelfia">Filadelfia</option>
+                  <option value="La Dorada">La Dorada</option>
+                  <option value="La Merced">La Merced</option>
+                  <option value="Manizales (capital)">Manizales (capital)</option>
+                  <option value="Manzanares">Manzanares</option>
+                  <option value="Marmato">Marmato</option>
+                  <option value="Marquetalia">Marquetalia</option>
+                  <option value="Marulanda">Marulanda</option>
+                  <option value="Neira">Neira</option>
+                  <option value="Norcasia">Norcasia</option>
+                  <option value="Pácora">Pácora</option>
+                  <option value="Palestina">Palestina</option>
+                  <option value="Pensilvania">Pensilvania</option>
+                  <option value="Riosucio">Riosucio</option>
+                  <option value="Risaralda">Risaralda</option>
+                  <option value="Salamina">Salamina</option>
+                  <option value="Samaná">Samaná</option>
+                  <option value="San José">San José</option>
+                  <option value="Supía">Supía</option>
+                  <option value="Victoria">Victoria</option>
+                  <option value="Villamaría">Villamaría</option>
+                  <option value="Viterbo">Viterbo</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[10px] font-semibold tracking-widest mb-1.5" style="color: #9CA3AF;">DEPARTAMENTO</label>
+                <input type="text" id="edit-departamento" value="Caldas" readonly tabindex="-1" class="w-full px-3 py-2.5 text-sm font-semibold rounded-lg border border-[#E8E0D8] outline-none bg-[#F8F8F8] text-slate-400 cursor-not-allowed" />
+              </div>
+              <div>
+                <label class="block text-[10px] font-semibold tracking-widest mb-1.5" style="color: #9CA3AF;">NOMBRE DE LA FINCA *</label>
+                <input type="text" id="edit-finca" required minlength="3" maxlength="80" placeholder="Ej. Hacienda El Paraíso" class="w-full px-3 py-2.5 text-sm font-semibold rounded-lg border border-[#E8E0D8] outline-none transition-colors bg-white" style="color: #2D2D2D;" onfocus="this.style.borderColor='#1b3928'" onblur="this.style.borderColor='#E8E0D8'" />
+              </div>
+              <div>
+                <label class="block text-[10px] font-semibold tracking-widest mb-1.5" style="color: #9CA3AF;">VEREDA / CORREGIMIENTO</label>
+                <input type="text" id="edit-vereda" maxlength="80" placeholder="Ej. Vereda La Esperanza" class="w-full px-3 py-2.5 text-sm font-semibold rounded-lg border border-[#E8E0D8] outline-none transition-colors bg-white" style="color: #2D2D2D;" onfocus="this.style.borderColor='#1b3928'" onblur="this.style.borderColor='#E8E0D8'" />
+              </div>
+              <div class="col-span-2">
+                <label class="block text-[10px] font-semibold tracking-widest mb-1.5" style="color: #9CA3AF;">SECTOR O REFERENCIA</label>
+                <textarea id="edit-referencia" maxlength="200" rows="2" placeholder="Ej. A 2 km del parque principal, vía al corregimiento de San Jose." class="w-full px-3 py-2.5 text-sm font-semibold rounded-lg border border-[#E8E0D8] outline-none transition-colors bg-white resize-none" style="color: #2D2D2D;" onfocus="this.style.borderColor='#1b3928'" onblur="this.style.borderColor='#E8E0D8'"></textarea>
+              </div>
+              <div>
+                <label class="block text-[10px] font-semibold tracking-widest mb-1.5" style="color: #9CA3AF;">SEXO</label>
+                <select id="edit-sexo" class="w-full px-3 py-2.5 text-sm font-semibold rounded-lg border border-[#E8E0D8] outline-none transition-colors" style="color: #2D2D2D; background-color: white;" onfocus="this.style.borderColor='#1b3928'" onblur="this.style.borderColor='#E8E0D8'">
+                  <option value="">No especificado</option>
+                  <option value="macho">Macho</option>
+                  <option value="hembra">Hembra</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[10px] font-semibold tracking-widest mb-1.5" style="color: #9CA3AF;">ESTADO</label>
+                <select id="edit-estado" class="w-full px-3 py-2.5 text-sm font-semibold rounded-lg border border-[#E8E0D8] outline-none transition-colors" style="color: #2D2D2D; background-color: white;" onfocus="this.style.borderColor='#1b3928'" onblur="this.style.borderColor='#E8E0D8'">
+                  <option value="disponible">Disponible</option>
+                  <option value="reservado">Reservado</option>
+                  <option value="vendido">Vendido</option>
+                  <option value="engorde">Engorde</option>
+                  <option value="produccion">Producción</option>
+                  <option value="levante">Levante</option>
+                  <option value="cria">Cría</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class="block text-[10px] font-semibold tracking-widest mb-1.5" style="color: #9CA3AF;">DESCRIPCIÓN</label>
+              <textarea id="edit-descripcion" rows="3" class="w-full px-3 py-2.5 text-sm rounded-lg border border-[#E8E0D8] outline-none transition-colors resize-none" style="color: #2D2D2D;" onfocus="this.style.borderColor='#1b3928'" onblur="this.style.borderColor='#E8E0D8'"></textarea>
+            </div>
+            <div>
+              <label class="block text-[10px] font-semibold tracking-widest mb-2" style="color: #9CA3AF;">IMÁGENES</label>
+              <div id="edit-imagenes-grid" class="grid grid-cols-3 sm:grid-cols-4 gap-3"></div>
+              <button type="button" id="btn-agregar-imagenes" class="mt-3 w-full py-2.5 text-sm font-medium rounded-lg border-2 border-dashed transition-colors" style="border-color: #E8E0D8; color: #6B6B6B;" onmouseover="this.style.borderColor='#1b3928'; this.style.color='#1b3928'" onmouseout="this.style.borderColor='#E8E0D8'; this.style.color='#6B6B6B'">
+                + Agregar imágenes
+              </button>
+              <input type="file" id="edit-file-input" accept="image/*" multiple class="hidden" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-semibold tracking-widest mb-2" style="color: #9CA3AF;">VIDEO</label>
+              <div id="edit-video-preview" class="hidden rounded-xl overflow-hidden relative group" style="border: 1px solid #E8E0D8;">
+                <video id="edit-video-player" class="w-full rounded-xl" style="max-height: 200px; object-fit: cover;" controls></video>
+                <button type="button" id="btn-delete-video" class="absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" style="background: rgba(0,0,0,0.6); color: white;">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+              </div>
+              <button type="button" id="btn-agregar-video" class="mt-2 w-full py-2.5 text-sm font-medium rounded-lg border-2 border-dashed transition-colors" style="border-color: #E8E0D8; color: #6B6B6B;" onmouseover="this.style.borderColor='#1b3928'; this.style.color='#1b3928'" onmouseout="this.style.borderColor='#E8E0D8'; this.style.color='#6B6B6B'">
+                + Agregar video
+              </button>
+              <input type="file" id="edit-video-input" accept="video/*" class="hidden" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-semibold tracking-widest mb-2" style="color: #9CA3AF;">CERTIFICADOS (ICA, RUV, RFG, REGISTRO GENEALÓGICO)</label>
+              <div id="edit-certificados-grid" class="space-y-2"></div>
+              <button type="button" id="btn-agregar-certificados" class="mt-3 w-full py-2.5 text-sm font-medium rounded-lg border-2 border-dashed transition-colors" style="border-color: #E8E0D8; color: #6B6B6B;" onmouseover="this.style.borderColor='#1b3928'; this.style.color='#1b3928'" onmouseout="this.style.borderColor='#E8E0D8'; this.style.color='#6B6B6B'">
+                + Agregar certificados
+              </button>
+              <input type="file" id="edit-certificados-input" accept=".pdf,application/pdf" multiple class="hidden" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-semibold tracking-widest mb-2" style="color: #9CA3AF;">TRANSPORTE</label>
+              <div class="space-y-2">
+                <label id="edit-transporte-agroup" class="flex items-center gap-3 px-4 py-3 rounded-xl border-2 cursor-pointer transition-colors" style="border-color: #E8E0D8; background-color: #FDFBF7;">
+                  <input type="radio" name="edit-transporte" value="agroup" class="hidden" />
+                  <span id="edit-transporte-agroup-dot" class="w-4 h-4 rounded-full border-2 shrink-0" style="border-color: #D5CBB8;"></span>
+                  <span class="text-sm font-medium" style="color: #2D2D2D;">Transporte por medio de AgroUp</span>
+                </label>
+                <label id="edit-transporte-propio" class="flex items-center gap-3 px-4 py-3 rounded-xl border-2 cursor-pointer transition-colors" style="border-color: #E8E0D8; background-color: #FDFBF7;">
+                  <input type="radio" name="edit-transporte" value="propio" class="hidden" />
+                  <span id="edit-transporte-propio-dot" class="w-4 h-4 rounded-full border-2 shrink-0" style="border-color: #D5CBB8;"></span>
+                  <span class="text-sm font-medium" style="color: #2D2D2D;">Transporte por medios propios</span>
+                </label>
+              </div>
+            </div>
+            <div id="edit-error" class="hidden text-sm font-medium" style="color: #E53935;"></div>
+            <div class="flex gap-3 pt-2">
+              <button type="button" id="btn-cancelar-editar" class="flex-1 px-4 py-2.5 rounded-lg font-medium transition-colors" style="border: 1px solid #E8E0D8; color: #2D2D2D;" onmouseover="this.style.backgroundColor='#F5F0E8'" onmouseout="this.style.backgroundColor='transparent'">Cancelar</button>
+              <button type="submit" class="flex-1 px-4 py-2.5 text-white rounded-lg font-bold transition-colors" style="background-color: #1b3928;" onmouseover="this.style.backgroundColor='#0A5C43'" onmouseout="this.style.backgroundColor='#1b3928'">Guardar Cambios</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <CartDrawer />
+</BaseLayout>
+
+<script>
+  import { updateUser } from '../stores/auth';
+  let productoAEliminar = null;
+
+  function cerrarModal() {
+    document.getElementById('detalles-modal').classList.add('hidden');
+  }
+
+  function cerrarEliminar() {
+    document.getElementById('eliminar-modal').classList.add('hidden');
+    productoAEliminar = null;
+  }
+
+  function getPlaceholderImagen(categoria) {
+    const imagenes = {
+      bovinos: '/images/ganado.svg',
+      equinos: '/images/caballo.svg',
+      porcinos: '/images/cerdo.svg',
+      ovinos: '/images/ganado.svg',
+      avicolas: '/images/gallina.svg',
+      cultivos: '/images/cultivos.svg',
+      servicios: '/images/default.svg',
+      agricultura: '/images/cultivos.svg',
+      insumos: '/images/default.svg',
+    };
+    return imagenes[String(categoria || '').toLowerCase()] || '/images/default.svg';
+  }
+
+  function mostrarDetalles(producto) {
+    const contenido = document.getElementById('detalles-contenido');
+    const imagenes = producto.imagenes?.filter(Boolean) || [];
+    const imgSrc = imagenes[0] || getPlaceholderImagen(producto.categoria);
+    const tieneVarias = imagenes.length > 1;
+
+    let galeriaHtml = '';
+    if (tieneVarias) {
+      const dots = imagenes.map((_, i) =>
+        `<button class="galeria-dot w-2 h-2 rounded-full transition-all" data-index="${i}" style="background-color: ${i === 0 ? '#1b3928' : '#D1D5DB'}; ${i === 0 ? 'transform: scale(1.3);' : ''}"></button>`
+      ).join('');
+      const miniaturas = imagenes.map((url, i) =>
+        `<button class="galeria-thumb flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden border-2 transition-all" data-index="${i}" style="${i === 0 ? 'border-color: #1b3928;' : 'border-color: transparent; opacity: 0.6;'}"><img src="${url}" alt="" class="w-full h-full object-cover" /></button>`
+      ).join('');
+      galeriaHtml = `
+        <div class="flex gap-2 mt-3 overflow-x-auto pb-1" id="galeria-thumbnails">${miniaturas}</div>
+        <div class="flex items-center justify-center gap-1.5 mt-2" id="galeria-dots">${dots}</div>
+      `;
+    }
+
+    contenido.innerHTML = `
+      <div class="relative aspect-video rounded-lg overflow-hidden" style="background-color: #1A0E08;">
+        <img id="detalle-imagen-principal" src="${imgSrc}" alt="${producto.nombre}" class="w-full h-full object-cover" />
+        ${tieneVarias ? `
+        <button id="btn-img-prev" class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110" style="background-color: rgba(0,0,0,0.5); color: white;">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <button id="btn-img-next" class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110" style="background-color: rgba(0,0,0,0.5); color: white;">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </button>
+        ` : ''}
+      </div>
+      ${galeriaHtml}
+      <div>
+        <h4 class="font-semibold" style="color: #1A0E08;">${producto.nombre}</h4>
+        <p class="text-sm capitalize" style="color: #6B6B6B;">${producto.categoria} ${producto.raza ? '- ' + producto.raza : ''}</p>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div><p class="text-xs" style="color: #6B6B6B;">Precio</p><p class="font-semibold">$${parseInt(producto.precio || 0).toLocaleString('es-CO')}</p></div>
+        <div><p class="text-xs" style="color: #6B6B6B;">Stock</p><p class="font-semibold">${producto.stock}</p></div>
+        <div><p class="text-xs" style="color: #6B6B6B;">Ubicación</p><p class="font-semibold">${producto.ubicacion}</p></div>
+        <div><p class="text-xs" style="color: #6B6B6B;">Departamento</p><p class="font-semibold">${producto.departamento}</p></div>
+        ${producto.peso ? `<div><p class="text-xs" style="color: #6B6B6B;">Peso</p><p class="font-semibold">${producto.peso} kg</p></div>` : ''}
+        ${producto.salud ? `<div><p class="text-xs" style="color: #6B6B6B;">Salud</p><p class="font-semibold">${producto.salud}</p></div>` : ''}
+      </div>
+      <a href="/marketplace" class="block w-full text-center py-2.5 text-white rounded-lg font-medium transition-colors" style="background-color: #1b3928;" onmouseover="this.style.backgroundColor='#0A5C43'" onmouseout="this.style.backgroundColor='#1b3928'">Ver todos en Marketplace</a>
+    `;
+
+    if (tieneVarias) {
+      let indiceActual = 0;
+      const imgPrincipal = document.getElementById('detalle-imagen-principal') as HTMLImageElement;
+      const dots = document.querySelectorAll('#galeria-dots .galeria-dot');
+      const thumbs = document.querySelectorAll('#galeria-thumbnails .galeria-thumb');
+      const btnPrev = document.getElementById('btn-img-prev');
+      const btnNext = document.getElementById('btn-img-next');
+
+      function actualizarGaleria(idx: number) {
+        indiceActual = idx;
+        imgPrincipal.src = imagenes[idx];
+        dots.forEach((dot, i) => {
+          (dot as HTMLElement).style.backgroundColor = i === idx ? '#1b3928' : '#D1D5DB';
+          (dot as HTMLElement).style.transform = i === idx ? 'scale(1.3)' : 'scale(1)';
+        });
+        thumbs.forEach((thumb, i) => {
+          (thumb as HTMLElement).style.borderColor = i === idx ? '#1b3928' : 'transparent';
+          (thumb as HTMLElement).style.opacity = i === idx ? '1' : '0.6';
+        });
+      }
+
+      dots.forEach(dot => {
+        dot.addEventListener('click', () => actualizarGaleria(parseInt((dot as HTMLElement).dataset.index)));
+      });
+      thumbs.forEach(thumb => {
+        thumb.addEventListener('click', () => actualizarGaleria(parseInt((thumb as HTMLElement).dataset.index)));
+      });
+      btnPrev?.addEventListener('click', () => {
+        actualizarGaleria(indiceActual > 0 ? indiceActual - 1 : imagenes.length - 1);
+      });
+      btnNext?.addEventListener('click', () => {
+        actualizarGaleria(indiceActual < imagenes.length - 1 ? indiceActual + 1 : 0);
+      });
+    }
+
+    document.getElementById('detalles-titulo').textContent = producto.nombre;
+    document.getElementById('detalles-modal').classList.remove('hidden');
+  }
+
+  function mostrarEliminar(producto) {
+    productoAEliminar = producto;
+    document.getElementById('eliminar-modal').classList.remove('hidden');
+  }
+
+  let productoAEditar = null;
+  let stockOriginalEditar = 1;
+  let editImages = [];
+  let editVideo = '';
+  let editCertificaciones: string[] = [];
+  let editTransporte: string = 'propio';
+
+  function renderEditImagenes() {
+    const grid = document.getElementById('edit-imagenes-grid');
+    grid.innerHTML = '';
+    editImages.forEach((url, i) => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'relative rounded-xl overflow-hidden group';
+      wrapper.style.cssText = 'aspect-ratio: 1 / 1; border: 1px solid #E8E0D8;';
+      wrapper.innerHTML = `
+        <img src="${url}" class="w-full h-full object-cover" />
+        <button type="button" class="btn-delete-img absolute top-1.5 right-1.5 w-7 h-7 rounded-full text-white flex items-center justify-center shadow-md transition-all cursor-pointer hover:scale-110 z-10" style="background-color: #1b3928;" onmouseover="this.style.backgroundColor='#DC2626'" onmouseout="this.style.backgroundColor='#1b3928'" title="Eliminar foto" data-index="${i}">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      `;
+      grid.appendChild(wrapper);
+    });
+    grid.querySelectorAll('.btn-delete-img').forEach(btn => {
+      btn.addEventListener('click', () => {
+        editImages.splice(parseInt(btn.dataset.index), 1);
+        renderEditImagenes();
+      });
+    });
+  }
+
+  function abrirEditar(producto) {
+    productoAEditar = producto;
+    stockOriginalEditar = parseInt(producto.stock) || 1;
+    editImages = Array.isArray(producto.imagenes) ? [...producto.imagenes] : [];
+    editVideo = producto.video || '';
+    document.getElementById('edit-id').value = producto.id || '';
+    document.getElementById('edit-nombre').value = producto.nombre || '';
+    document.getElementById('edit-categoria').value = producto.categoria || 'bovinos';
+    document.getElementById('edit-raza').value = producto.raza || '';
+    
+    const precioVal = parseFloat(producto.precio) || 0;
+    const stockVal = parseInt(producto.stock) || 1;
+    const unitVal = producto.precio_unitario ? parseFloat(producto.precio_unitario) : (stockVal > 0 ? Math.round(precioVal / stockVal) : precioVal);
+
+    document.getElementById('edit-precio').value = precioVal || '';
+    document.getElementById('edit-precio-unitario').value = unitVal || '';
+    document.getElementById('edit-stock').value = stockVal;
+    
+    const hintEl = document.getElementById('edit-stock-max-hint');
+    if (hintEl) {
+      hintEl.textContent = `(Lote original: ${stockOriginalEditar} cabezas)`;
+    }
+
+    document.getElementById('edit-peso').value = producto.peso || '';
+    document.getElementById('edit-ubicacion').value = producto.ubicacion || '';
+    document.getElementById('edit-departamento').value = 'Caldas';
+    document.getElementById('edit-finca').value = producto.finca || '';
+    document.getElementById('edit-vereda').value = producto.vereda || '';
+    document.getElementById('edit-referencia').value = producto.referencia_ubicacion || '';
+    document.getElementById('edit-sexo').value = producto.sexo || '';
+    document.getElementById('edit-estado').value = producto.estado || 'disponible';
+    document.getElementById('edit-descripcion').value = producto.descripcion || '';
+    document.getElementById('edit-error').classList.add('hidden');
+    editCertificaciones = parseCertificacionesProducto(producto);
+    editTransporte = producto.transporte === 'agroup' ? 'agroup' : 'propio';
+    renderEditImagenes();
+    renderEditVideo();
+    renderEditCertificaciones();
+    renderEditTransporte();
+    document.getElementById('editar-modal').classList.remove('hidden');
+  }
+
+  function renderEditVideo() {
+    const preview = document.getElementById('edit-video-preview');
+    const player = document.getElementById('edit-video-player');
+    const btnAdd = document.getElementById('btn-agregar-video');
+    if (editVideo) {
+      player.src = editVideo;
+      preview.classList.remove('hidden');
+      btnAdd.classList.add('hidden');
+    } else {
+      player.src = '';
+      preview.classList.add('hidden');
+      btnAdd.classList.remove('hidden');
+    }
+  }
+
+  function parseCertificacionesProducto(producto: any) {
+    if (Array.isArray(producto.certificaciones)) return [...producto.certificaciones];
+    if (producto.ica_pdf) {
+      try {
+        const parsed = JSON.parse(producto.ica_pdf);
+        if (Array.isArray(parsed)) return parsed;
+      } catch {}
+    }
+    return [];
+  }
+
+  function renderEditCertificaciones() {
+    const grid = document.getElementById('edit-certificados-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    if (editCertificaciones.length === 0) {
+      const vacio = document.createElement('p');
+      vacio.className = 'text-sm';
+      vacio.style.color = '#9CA3AF';
+      vacio.textContent = 'No hay certificados asociados a esta publicación.';
+      grid.appendChild(vacio);
+      return;
+    }
+    editCertificaciones.forEach((url, i) => {
+      const filename = url.split('/').pop() || `certificado-${i + 1}`;
+      const wrapper = document.createElement('div');
+      wrapper.className = 'flex items-center gap-3 p-3 rounded-xl';
+      wrapper.style.cssText = 'border: 1px solid #E8E0D8; background-color: #FDFBF7;';
+      wrapper.innerHTML = `
+        <svg class="w-5 h-5 shrink-0" style="color: #1b3928;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        <span class="text-sm font-medium flex-1 min-w-0 truncate" style="color: #2D2D2D;" title="${url}">${filename}</span>
+        <a href="${url}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1.5 text-xs font-semibold rounded-lg transition-colors shrink-0" style="background-color: #E8F5E9; color: #1b3928;" onmouseover="this.style.backgroundColor='#C8E6C9'" onmouseout="this.style.backgroundColor='#E8F5E9'">Ver</a>
+        <button type="button" class="btn-delete-cert w-7 h-7 rounded-full flex items-center justify-center text-white transition-all cursor-pointer hover:scale-110 shrink-0" style="background-color: #E53935;" data-index="${i}" title="Eliminar certificado">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      `;
+      grid.appendChild(wrapper);
+    });
+    grid.querySelectorAll('.btn-delete-cert').forEach(btn => {
+      btn.addEventListener('click', () => {
+        editCertificaciones.splice(parseInt(btn.dataset.index), 1);
+        renderEditCertificaciones();
+      });
+    });
+  }
+
+  function renderEditTransporte() {
+    const opciones = [
+      { val: 'agroup', el: document.getElementById('edit-transporte-agroup'), dot: document.getElementById('edit-transporte-agroup-dot') },
+      { val: 'propio', el: document.getElementById('edit-transporte-propio'), dot: document.getElementById('edit-transporte-propio-dot') },
+    ];
+    opciones.forEach(({ val, el, dot }) => {
+      if (!el) return;
+      const activo = editTransporte === val;
+      el.style.borderColor = activo ? '#1b3928' : '#E8E0D8';
+      el.style.backgroundColor = activo ? '#E8F5E9' : '#FDFBF7';
+      if (dot) {
+        dot.style.borderColor = activo ? '#1b3928' : '#D5CBB8';
+        dot.style.backgroundColor = activo ? '#1b3928' : 'transparent';
+      }
+    });
+  }
+
+  function setEditTransporte(val: string) {
+    editTransporte = val;
+    renderEditTransporte();
+  }
+
+  function cerrarEditar() {
+    document.getElementById('editar-modal').classList.add('hidden');
+    productoAEditar = null;
+  }
+
+  async function confirmarEliminar() {
+    if (!productoAEliminar) return;
+    const token = localStorage.getItem('agroup_token');
+    
+    try {
+      await fetch(`/api/productos/${productoAEliminar.id}`, {
+        method: 'DELETE',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+      });
+    } catch (err) {
+      console.error('Error al eliminar:', err);
+    }
+    
+    cerrarEliminar();
+    cargarMisPublicaciones();
+    actualizarStatsVendedor();
+  }
+
+  document.getElementById('btn-cerrar-detalles').addEventListener('click', cerrarModal);
+  document.getElementById('btn-confirmar-eliminar').addEventListener('click', confirmarEliminar);
+  document.getElementById('btn-cancelar-eliminar').addEventListener('click', cerrarEliminar);
+
+  document.getElementById('detalles-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'detalles-modal') cerrarModal();
+  });
+  document.getElementById('eliminar-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'eliminar-modal') cerrarEliminar();
+  });
+
+  document.getElementById('btn-cerrar-editar').addEventListener('click', cerrarEditar);
+  document.getElementById('btn-cancelar-editar').addEventListener('click', cerrarEditar);
+  document.getElementById('editar-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'editar-modal') cerrarEditar();
+  });
+
+  document.getElementById('btn-agregar-imagenes').addEventListener('click', () => {
+    document.getElementById('edit-file-input').click();
+  });
+
+  document.getElementById('edit-file-input').addEventListener('change', async (e) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    const formData = new FormData();
+    for (const file of files) {
+      formData.append('photos', file);
+    }
+    try {
+      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+      if (!res.ok) throw new Error('Error al subir imagen');
+      const data = await res.json();
+      if (data.urls) {
+        editImages.push(...data.urls);
+        renderEditImagenes();
+      }
+    } catch (err) {
+      const errorEl = document.getElementById('edit-error');
+      errorEl.textContent = err.message;
+      errorEl.classList.remove('hidden');
+    }
+    e.target.value = '';
+  });
+
+  document.getElementById('btn-agregar-video').addEventListener('click', () => {
+    document.getElementById('edit-video-input').click();
+  });
+
+  document.getElementById('edit-video-input').addEventListener('change', async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('video', file);
+    try {
+      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+      if (!res.ok) throw new Error('Error al subir video');
+      const data = await res.json();
+      if (data.videoUrl) {
+        editVideo = data.videoUrl;
+        renderEditVideo();
+      }
+    } catch (err) {
+      const errorEl = document.getElementById('edit-error');
+      errorEl.textContent = err.message;
+      errorEl.classList.remove('hidden');
+    }
+    e.target.value = '';
+  });
+
+  document.getElementById('btn-delete-video').addEventListener('click', () => {
+    editVideo = '';
+    renderEditVideo();
+  });
+
+  document.getElementById('btn-agregar-certificados').addEventListener('click', () => {
+    document.getElementById('edit-certificados-input').click();
+  });
+
+  document.getElementById('edit-transporte-agroup').addEventListener('click', () => setEditTransporte('agroup'));
+  document.getElementById('edit-transporte-propio').addEventListener('click', () => setEditTransporte('propio'));
+
+  document.getElementById('edit-certificados-input').addEventListener('change', async (e) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    const formData = new FormData();
+    for (const file of files) {
+      formData.append('certificaciones', file);
+    }
+    try {
+      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+      if (!res.ok) throw new Error('Error al subir certificado');
+      const data = await res.json();
+      if (data.certUrls) {
+        editCertificaciones.push(...data.certUrls);
+        renderEditCertificaciones();
+      }
+    } catch (err) {
+      const errorEl = document.getElementById('edit-error');
+      errorEl.textContent = err.message;
+      errorEl.classList.remove('hidden');
+    }
+    e.target.value = '';
+  });
+
+  // Sincronización dinámica de precios y stock en edición
+  document.getElementById('edit-precio-unitario')?.addEventListener('input', () => {
+    const unit = parseFloat((document.getElementById('edit-precio-unitario') as HTMLInputElement).value) || 0;
+    const stock = parseInt((document.getElementById('edit-stock') as HTMLInputElement).value) || 0;
+    if (unit > 0 && stock > 0) {
+      const calcTotal = unit * stock;
+      (document.getElementById('edit-precio') as HTMLInputElement).value = Number.isInteger(calcTotal) ? String(calcTotal) : calcTotal.toFixed(2);
+    }
+  });
+
+  document.getElementById('edit-stock')?.addEventListener('input', () => {
+    const stockInput = document.getElementById('edit-stock') as HTMLInputElement;
+    let stock = parseInt(stockInput.value);
+    const errorEl = document.getElementById('edit-error');
+    if (isNaN(stock) || stock < 0) {
+      stockInput.value = '0';
+      stock = 0;
+    } else if (stock > stockOriginalEditar) {
+      stockInput.value = String(stockOriginalEditar);
+      stock = stockOriginalEditar;
+      if (errorEl) {
+        errorEl.textContent = `No puedes aumentar el stock por encima del lote original (${stockOriginalEditar} cabezas). Para agregar más animales crea una nueva publicación.`;
+        errorEl.classList.remove('hidden');
+        setTimeout(() => errorEl?.classList.add('hidden'), 4000);
+      }
+    }
+    const unit = parseFloat((document.getElementById('edit-precio-unitario') as HTMLInputElement).value) || 0;
+    if (unit > 0) {
+      const calcTotal = unit * stock;
+      (document.getElementById('edit-precio') as HTMLInputElement).value = Number.isInteger(calcTotal) ? String(calcTotal) : calcTotal.toFixed(2);
+    }
+  });
+
+  document.getElementById('edit-precio')?.addEventListener('input', () => {
+    const total = parseFloat((document.getElementById('edit-precio') as HTMLInputElement).value) || 0;
+    const stock = parseInt((document.getElementById('edit-stock') as HTMLInputElement).value) || 1;
+    if (total > 0 && stock > 0) {
+      const calcUnit = total / stock;
+      (document.getElementById('edit-precio-unitario') as HTMLInputElement).value = Number.isInteger(calcUnit) ? String(calcUnit) : calcUnit.toFixed(2);
+    }
+  });
+
+  document.getElementById('form-editar').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!productoAEditar) return;
+    const errorEl = document.getElementById('edit-error');
+    errorEl.classList.add('hidden');
+
+    const precioTotalVal = parseFloat((document.getElementById('edit-precio') as HTMLInputElement).value) || 0;
+    const stockVal = parseInt((document.getElementById('edit-stock') as HTMLInputElement).value) || 0;
+    const precioUnitarioVal = parseFloat((document.getElementById('edit-precio-unitario') as HTMLInputElement).value) || (stockVal > 0 ? Math.round(precioTotalVal / stockVal) : precioTotalVal);
+
+    if (stockVal < 0) {
+      errorEl.textContent = 'El stock no puede ser negativo.';
+      errorEl.classList.remove('hidden');
+      return;
+    }
+    if (stockVal > stockOriginalEditar) {
+      errorEl.textContent = `El stock no puede exceder el lote original (${stockOriginalEditar} cabezas).`;
+      errorEl.classList.remove('hidden');
+      return;
+    }
+    if (precioTotalVal <= 0) {
+      errorEl.textContent = 'El precio debe ser un número positivo.';
+      errorEl.classList.remove('hidden');
+      return;
+    }
+
+    const body = {
+      nombre: (document.getElementById('edit-nombre') as HTMLInputElement).value.trim(),
+      categoria: (document.getElementById('edit-categoria') as HTMLSelectElement).value,
+      raza: (document.getElementById('edit-raza') as HTMLInputElement).value.trim(),
+      precio: precioTotalVal,
+      precio_unitario: precioUnitarioVal,
+      stock: stockVal,
+      peso: (document.getElementById('edit-peso') as HTMLInputElement).value ? parseFloat((document.getElementById('edit-peso') as HTMLInputElement).value) : null,
+      ubicacion: (document.getElementById('edit-ubicacion') as HTMLSelectElement).value.trim(),
+      departamento: 'Caldas',
+      finca: document.getElementById('edit-finca').value.trim(),
+      vereda: document.getElementById('edit-vereda').value.trim(),
+      referencia_ubicacion: document.getElementById('edit-referencia').value.trim(),
+      sexo: document.getElementById('edit-sexo').value,
+      estado: document.getElementById('edit-estado').value,
+      descripcion: document.getElementById('edit-descripcion').value.trim(),
+      imagenes: editImages,
+      video: editVideo,
+      certificaciones: editCertificaciones,
+      transporte: editTransporte,
+    };
+
+    if (!body.finca || body.finca.length < 3 || body.finca.length > 80) {
+      errorEl.textContent = 'El nombre de la finca es obligatorio y debe tener entre 3 y 80 caracteres.';
+      errorEl.classList.remove('hidden');
+      return;
+    }
+
+    if (!body.nombre) {
+      errorEl.textContent = 'El nombre es obligatorio.';
+      errorEl.classList.remove('hidden');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('agroup_token');
+      const res = await fetch(`/api/productos/${productoAEditar.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Error al guardar');
+      }
+      cerrarEditar();
+      await cargarMisPublicaciones();
+      await actualizarStatsVendedor();
+    } catch (err) {
+      errorEl.textContent = err.message;
+      errorEl.classList.remove('hidden');
+    }
+  });
+
+  function cargarPerfil() {
+    const user = JSON.parse(localStorage.getItem('agroup_user') || '{}');
+    const camposInfo = ['nombre', 'email', 'celular'];
+    camposInfo.forEach(key => {
+      const el = document.getElementById(`info-${key}`);
+      if (el) el.textContent = user[key] || '—';
+    });
+    const inputHacienda = document.getElementById('input-hacienda-nombre');
+    if (inputHacienda && user.hacienda) {
+      inputHacienda.value = user.hacienda;
+    }
+    if (user.logo) {
+      const container = document.getElementById('hacienda-logo-container');
+      container.innerHTML = `<img src="${user.logo}" alt="Logo hacienda" class="w-full h-full object-cover" />`;
+      container.onclick = () => document.getElementById('hacienda-logo-input')?.click();
+      document.getElementById('btn-eliminar-logo')?.classList.remove('hidden');
+    } else {
+      document.getElementById('btn-eliminar-logo')?.classList.add('hidden');
+    }
+  }
+
+  document.getElementById('btn-guardar-hacienda').addEventListener('click', async () => {
+    const input = document.getElementById('input-hacienda-nombre');
+    const nombre = input.value.trim();
+    if (!nombre) return;
+    const token = localStorage.getItem('agroup_token');
+    try {
+      const res = await fetch('/api/auth/perfil', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
+        body: JSON.stringify({ hacienda: nombre }),
+      });
+      const data = await res.json();
+      if (data.success && data.user) {
+        localStorage.setItem('agroup_user', JSON.stringify(data.user));
+        if (data.token) localStorage.setItem('agroup_token', data.token);
+      }
+    } catch {}
+    const btn = document.getElementById('btn-guardar-hacienda');
+    btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>';
+    btn.style.backgroundColor = '#2E7D32';
+    setTimeout(() => { btn.style.backgroundColor = '#1b3928'; }, 1500);
+  });
+
+  const logoInput = document.getElementById('hacienda-logo-input');
+  if (logoInput) {
+    logoInput.addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const dataUrl = ev.target.result;
+        const container = document.getElementById('hacienda-logo-container');
+        container.innerHTML = `<img src="${dataUrl}" alt="Logo hacienda" class="w-full h-full object-cover" />`;
+        container.onclick = () => logoInput.click();
+        window._pendingLogo = dataUrl;
+        document.getElementById('btn-guardar-logo')?.classList.remove('hidden');
+        document.getElementById('btn-eliminar-logo')?.classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  document.getElementById('btn-guardar-logo')?.addEventListener('click', async () => {
+    if (!window._pendingLogo) return;
+    const btn = document.getElementById('btn-guardar-logo');
+    btn.textContent = 'Guardando...';
+    btn.disabled = true;
+    const user = JSON.parse(localStorage.getItem('agroup_user') || '{}');
+    user.logo = window._pendingLogo;
+    user.avatar = window._pendingLogo;
+    localStorage.setItem('agroup_user', JSON.stringify(user));
+    updateUser(user);
+    const token = localStorage.getItem('agroup_token');
+    try {
+      const res = await fetch('/api/auth/perfil', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
+        body: JSON.stringify({ logo: window._pendingLogo, avatar: window._pendingLogo }),
+      });
+      const data = await res.json();
+      if (data.user) {
+        localStorage.setItem('agroup_user', JSON.stringify(data.user));
+        updateUser(data.user);
+      }
+      if (data.token) localStorage.setItem('agroup_token', data.token);
+    } catch {}
+    window._pendingLogo = null;
+    btn.textContent = 'Logo guardado';
+    btn.style.backgroundColor = '#2E7D32';
+    setTimeout(() => { btn.classList.add('hidden'); btn.style.backgroundColor = '#1b3928'; btn.disabled = false; btn.textContent = 'Guardar logo de hacienda'; }, 1500);
+  });
+
+  document.getElementById('btn-eliminar-logo')?.addEventListener('click', async () => {
+    const user = JSON.parse(localStorage.getItem('agroup_user') || '{}');
+    user.logo = '';
+    user.avatar = '';
+    localStorage.setItem('agroup_user', JSON.stringify(user));
+    updateUser(user);
+    window._pendingLogo = null;
+
+    const container = document.getElementById('hacienda-logo-container');
+    container.innerHTML = `<svg class="w-28 h-28 text-[#A5D6A7] group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors rounded-xl flex items-center justify-center">
+      <span class="opacity-0 group-hover:opacity-100 transition-opacity text-white text-xs font-semibold bg-black/50 px-2 py-1 rounded-lg">Cambiar logo</span>
+    </div>`;
+
+    document.getElementById('btn-guardar-logo')?.classList.add('hidden');
+    document.getElementById('btn-eliminar-logo')?.classList.add('hidden');
+
+    const token = localStorage.getItem('agroup_token');
+    try {
+      await fetch('/api/auth/perfil', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
+        body: JSON.stringify({ logo: '', avatar: '' }),
+      });
+    } catch {}
+  });
+
+  const POR_PAGINA = 10;
+  let paginaActual = 1;
+  let todosLosProductos: any[] = [];
+
+  function renderizarPagina() {
+    const grid = document.getElementById('mi-publicaciones-grid');
+    const sinPublicaciones = document.getElementById('sin-publicaciones');
+    const paginationContainer = document.getElementById('pagination-container');
+    if (!grid) return;
+
+    const totalPaginas = Math.ceil(todosLosProductos.length / POR_PAGINA) || 1;
+    if (paginaActual > totalPaginas) paginaActual = totalPaginas;
+
+    const inicio = (paginaActual - 1) * POR_PAGINA;
+    const fin = inicio + POR_PAGINA;
+    const productosPagina = todosLosProductos.slice(inicio, fin);
+
+    grid.innerHTML = '';
+
+    if (todosLosProductos.length === 0) {
+      sinPublicaciones!.style.display = 'block';
+      paginationContainer?.classList.add('hidden');
+      return;
+    }
+
+    sinPublicaciones!.style.display = 'none';
+    paginationContainer?.classList.toggle('hidden', totalPaginas <= 1);
+
+    productosPagina.forEach((p) => {
+      const idxReal = todosLosProductos.indexOf(p);
+      const card = document.createElement('div');
+      card.className = 'rounded-2xl p-5 transition-shadow';
+      card.style.border = '1px solid #E8E0D8';
+      card.onmouseover = function() { this.style.boxShadow = '0 6px 20px rgba(0,0,0,0.1)'; };
+      card.onmouseout = function() { this.style.boxShadow = 'none'; };
+
+      const imgSrc = p.imagenes?.[0] || getPlaceholderImagen(p.categoria);
+
+      card.innerHTML = `
+        <div class="flex gap-4">
+          <div class="w-24 h-24 rounded-xl flex items-center justify-center shrink-0" style="background-color: #FDFBF7; border: 1px solid #E8E0D8;">
+            <img src="${imgSrc}" alt="${p.nombre}" class="w-20 h-20 object-contain" />
+          </div>
+          <div class="flex-1 min-w-0">
+            <h4 class="font-bold text-base truncate" style="color: #1A0E08;">${p.nombre}</h4>
+            <p class="text-sm capitalize" style="color: #6B6B6B;">${p.categoria}${p.raza ? ' · ' + p.raza : ''}</p>
+            <p class="text-xl font-bold mt-1" style="color: #1b3928;">$${parseInt(p.precio || 0).toLocaleString('es-CO')}</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-2 mt-4">
+          <button class="btn-detalles py-2.5 text-sm font-medium rounded-lg transition-colors" style="border: 1px solid #1b3928; color: #1b3928;" data-index="${idxReal}" onmouseover="this.style.backgroundColor='#E8F5E9'" onmouseout="this.style.backgroundColor='transparent'">Detalles</button>
+          <button class="btn-editar py-2.5 text-sm font-medium rounded-lg transition-colors" style="border: 1px solid #1b3928; color: #1b3928;" data-index="${idxReal}" onmouseover="this.style.backgroundColor='#E8F5E9'" onmouseout="this.style.backgroundColor='transparent'">Editar</button>
+          <button class="btn-eliminar py-2.5 text-sm font-medium rounded-lg transition-colors" style="border: 1px solid #1b3928; color: #1b3928;" data-index="${idxReal}" onmouseover="this.style.backgroundColor='#E8F5E9'" onmouseout="this.style.backgroundColor='transparent'">Eliminar</button>
+        </div>
+      `;
+
+      grid.appendChild(card);
+    });
+
+    document.querySelectorAll('.btn-detalles').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.index);
+        mostrarDetalles(todosLosProductos[idx]);
+      });
+    });
+
+    document.querySelectorAll('.btn-editar').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.index);
+        abrirEditar(todosLosProductos[idx]);
+      });
+    });
+
+    document.querySelectorAll('.btn-eliminar').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.index);
+        mostrarEliminar(todosLosProductos[idx]);
+      });
+    });
+
+    renderizarPaginacion(totalPaginas);
+  }
+
+  function renderizarPaginacion(totalPaginas: number) {
+    const numbersContainer = document.getElementById('pagination-numbers');
+    const btnAnterior = document.getElementById('btn-pagina-anterior');
+    const btnSiguiente = document.getElementById('btn-pagina-siguiente');
+    if (!numbersContainer) return;
+
+    btnAnterior?.classList.toggle('opacity-50', paginaActual <= 1);
+    btnSiguiente?.classList.toggle('opacity-50', paginaActual >= totalPaginas);
+
+    numbersContainer.innerHTML = '';
+    for (let i = 1; i <= totalPaginas; i++) {
+      const btn = document.createElement('button');
+      btn.textContent = String(i);
+      btn.className = 'w-8 h-8 text-sm font-medium rounded-lg transition-colors';
+      btn.style.border = i === paginaActual ? '2px solid #1b3928' : '1px solid #E8E0D8';
+      btn.style.color = i === paginaActual ? '#1b3928' : '#6B6B6B';
+      btn.style.backgroundColor = i === paginaActual ? '#E8F5E9' : 'transparent';
+      btn.onmouseover = function() { if (i !== paginaActual) { this.style.borderColor = '#1b3928'; this.style.color = '#1b3928'; } };
+      btn.onmouseout = function() { if (i !== paginaActual) { this.style.borderColor = '#E8E0D8'; this.style.color = '#6B6B6B'; } };
+      btn.addEventListener('click', () => { paginaActual = i; renderizarPagina(); });
+      numbersContainer.appendChild(btn);
+    }
+  }
+
+  async function cargarMisPublicaciones() {
+    const countEl = document.getElementById('mi-publicaciones-count');
+    const token = localStorage.getItem('agroup_token');
+
+    let productos = [];
+    try {
+      const res = await fetch('/api/productos/mios', {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+      });
+      if (res.ok) {
+        const data = await res.json();
+        productos = data.productos || [];
+      }
+    } catch (err) {
+      console.error('Error al cargar publicaciones:', err);
+      productos = [];
+    }
+
+    todosLosProductos = [...productos].reverse();
+    paginaActual = 1;
+    if (countEl) countEl.textContent = `${todosLosProductos.length} publicados`;
+    renderizarPagina();
+  }
+  document.getElementById('btn-pagina-anterior')?.addEventListener('click', () => {
+    if (paginaActual > 1) { paginaActual--; renderizarPagina(); }
+  });
+
+  document.getElementById('btn-pagina-siguiente')?.addEventListener('click', () => {
+    const totalPaginas = Math.ceil(todosLosProductos.length / POR_PAGINA);
+    if (paginaActual < totalPaginas) { paginaActual++; renderizarPagina(); }
+  });
+
+  cargarPerfil();
+  cargarMisPublicaciones();
+
+  fetch('/api/categorias')
+    .then(r => r.json())
+    .then(data => {
+      if (data.categorias) {
+        const select = document.getElementById('edit-categoria') as HTMLSelectElement;
+        data.categorias.forEach((c: any) => {
+          const opt = document.createElement('option');
+          opt.value = c.slug;
+          opt.textContent = c.nombre;
+          select.appendChild(opt);
+        });
+      }
+    })
+    .catch(() => {});
+  
+  async function actualizarStatsVendedor() {
+    const token = localStorage.getItem('agroup_token');
+    
+    let publicaciones = [];
+    try {
+      const res = await fetch('/api/productos/mios', {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+      });
+      if (res.ok) {
+        const data = await res.json();
+        publicaciones = data.productos || [];
+      }
+    } catch {
+      publicaciones = [];
+    }
+
+    const statPublicaciones = document.getElementById('stat-publicaciones');
+    const statVentas = document.getElementById('stat-ventas');
+    const statVistas = document.getElementById('stat-vistas');
+    const statRating = document.getElementById('stat-rating');
+    
+    if (statPublicaciones) statPublicaciones.textContent = String(publicaciones.length);
+
+    if (token) {
+      try {
+        const res = await fetch('/api/vendor/stats', {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const stats = await res.json();
+          if (statPublicaciones) statPublicaciones.textContent = String(stats.publicaciones);
+          if (statVentas) statVentas.textContent = String(stats.ventas);
+          if (statVistas) statVistas.textContent = String(stats.vistas);
+          if (statRating) statRating.textContent = stats.rating > 0 ? String(stats.rating) : 'N/A';
+        }
+      } catch {}
+    }
+  }
+  
+  actualizarStatsVendedor();
+</script>
