@@ -66,7 +66,7 @@ const isDirecto = metodo === 'whatsapp' || metodo === 'efectivo';
 
       <!-- Indicador de verificación Wompi -->
       {!isDirecto && (
-        <div id="polling-info" class="mb-6">
+        <div id="polling-info" class="mb-6" data-transaction-id={transactionId} data-orden-id={ordenId} data-reference={reference}>
           <div class="inline-flex items-center gap-2 text-sm text-slate-500 bg-slate-50 rounded-full px-4 py-2">
             <span class="w-2 h-2 bg-gold-500 rounded-full animate-pulse"></span>
             <span id="polling-text">Consultando estado en Wompi... (<span id="poll-count">1</span>/25)</span>
@@ -94,11 +94,16 @@ const isDirecto = metodo === 'whatsapp' || metodo === 'efectivo';
   </div>
 
   {!isDirecto && (
-    <script define:vars={{ transactionId, ordenId, reference }}>
+    <script>
       const MAX_ATTEMPTS = 25;
       const POLL_INTERVAL = 3000;
       let attempts = 0;
-      let pollTimer = null;
+      let pollTimer: ReturnType<typeof setTimeout> | null = null;
+
+      const pollingInfo = document.getElementById('polling-info');
+      const transactionId = pollingInfo?.getAttribute('data-transaction-id') || '';
+      const ordenId = pollingInfo?.getAttribute('data-orden-id') || '';
+      const reference = pollingInfo?.getAttribute('data-reference') || '';
 
       const iconWrapper = document.getElementById('status-icon-wrapper');
       const iconPending = document.getElementById('icon-pending');
@@ -106,13 +111,12 @@ const isDirecto = metodo === 'whatsapp' || metodo === 'efectivo';
       const iconError = document.getElementById('icon-error');
       const statusTitle = document.getElementById('status-title');
       const statusMessage = document.getElementById('status-message');
-      const pollingInfo = document.getElementById('polling-info');
       const pollCount = document.getElementById('poll-count');
       const actionButtons = document.getElementById('action-buttons');
       const ordenBox = document.getElementById('orden-box');
       const ordenIdDisplay = document.getElementById('orden-id-display');
 
-      function showState(state, info) {
+      function showState(state: string, info?: any) {
         iconPending?.classList.add('hidden');
         iconSuccess?.classList.add('hidden');
         iconError?.classList.add('hidden');
@@ -167,7 +171,7 @@ const isDirecto = metodo === 'whatsapp' || metodo === 'efectivo';
         }
 
         attempts++;
-        if (pollCount) pollCount.textContent = attempts;
+        if (pollCount) pollCount.textContent = String(attempts);
 
         try {
           const params = new URLSearchParams();
