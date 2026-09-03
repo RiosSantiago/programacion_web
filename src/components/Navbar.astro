@@ -418,6 +418,7 @@ const { variant = 'dark' } = Astro.props;
 
 <script>
   import { $user, $isAuthenticated, logout } from '../stores/auth';
+  import { escapeHtml } from '../lib/sanitize';
 
   const menuBtn = document.getElementById('mobile-menu-btn');
   const mobileMenu = document.getElementById('mobile-menu');
@@ -493,9 +494,9 @@ const { variant = 'dark' } = Astro.props;
       document.documentElement.classList.add('user-logged-in');
       if (userAvatar && user.nombre) {
         if (user.avatar) {
-          userAvatar.innerHTML = `<img src="${user.avatar}" alt="Avatar" class="w-full h-full object-cover rounded-lg" />`;
+          userAvatar.innerHTML = `<img src="${escapeHtml(user.avatar)}" alt="Avatar" class="w-full h-full object-cover rounded-lg" />`;
         } else {
-          userAvatar.innerHTML = user.nombre.charAt(0).toUpperCase();
+          userAvatar.innerHTML = escapeHtml(user.nombre.charAt(0).toUpperCase());
         }
       }
       if (userName) {

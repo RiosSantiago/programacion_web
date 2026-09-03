@@ -129,6 +129,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 </BaseLayout>
 
 <script>
+  import { escapeHtml } from '../../../lib/sanitize';
   let productos: any[] = [];
   let editandoId: number | null = null;
   let currentUserRole: string | null = null;
@@ -143,13 +144,6 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
   function getHeaders(): Record<string, string> {
     const t = localStorage.getItem('agroup_token');
     return t ? { 'Authorization': `Bearer ${t}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
-  }
-
-  function escapeHtml(text: string) {
-    if (!text) return '';
-    const d = document.createElement('div');
-    d.textContent = text;
-    return d.innerHTML;
   }
 
   const estadoClass: Record<string, string> = {
@@ -239,7 +233,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
           <td class="px-4 py-3">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 bg-slate-500 rounded-lg shrink-0 overflow-hidden">
-<img src="${img}" alt="" class="w-full h-full object-contain" />
+<img src="${escapeHtml(img)}" alt="" class="w-full h-full object-contain" />
               </div>
               <div class="min-w-0">
                 <p class="font-medium text-slate-900 truncate max-w-[220px]">${escapeHtml(p.nombre)}</p>
@@ -248,11 +242,11 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
             </div>
           </td>
           <td class="px-4 py-3 text-slate-600">${escapeHtml(p.vendedor || '—')}</td>
-          <td class="px-4 py-3 text-slate-600 capitalize">${p.categoria || '—'}</td>
+          <td class="px-4 py-3 text-slate-600 capitalize">${escapeHtml(p.categoria || '—')}</td>
           <td class="px-4 py-3 text-right font-semibold text-slate-900">$${(p.precio || 0).toLocaleString('es-CO')}</td>
-          <td class="px-4 py-3 text-center text-slate-600">${p.stock || 1}</td>
+          <td class="px-4 py-3 text-center text-slate-600">${escapeHtml(String(p.stock ?? 1))}</td>
           <td class="px-4 py-3 text-center">
-            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold capitalize ${estadoClass[estado] || 'bg-slate-500 text-slate-700'}">${estado}</span>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold capitalize ${estadoClass[estado] || 'bg-slate-500 text-slate-700'}">${escapeHtml(estado)}</span>
           </td>
           <td class="px-4 py-3 text-right">
             <div class="flex items-center justify-end gap-1">
@@ -403,12 +397,12 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     document.getElementById('view-content')!.innerHTML = `
       <div class="flex gap-4">
         <div class="w-24 h-24 bg-slate-500 rounded-xl shrink-0 overflow-hidden">
-          <img src="${img}" alt="" class="w-full h-full object-contain" />
+          <img src="${escapeHtml(img)}" alt="" class="w-full h-full object-contain" />
         </div>
         <div class="flex-1">
           <h4 class="text-xl font-bold text-slate-900">${escapeHtml(p.nombre)}</h4>
-          <p class="text-sm text-slate-500 capitalize mt-1">${p.categoria || '—'} ${p.raza ? '· ' + p.raza : ''}</p>
-          <p class="text-xs text-slate-400 mt-1">Vendedor: ${escapeHtml(p.vendedor || '—')} ${p.vendedor_id ? '(ID: ' + p.vendedor_id + ')' : ''}</p>
+          <p class="text-sm text-slate-500 capitalize mt-1">${escapeHtml(p.categoria || '—')} ${p.raza ? '· ' + escapeHtml(p.raza) : ''}</p>
+          <p class="text-xs text-slate-400 mt-1">Vendedor: ${escapeHtml(p.vendedor || '—')} ${p.vendedor_id ? '(ID: ' + escapeHtml(String(p.vendedor_id)) + ')' : ''}</p>
         </div>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
@@ -426,19 +420,19 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
         </div>
         <div class="bg-slate-50 rounded-lg p-3">
           <p class="text-slate-500 text-xs">Estado</p>
-          <p class="font-semibold text-slate-700 capitalize">${p.estado || 'disponible'}</p>
+          <p class="font-semibold text-slate-700 capitalize">${escapeHtml(p.estado || 'disponible')}</p>
         </div>
         <div class="bg-slate-50 rounded-lg p-3">
           <p class="text-slate-500 text-xs">Categoría</p>
-          <p class="font-semibold text-slate-700 capitalize">${p.categoria || '—'}</p>
+          <p class="font-semibold text-slate-700 capitalize">${escapeHtml(p.categoria || '—')}</p>
         </div>
         <div class="bg-slate-50 rounded-lg p-3">
           <p class="text-slate-500 text-xs">Peso</p>
-          <p class="font-semibold text-slate-700">${p.peso ? p.peso + ' kg' : '—'}</p>
+          <p class="font-semibold text-slate-700">${p.peso ? escapeHtml(String(p.peso)) + ' kg' : '—'}</p>
         </div>
         ${p.salud ? `<div class="bg-slate-50 rounded-lg p-3"><p class="text-slate-500 text-xs">Salud</p><p class="font-semibold text-slate-700">${escapeHtml(p.salud)}</p></div>` : ''}
         ${p.descripcion ? `<div class="col-span-2 bg-slate-50 rounded-lg p-3"><p class="text-slate-500 text-xs">Descripción</p><p class="text-slate-700 text-left">${escapeHtml(p.descripcion)}</p></div>` : ''}
-        ${p.video ? `<div class="col-span-2 bg-slate-50 rounded-lg p-3"><p class="text-slate-500 text-xs">Video</p><video src="${p.video}" controls class="w-full rounded-lg mt-1 max-h-48 object-cover"></video></div>` : ''}
+        ${p.video ? `<div class="col-span-2 bg-slate-50 rounded-lg p-3"><p class="text-slate-500 text-xs">Video</p><video src="${escapeHtml(p.video)}" controls class="w-full rounded-lg mt-1 max-h-48 object-cover"></video></div>` : ''}
       </div>
       <a href="/marketplace/${p.id}" target="_blank" class="block w-full text-center py-2.5 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 text-sm">Ver en Marketplace</a>
     `;
@@ -598,7 +592,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
         const div = document.createElement('div');
         div.className = 'relative w-20 h-20 rounded-lg overflow-hidden border border-slate-200 group';
         div.dataset.index = String(i);
-        div.innerHTML = '<img src="' + url + '" alt="" class="w-full h-full object-contain bg-slate-50" />' +
+        div.innerHTML = '<img src="' + escapeHtml(url) + '" alt="" class="w-full h-full object-contain bg-slate-50" />' +
           '<button type="button" class="absolute top-0.5 right-0.5 w-6 h-6 sm:w-5 sm:h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity hover:bg-red-600" data-remove-index="' + i + '">×</button>';
         div.querySelector('[data-remove-index]')!.addEventListener('click', (e: Event) => {
           e.stopPropagation();
@@ -615,7 +609,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       exVideoEl.innerHTML = '';
       if (editMediaState.existingVideo) {
         exVideoEl.innerHTML = '<div class="relative rounded-lg overflow-hidden border border-slate-200 group inline-block max-w-xs">' +
-          '<video src="' + editMediaState.existingVideo + '" controls class="w-full max-h-32 object-contain bg-slate-50"></video>' +
+          '<video src="' + escapeHtml(editMediaState.existingVideo) + '" controls class="w-full max-h-32 object-contain bg-slate-50"></video>' +
           '<button type="button" id="e-btn-remove-video" class="absolute top-1 right-1 w-7 h-7 sm:w-6 sm:h-6 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity hover:bg-red-600">×</button></div>';
         document.getElementById('e-btn-remove-video')!.addEventListener('click', function() {
           editMediaState.videoRemoved = true;

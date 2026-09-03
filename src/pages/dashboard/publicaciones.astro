@@ -123,6 +123,7 @@ import PublicationForm from '../../components/dashboard/PublicationForm.tsx';
 </BaseLayout>
 
 <script>
+  import { escapeHtml } from '../../lib/sanitize';
   const municipiosCaldas = [
     'Aguadas', 'Anserma', 'Aranzazu', 'Belalcázar', 'Chinchiná', 'Filadelfia',
     'La Dorada', 'La Merced', 'Manizales (capital)', 'Manzanares', 'Marmato',
@@ -195,17 +196,17 @@ import PublicationForm from '../../components/dashboard/PublicationForm.tsx';
         };
 
         div.innerHTML = `
-          <img src="${imgSrc}" alt="${p.nombre}" class="w-full sm:w-32 h-32 object-contain bg-slate-50 rounded-lg" />
+          <img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(p.nombre)}" class="w-full sm:w-32 h-32 object-contain bg-slate-50 rounded-lg" />
           <div class="flex-1">
-            <h3 class="font-semibold text-slate-900">${p.nombre}</h3>
-            <p class="text-sm text-slate-500 mt-1">${p.raza || p.categoria} ${p.peso ? '· ' + p.peso + ' kg' : ''}</p>
+            <h3 class="font-semibold text-slate-900">${escapeHtml(p.nombre)}</h3>
+            <p class="text-sm text-slate-500 mt-1">${escapeHtml(p.raza || p.categoria)} ${p.peso ? '· ' + escapeHtml(String(p.peso)) + ' kg' : ''}</p>
             ${p.descripcion ? `<p class="text-xs text-slate-400 mt-1 italic">${escapeHtml(p.descripcion)}</p>` : ''}
             ${p.video ? '<span class="inline-flex items-center gap-1 text-xs text-blue-600 mt-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg> Video</span>' : ''}
             <p class="text-lg font-bold text-slate-900 mt-2">$${(p.precio || 0).toLocaleString('es-CO')}</p>
           </div>
           <div class="flex sm:flex-col gap-2">
             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold w-fit capitalize ${estadoClases[p.estado] || 'bg-slate-500 text-slate-700'}">
-              ${p.estado || 'disponible'}
+              ${escapeHtml(p.estado || 'disponible')}
             </span>
             <div class="flex gap-2">
               <a href="/marketplace/${p.id}" class="p-2 text-slate-400 hover:text-gold-700" title="Ver en marketplace">
@@ -214,12 +215,12 @@ import PublicationForm from '../../components/dashboard/PublicationForm.tsx';
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>
               </a>
-              <button class="btn-editar p-2 text-slate-400 hover:text-amber-600" title="Editar" data-id="${p.id}">
+              <button class="btn-editar p-2 text-slate-400 hover:text-amber-600" title="Editar" data-id="${escapeHtml(p.id)}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
               </button>
-              <button class="btn-eliminar p-2 text-slate-400 hover:text-red-600" title="Eliminar" data-id="${p.id}">
+              <button class="btn-eliminar p-2 text-slate-400 hover:text-red-600" title="Eliminar" data-id="${escapeHtml(p.id)}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
@@ -491,7 +492,7 @@ import PublicationForm from '../../components/dashboard/PublicationForm.tsx';
           const div = document.createElement('div');
           div.className = 'relative w-20 h-20 rounded-lg overflow-hidden border border-slate-200 group';
           div.dataset.index = String(i);
-          div.innerHTML = '<img src="' + url + '" alt="" class="w-full h-full object-contain bg-slate-50" />' +
+          div.innerHTML = '<img src="' + escapeHtml(url) + '" alt="" class="w-full h-full object-contain bg-slate-50" />' +
             '<button type="button" class="absolute top-1 right-1 w-6 h-6 text-white rounded-full flex items-center justify-center shadow-md transition-all hover:scale-110 z-10" style="background-color: #1b3928;" onmouseover="this.style.backgroundColor=\'#DC2626\'" onmouseout="this.style.backgroundColor=\'#1b3928\'" data-remove-index="' + i + '" title="Eliminar foto"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>';
           div.querySelector('[data-remove-index]').addEventListener('click', function(e) {
             e.stopPropagation();
@@ -508,7 +509,7 @@ import PublicationForm from '../../components/dashboard/PublicationForm.tsx';
         existingVideoEl.innerHTML = '';
         if (editMediaState.existingVideo) {
           existingVideoEl.innerHTML = '<div class="relative rounded-lg overflow-hidden border border-slate-200 group inline-block max-w-xs">' +
-            '<video src="' + editMediaState.existingVideo + '" controls class="w-full max-h-32 object-contain bg-slate-50"></video>' +
+            '<video src="' + escapeHtml(editMediaState.existingVideo) + '" controls class="w-full max-h-32 object-contain bg-slate-50"></video>' +
             '<button type="button" id="btn-remove-existing-video" class="absolute top-1 right-1 w-6 h-6 text-white rounded-full flex items-center justify-center shadow-md transition-all hover:scale-110 z-10" style="background-color: #1b3928;" onmouseover="this.style.backgroundColor=\'#DC2626\'" onmouseout="this.style.backgroundColor=\'#1b3928\'" title="Eliminar video"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div>';
           document.getElementById('btn-remove-existing-video').addEventListener('click', function() {
             editMediaState.videoRemoved = true;
@@ -701,13 +702,6 @@ import PublicationForm from '../../components/dashboard/PublicationForm.tsx';
     cerrarEliminarModal();
     cargarPublicaciones();
   });
-
-  function escapeHtml(text) {
-    if (!text) return '';
-    const d = document.createElement('div');
-    d.textContent = text;
-    return d.innerHTML;
-  }
 
   cargarPublicaciones();
 </script>

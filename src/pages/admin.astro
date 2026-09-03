@@ -219,6 +219,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 </BaseLayout>
 
 <script>
+  import { escapeHtml } from '../lib/sanitize';
   const token = localStorage.getItem('agroup_token');
 
   function getHeaders() {
@@ -342,13 +343,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         </div>
       `;
     } catch {}
-  }
-
-  function escapeHtml(text) {
-    if (!text) return '';
-    const d = document.createElement('div');
-    d.textContent = text;
-    return d.innerHTML;
   }
 
   async function cargarUsuarios(page = usuariosPage) {
