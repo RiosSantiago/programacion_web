@@ -395,6 +395,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <script>
   import { $cart, clearCart, fetchCart } from '../stores/cart';
   import { $user, $isAuthenticated } from '../stores/auth';
+  import { escapeHtml } from '../lib/sanitize';
 
   function formatCOP(value: number): string {
     return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(value);
@@ -465,12 +466,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     resumenItems.innerHTML = items.map(item => `
       <div class="flex gap-3 p-3 rounded-2xl bg-white/[0.06] border border-white/10 backdrop-blur-sm hover:bg-white/[0.09] transition-colors">
         <div class="relative flex-shrink-0">
-          <img src="${item.imagen}" alt="${item.nombre}" class="w-16 h-16 object-cover rounded-xl ring-1 ring-white/10" onerror="this.src='/images/ganado.svg'" />
+          <img src="${escapeHtml(item.imagen)}" alt="${escapeHtml(item.nombre)}" class="w-16 h-16 object-cover rounded-xl ring-1 ring-white/10" onerror="this.src='/images/ganado.svg'" />
           <span class="absolute -top-1.5 -right-1.5 min-w-[1.35rem] h-[1.35rem] px-1 rounded-full bg-gold-500 text-campo-900 text-[10px] font-bold flex items-center justify-center shadow-lg">${item.cantidad}</span>
         </div>
         <div class="flex-1 min-w-0 flex flex-col">
-          <p class="text-sm font-semibold text-white truncate">${item.nombre}</p>
-          <p class="text-xs text-white/50 mt-0.5 truncate">${item.vendedor || ''}</p>
+          <p class="text-sm font-semibold text-white truncate">${escapeHtml(item.nombre)}</p>
+          <p class="text-xs text-white/50 mt-0.5 truncate">${escapeHtml(item.vendedor || '')}</p>
           <p class="mt-auto text-sm font-bold text-gold-300">${formatCOP(item.precio * item.cantidad)}</p>
         </div>
       </div>

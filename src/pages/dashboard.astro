@@ -380,6 +380,7 @@ const campos = [
 
 <script>
   import { updateUser } from '../stores/auth';
+  import { escapeHtml } from '../lib/sanitize';
   let productoAEliminar = null;
 
   function cerrarModal() {
@@ -418,7 +419,7 @@ const campos = [
         `<button class="galeria-dot w-2 h-2 rounded-full transition-all" data-index="${i}" style="background-color: ${i === 0 ? '#1b3928' : '#D1D5DB'}; ${i === 0 ? 'transform: scale(1.3);' : ''}"></button>`
       ).join('');
       const miniaturas = imagenes.map((url, i) =>
-        `<button class="galeria-thumb flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden border-2 transition-all" data-index="${i}" style="${i === 0 ? 'border-color: #1b3928;' : 'border-color: transparent; opacity: 0.6;'}"><img src="${url}" alt="" class="w-full h-full object-cover" /></button>`
+        `<button class="galeria-thumb flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden border-2 transition-all" data-index="${i}" style="${i === 0 ? 'border-color: #1b3928;' : 'border-color: transparent; opacity: 0.6;'}"><img src="${escapeHtml(url)}" alt="" class="w-full h-full object-cover" /></button>`
       ).join('');
       galeriaHtml = `
         <div class="flex gap-2 mt-3 overflow-x-auto pb-1" id="galeria-thumbnails">${miniaturas}</div>
@@ -428,7 +429,7 @@ const campos = [
 
     contenido.innerHTML = `
       <div class="relative aspect-video rounded-lg overflow-hidden" style="background-color: #1A0E08;">
-        <img id="detalle-imagen-principal" src="${imgSrc}" alt="${producto.nombre}" class="w-full h-full object-cover" />
+        <img id="detalle-imagen-principal" src="${escapeHtml(imgSrc)}" alt="${escapeHtml(producto.nombre)}" class="w-full h-full object-cover" />
         ${tieneVarias ? `
         <button id="btn-img-prev" class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110" style="background-color: rgba(0,0,0,0.5); color: white;">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
@@ -440,16 +441,16 @@ const campos = [
       </div>
       ${galeriaHtml}
       <div>
-        <h4 class="font-semibold" style="color: #1A0E08;">${producto.nombre}</h4>
-        <p class="text-sm capitalize" style="color: #6B6B6B;">${producto.categoria} ${producto.raza ? '- ' + producto.raza : ''}</p>
+        <h4 class="font-semibold" style="color: #1A0E08;">${escapeHtml(producto.nombre)}</h4>
+        <p class="text-sm capitalize" style="color: #6B6B6B;">${escapeHtml(producto.categoria)} ${producto.raza ? '- ' + escapeHtml(producto.raza) : ''}</p>
       </div>
       <div class="grid grid-cols-2 gap-4">
         <div><p class="text-xs" style="color: #6B6B6B;">Precio</p><p class="font-semibold">$${parseInt(producto.precio || 0).toLocaleString('es-CO')}</p></div>
-        <div><p class="text-xs" style="color: #6B6B6B;">Stock</p><p class="font-semibold">${producto.stock}</p></div>
-        <div><p class="text-xs" style="color: #6B6B6B;">Ubicación</p><p class="font-semibold">${producto.ubicacion}</p></div>
-        <div><p class="text-xs" style="color: #6B6B6B;">Departamento</p><p class="font-semibold">${producto.departamento}</p></div>
-        ${producto.peso ? `<div><p class="text-xs" style="color: #6B6B6B;">Peso</p><p class="font-semibold">${producto.peso} kg</p></div>` : ''}
-        ${producto.salud ? `<div><p class="text-xs" style="color: #6B6B6B;">Salud</p><p class="font-semibold">${producto.salud}</p></div>` : ''}
+        <div><p class="text-xs" style="color: #6B6B6B;">Stock</p><p class="font-semibold">${escapeHtml(producto.stock)}</p></div>
+        <div><p class="text-xs" style="color: #6B6B6B;">Ubicación</p><p class="font-semibold">${escapeHtml(producto.ubicacion)}</p></div>
+        <div><p class="text-xs" style="color: #6B6B6B;">Departamento</p><p class="font-semibold">${escapeHtml(producto.departamento)}</p></div>
+        ${producto.peso ? `<div><p class="text-xs" style="color: #6B6B6B;">Peso</p><p class="font-semibold">${escapeHtml(producto.peso)} kg</p></div>` : ''}
+        ${producto.salud ? `<div><p class="text-xs" style="color: #6B6B6B;">Salud</p><p class="font-semibold">${escapeHtml(producto.salud)}</p></div>` : ''}
       </div>
       <a href="/marketplace" class="block w-full text-center py-2.5 text-white rounded-lg font-medium transition-colors" style="background-color: #1b3928;" onmouseover="this.style.backgroundColor='#0A5C43'" onmouseout="this.style.backgroundColor='#1b3928'">Ver todos en Marketplace</a>
     `;
@@ -1066,11 +1067,11 @@ const campos = [
       card.innerHTML = `
         <div class="flex gap-4">
           <div class="w-24 h-24 rounded-xl flex items-center justify-center shrink-0" style="background-color: #FDFBF7; border: 1px solid #E8E0D8;">
-            <img src="${imgSrc}" alt="${p.nombre}" class="w-20 h-20 object-contain" />
+            <img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(p.nombre)}" class="w-20 h-20 object-contain" />
           </div>
           <div class="flex-1 min-w-0">
-            <h4 class="font-bold text-base truncate" style="color: #1A0E08;">${p.nombre}</h4>
-            <p class="text-sm capitalize" style="color: #6B6B6B;">${p.categoria}${p.raza ? ' · ' + p.raza : ''}</p>
+            <h4 class="font-bold text-base truncate" style="color: #1A0E08;">${escapeHtml(p.nombre)}</h4>
+            <p class="text-sm capitalize" style="color: #6B6B6B;">${escapeHtml(p.categoria)}${p.raza ? ' · ' + escapeHtml(p.raza) : ''}</p>
             <p class="text-xl font-bold mt-1" style="color: #1b3928;">$${parseInt(p.precio || 0).toLocaleString('es-CO')}</p>
           </div>
         </div>

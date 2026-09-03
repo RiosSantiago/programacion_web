@@ -2,6 +2,7 @@ import { $cart, $cartOpen, addToCart, fetchCart, removeFromCart, updateQuantity,
 import { $favorites, toggleFavorite, isFavorite } from './favorites';
 import { $toasts, addToast, removeToast } from './toast';
 import { $isAuthenticated, $user } from './auth';
+import { escapeHtml } from '../lib/sanitize';
 
 function formatearCOP(valor: number): string {
   return new Intl.NumberFormat('es-CO', {
@@ -160,10 +161,10 @@ function actualizarCarritoUI() {
     const maxAlcanzado = item.stock !== undefined && item.cantidad >= item.stock;
     const stockMax = item.stock ?? 999999;
     itemEl.innerHTML = `
-      <img src="${item.imagen}" alt="${item.nombre}" class="w-20 h-20 rounded-xl object-cover flex-shrink-0" />
+      <img src="${escapeHtml(item.imagen)}" alt="${escapeHtml(item.nombre)}" class="w-20 h-20 rounded-xl object-cover flex-shrink-0" />
       <div class="flex-1 min-w-0">
-        <h4 class="text-sm font-bold text-[#2D2D2D] truncate">${item.nombre}</h4>
-        <p class="text-xs text-[#6B6B6B] mt-0.5">${item.vendedor}</p>
+        <h4 class="text-sm font-bold text-[#2D2D2D] truncate">${escapeHtml(item.nombre)}</h4>
+        <p class="text-xs text-[#6B6B6B] mt-0.5">${escapeHtml(item.vendedor)}</p>
         <p class="text-lg font-extrabold text-[#2D2D2D] mt-1">${formatearCOP(item.precio)}</p>
         ${item.stock !== undefined ? `<p class="text-[11px] font-medium ${maxAlcanzado ? 'text-coral-500 font-bold' : 'text-[#6B6B6B]'} mt-0.5">Stock disponible: ${item.stock}${maxAlcanzado ? ' (Máximo alcanzado)' : ''}</p>` : ''}
         <div class="flex items-center justify-between mt-3">
@@ -238,10 +239,10 @@ function actualizarFavoritosUI() {
     itemEl.className = 'flex gap-4 p-4 bg-white rounded-2xl border border-[#E8E0D8] shadow-sm hover:shadow-md transition-shadow';
     itemEl.innerHTML = `
       <a href="/marketplace/${item.id}" class="shrink-0">
-        <img src="${item.imagen}" alt="${item.nombre}" class="w-20 h-20 rounded-xl object-cover" onerror="this.src='/images/ganado.svg'" />
+        <img src="${escapeHtml(item.imagen)}" alt="${escapeHtml(item.nombre)}" class="w-20 h-20 rounded-xl object-cover" onerror="this.src='/images/ganado.svg'" />
       </a>
       <div class="flex-1 min-w-0">
-        <a href="/marketplace/${item.id}" class="text-sm font-bold text-[#2D2D2D] line-clamp-2 hover:text-gold-700 transition-colors">${item.nombre}</a>
+        <a href="/marketplace/${item.id}" class="text-sm font-bold text-[#2D2D2D] line-clamp-2 hover:text-gold-700 transition-colors">${escapeHtml(item.nombre)}</a>
         <p class="text-lg font-extrabold text-[#2D2D2D] mt-1">${formatearCOP(item.precio)}</p>
         <div class="flex items-center justify-between mt-3">
           <span class="text-xs text-[#6B6B6B]">Guardado</span>
@@ -315,8 +316,8 @@ function init() {
     const toasts = $toasts.get();
     container.innerHTML = toasts.map((t) => `
       <div class="pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl border shadow-lg transition-all duration-300 animate-slide-in ${toastColorMap[t.type] || toastColorMap.info}">
-        <span class="text-sm font-medium flex-1">${t.message}</span>
-        ${t.action ? `<a href="${t.action.href}" class="text-sm font-bold whitespace-nowrap underline ${toastActionColorMap[t.type] || toastActionColorMap.info}">${t.action.label}</a>` : ''}
+        <span class="text-sm font-medium flex-1">${escapeHtml(t.message)}</span>
+        ${t.action ? `<a href="${escapeHtml(t.action.href)}" class="text-sm font-bold whitespace-nowrap underline ${toastActionColorMap[t.type] || toastActionColorMap.info}">${escapeHtml(t.action.label)}</a>` : ''}
         <button onclick="document.dispatchEvent(new CustomEvent('dismiss-toast', {detail:{id:${t.id}}}))" class="ml-1 opacity-60 hover:opacity-100 text-lg leading-none">&times;</button>
       </div>
     `).join('');
