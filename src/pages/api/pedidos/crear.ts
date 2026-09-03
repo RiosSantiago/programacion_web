@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { queryGet, queryAll, withTransaction } from '../../../lib/db';
-import { getRequestUser, unauthorized } from '../../../lib/rbac';
+import { getRequestUser, getAuthContext, unauthorized, forbidden } from '../../../lib/rbac';
 import { ApiError } from '../../../lib/errors';
 
 function generarOrdenId(): string {
@@ -106,8 +106,9 @@ export const POST: APIRoute = async ({ request }) => {
 
 export const GET: APIRoute = async ({ request }) => {
   try {
-    const user = getRequestUser(request);
-    if (!user) return unauthorized();
+    const ctx = await getAuthContext(request);
+    if (!ctx) return unauthorized();
+    const { user, rol } = ctx;
 
     const url     = new URL(request.url);
     const ordenId = url.searchParams.get('ordenId') || url.searchParams.get('orden');
@@ -128,10 +129,10 @@ export const GET: APIRoute = async ({ request }) => {
       });
     }
 
-    const isAdmin = user.rol === 'root' || user.rol === 'admin';
+    const isAdmin = rol === 'root' || rol === 'admin';
     const isOwner = pedido.usuario_id === user.id;
     if (!isAdmin && !isOwner) {
-      return new Response(JSON.stringify({ error: 'Acceso denegado' }), { status: 403 });
+      return forbidden();
     }
 
     const detalles = await queryAll<any>(
