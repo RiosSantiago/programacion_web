@@ -1,19 +1,86 @@
-name: agroup
+# =============================================================================
+# AGROUP — AMBIENTE B: STAGING / PRUEBAS OFICIALES
+# -----------------------------------------------------------------------------
+# Alineado con el informe oficial (informe-proyecto-agroup.pdf), sección 3
+# "Entorno de pruebas":
+#
+#   • 3.1  Staging (B) se levanta con el MISMO build de producción:
+#         astro build -> node ./dist/server/entry.mjs  (¡no dev server!).
+#   • 3.3  PostgreSQL se expone en el puerto HOST 4322 (no 5432).
+#         base de datos: agroup_staging
+#   • 3.4  Wompi en modo sandbox (WOMPI_ENV=sandbox → https://sandbox.wompi.co/v1)
+#         con tarjetas de prueba oficiales (ver README-STAGING.md).
+#
+# Comando único:
+#     docker compose up
+# App:   http://localhost:4321
+# Postgres (desde el host):  127.0.0.1:4322  (usuario postgres / postgrespassword)
+#
+# El esquema + datos de prueba se cargan automáticamente al crear el volumen
+# (01-schema.sql = database/schema.pg.sql ; 02-seed.sql = ./init-db.sql).
+# La app además auto-crea tablas y aplica migraciones en el primer request
+# (src/lib/db.ts -> inicializar(), tal como dice el informe 3.3).
+# =============================================================================
+
+name: agroup-staging
 
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: agroup-postgres
-    restart: always
+    restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-agroup}
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_DB: agroup_staging   # informe 3.3: BD oficial de staging
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
     ports:
-      - "4322:5432"
+      - "4322:5432"                 # informe 3.3: host 4322 -> contenedor 5432
     volumes:
-      - agroup_pgdata:/var/lib/postgresql/data
+      - postgres_staging_data:/var/lib/postgresql/data
+      - ./database/schema.pg.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./init-db.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d agroup_staging"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "4321:4321"
+    environment:
+      # Staging usa el artefacto de producción (informe 3.1)
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 4321
+
+      # Base de datos (informe 3.3)
+      POSTGRES_DB: agroup_staging
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      DATABASE_URL: postgresql://postgres:postgrespassword@postgres:5432/agroup_staging
+
+      # Seguridad / tokens (Staging usa secreto propio, ver informe 2.2 y 3.1)
+      JWT_SECRET: staging_secret_min_32_characters_agroup_2026
+      ADMIN_SECRET: staging_admin_secret_aqui
+      ROOT_ADMIN_KEY: staging_root_key_aqui
+
+      # Wompi — SANDBOX obligatorio en Staging (informe 3.4)
+      # Reemplaza los placeholders por las llaves de PRUEBA reales (pub_test_ / prv_test_).
+      WOMPI_ENV: sandbox
+      WOMPI_PUBLIC_KEY: pub_test_informe_agroup_sandbox
+      WOMPI_PRIVATE_KEY: prv_test_informe_agroup_sandbox
+      WOMPI_INTEGRITY_SECRET: test_integrity_informe_agroup_sandbox
+      WOMPI_EVENTS_SECRET: test_events_informe_agroup_sandbox
+
+      SITE_URL: http://localhost:4321
+      GOOGLE_CLIENT_ID: ""
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
-  agroup_pgdata:
+  postgres_staging_data:

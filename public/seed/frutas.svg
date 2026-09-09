@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Frutas Orgánicas">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFF3B0"/>
+      <stop offset="1" stop-color="#FFD633"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <circle cx="400" cy="300" r="200" fill="#ffffff" opacity="0.35"/>
+  <!-- naranja -->
+  <circle cx="360" cy="330" r="95" fill="#FF8A3D" stroke="#A62A23" stroke-width="6"/>
+  <circle cx="360" cy="222" r="16" fill="#4A9B5D"/>
+  <path d="M360 222 q-10 -24 20 -34" stroke="#4A9B5D" stroke-width="12" fill="none" stroke-linecap="round"/>
+  <!-- manzana -->
+  <g transform="translate(560,300)">
+    <path d="M0 60 q-70 -20 -55 -85 q10 -15 30 -10 q20 4 25 30 q5 -26 25 -30 q20 -5 30 10 q15 65 -55 85 z"
+          fill="#D9443A" stroke="#A62A23" stroke-width="6"/>
+    <path d="M0 -52 q0 -26 -6 -36" stroke="#7A5500" stroke-width="8" fill="none" stroke-linecap="round"/>
+  </g>
+  <!-- hoja -->
+  <path d="M180 300 q60 -70 140 -70 q-10 80 -70 90 q-40 4 -70 -20 z" fill="#3B7E4B" stroke="#1F4628" stroke-width="6"/>
+  <path d="M600 260 q40 -30 90 -10" stroke="#2D6A3E" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <text x="50" y="70" font-family="Georgia, serif" font-size="44" font-weight="bold" fill="#7A5500">Frutas Orgánicas</text>
+</svg>

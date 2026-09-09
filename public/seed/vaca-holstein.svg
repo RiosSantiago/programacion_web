@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Vacas Holstein">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#D8F0DE"/>
+      <stop offset="1" stop-color="#82CF97"/>
+    </linearGradient>
+    <linearGradient id="cow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FAFAFA"/>
+      <stop offset="1" stop-color="#D9D9D9"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <circle cx="400" cy="300" r="200" fill="#ffffff" opacity="0.35"/>
+  <!-- vaca -->
+  <g transform="translate(400,330)">
+    <ellipse cx="0" cy="30" rx="170" ry="80" fill="url(#cow)" stroke="#1F4628" stroke-width="6"/>
+    <circle cx="150" cy="-10" r="70" fill="url(#cow)" stroke="#1F4628" stroke-width="6"/>
+    <path d="M150 -80 q-8 -70 20 -95" stroke="#1F4628" stroke-width="10" fill="none" stroke-linecap="round"/>
+    <path d="M150 -80 q8 -70 -20 -95" stroke="#1F4628" stroke-width="10" fill="none" stroke-linecap="round"/>
+    <path d="M120 5 a22 22 0 0 1 60 0 z" fill="#2D6A3E"/>
+    <circle cx="262" cy="-28" r="7" fill="#132D1A"/>
+    <path d="M50 -55 a52 52 0 0 1 52 48 a52 52 0 0 1 -52 -48 a52 52 0 0 1 -52 48 a52 52 0 0 1 52 -48" fill="#132D1A"/>
+    <path d="M-96 48 q-46 16 -78 60 l40 20 q38 -40 70 -48 z" fill="#132D1A"/>
+    <path d="M-34 52 q0 30 -4 52 l30 6 q8 -36 4 -62 z" fill="#132D1A"/>
+    <path d="M34 52 q0 30 4 52 l-30 6 q-8 -36 -4 -62 z" fill="#132D1A"/>
+    <path d="M108 44 q34 24 62 66 l18 -12 q-34 -52 -76 -68 z" fill="#132D1A"/>
+    <path d="M-40 -12 q40 30 80 0" stroke="#132D1A" stroke-width="10" fill="none" opacity="0.5"/>
+  </g>
+  <text x="50" y="70" font-family="Georgia, serif" font-size="44" font-weight="bold" fill="#132D1A">Vacas Holstein</text>
+</svg>

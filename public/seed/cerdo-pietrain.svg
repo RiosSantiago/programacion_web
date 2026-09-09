@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Cerdos Pietrain">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFD6CC"/>
+      <stop offset="1" stop-color="#FF8A75"/>
+    </linearGradient>
+    <linearGradient id="pig" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFE4E6"/>
+      <stop offset="1" stop-color="#F9A8B4"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <circle cx="400" cy="310" r="200" fill="#ffffff" opacity="0.35"/>
+  <g transform="translate(400,340)">
+    <ellipse cx="-40" cy="30" rx="120" ry="65" fill="url(#pig)" stroke="#8C201A" stroke-width="6"/>
+    <circle cx="70" cy="10" r="75" fill="url(#pig)" stroke="#8C201A" stroke-width="6"/>
+    <path d="M70 -65 q0 -70 30 -90" stroke="#8C201A" stroke-width="9" fill="none" stroke-linecap="round"/>
+    <path d="M70 -65 q0 -70 -30 -90" stroke="#8C201A" stroke-width="9" fill="none" stroke-linecap="round"/>
+    <ellipse cx="120" cy="0" rx="34" ry="26" fill="url(#pig)" stroke="#8C201A" stroke-width="6"/>
+    <ellipse cx="118" cy="8" rx="15" ry="12" fill="#8C201A"/>
+    <circle cx="216" cy="-18" r="7" fill="#855A63"/>
+    <path d="M40 6 a20 20 0 0 1 42 0 z" fill="#B4556B"/>
+    <path d="M-146 52 q-40 14 -66 46 l36 18 q32 -34 62 -42 z" fill="#8C201A"/>
+    <path d="M-86 20 q-50 12 -78 48 l34 16 q36 -34 68 -42 z" fill="#8C201A"/>
+    <path d="M-80 78 q-6 26 4 50 l30 -4 q-4 -26 0 -52 z" fill="#8C201A"/>
+    <path d="M-8 80 q-6 26 4 50 l30 -4 q-4 -26 0 -52 z" fill="#8C201A"/>
+    <path d="M64 64 q-2 30 8 56 l30 -4 q-4 -28 2 -58 z" fill="#8C201A"/>
+    <path d="M128 58 q30 16 56 50 l18 -10 q-34 -44 -70 -54 z" fill="#8C201A"/>
+    <circle cx="52" cy="-22" r="5" fill="#8C201A" opacity="0.6"/>
+    <circle cx="90" cy="-18" r="5" fill="#8C201A" opacity="0.6"/>
+  </g>
+  <text x="50" y="70" font-family="Georgia, serif" font-size="44" font-weight="bold" fill="#8C201A">Cerdos Pietrain</text>
+</svg>
