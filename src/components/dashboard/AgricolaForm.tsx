@@ -115,11 +115,19 @@ export default function AgricolaForm() {
 
     if (photos.length > 0) {
       try {
+        const token = localStorage?.getItem?.('agroup_token') || window?.localStorage?.getItem('agroup_token') || '';
         const uploadFormData = new FormData();
         uploadFormData.append('categoria', 'agricultura');
+        if (token) {
+          uploadFormData.append('authorization', `Bearer ${token}`);
+          uploadFormData.append('token', token);
+        }
         photos.forEach((photo) => uploadFormData.append('photos', photo));
 
-        const uploadRes = await fetch('/api/upload', { method: 'POST', body: uploadFormData });
+        const uploadRes = await fetch('/api/upload', {
+          method: 'POST',
+          body: uploadFormData,
+        });
         if (uploadRes.ok) {
           const uploadData = await uploadRes.json();
           uploadedPhotoUrls = uploadData.urls || [];

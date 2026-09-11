@@ -1,8 +1,28 @@
 import { defineMiddleware } from 'astro/middleware';
+import { existsSync, statSync } from 'fs';
+import { readFile } from 'fs/promises';
+import path from 'path';
+import { cwd } from 'process';
 import { queryGet, inicializar } from './lib/db';
 import { getTokenFromRequest } from './lib/auth';
 
 let dbInicializada = false;
+
+// En producción el servidor standalone sirve solo dist/client. Los archivos
+// subidos en runtime viven en public/uploads (gitignored) y no se copian al
+// build, así que se sirven aquí directamente desde el filesystem.
+const UPLOADS_DIR = path.join(cwd(), 'public', 'uploads');
+const UPLOADS_MIME: Record<string, string> = {
+  '.pdf': 'application/pdf',
+  '.webp': 'image/webp',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.png': 'image/png',
+  '.gif': 'image/gif',
+  '.svg': 'image/svg+xml',
+  '.mp4': 'video/mp4',
+  '.webm': 'video/webm',
+};
 
 function buildCsp(): string {
   const isProd = import.meta.env.PROD;
@@ -96,6 +116,25 @@ export const onRequest = defineMiddleware(async (context, next) => {
         }),
       );
     }
+  }
+
+  // ── Estáticos dinámicos: /uploads/* servidos desde public/uploads ──
+  // (necesario en producción: dist/client no contiene archivos subidos en runtime)
+  if (url.pathname.startsWith('/uploads/')) {
+    const relative = decodeURIComponent(url.pathname.slice('/uploads/'.length));
+    const filePath = path.join(UPLOADS_DIR, relative);
+    const dentroDeUploads = filePath === UPLOADS_DIR || filePath.startsWith(UPLOADS_DIR + path.sep);
+    if (!dentroDeUploads || !existsSync(filePath) || !statSync(filePath).isFile()) {
+      return withSecurityHeaders(new Response('No encontrado', { status: 404 }));
+    }
+    const ext = path.extname(filePath).toLowerCase();
+    const mime = UPLOADS_MIME[ext] || 'application/octet-stream';
+    const data = await readFile(filePath);
+    return withSecurityHeaders(
+      new Response(new Uint8Array(data), {
+        headers: { 'Content-Type': mime, 'Cache-Control': 'no-cache' },
+      }),
+    );
   }
 
   const response = await next();

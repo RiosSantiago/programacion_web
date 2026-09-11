@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Certificado ICA">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F4ECD8"/>
+      <stop offset="1" stop-color="#E2CFA5"/>
+    </linearGradient>
+    <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFEF8"/>
+      <stop offset="1" stop-color="#F5EFDC"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <circle cx="400" cy="300" r="200" fill="#ffffff" opacity="0.35"/>
+  <!-- hoja de certificado -->
+  <g transform="translate(400,300)">
+    <rect x="-210" y="-240" width="420" height="480" rx="16" fill="url(#paper)" stroke="#7A5C2E" stroke-width="6"/>
+    <rect x="-210" y="-240" width="420" height="110" rx="16" fill="#C9A96A"/>
+    <text x="0" y="-160" text-anchor="middle" font-family="Georgia, serif" font-size="42" font-weight="bold" fill="#3D2E12">ICA</text>
+    <text x="0" y="-118" text-anchor="middle" font-family="Georgia, serif" font-size="24" fill="#3D2E12">Instituto Colombiano Agropecuario</text>
+    <line x1="-170" y1="60" x2="170" y2="60" stroke="#C9A96A" stroke-width="3"/>
+    <text x="0" y="95" text-anchor="middle" font-family="Georgia, serif" font-size="30" font-weight="bold" fill="#5C4A22">Certificado ICA-2026-001234</text>
+    <text x="0" y="140" text-anchor="middle" font-family="Georgia, serif" font-size="22" fill="#5C4A22">Sanidad y genética certificadas</text>
+    <!-- sello -->
+    <circle cx="0" cy="170" r="46" fill="#FFFFFF" opacity="0.9" stroke="#8B5E2A" stroke-width="4"/>
+    <path d="M0 142 l6 12 13 2 -9 9 2 13 -12 -6 -12 6 2 -13 -9 -9 13 -2 z" fill="#8B5E2A"/>
+  </g>
+  <text x="50" y="70" font-family="Georgia, serif" font-size="44" font-weight="bold" fill="#3D2E12">Certificado ICA</text>
+</svg>

@@ -701,12 +701,20 @@ const campos = [
   document.getElementById('edit-file-input').addEventListener('change', async (e) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
+    const token = localStorage.getItem('agroup_token') || '';
     const formData = new FormData();
+    if (token) {
+      formData.append('authorization', `Bearer ${token}`);
+      formData.append('token', token);
+    }
     for (const file of files) {
       formData.append('photos', file);
     }
     try {
-      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
       if (!res.ok) throw new Error('Error al subir imagen');
       const data = await res.json();
       if (data.urls) {
@@ -728,10 +736,18 @@ const campos = [
   document.getElementById('edit-video-input').addEventListener('change', async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    const token = localStorage.getItem('agroup_token') || '';
     const formData = new FormData();
+    if (token) {
+      formData.append('authorization', `Bearer ${token}`);
+      formData.append('token', token);
+    }
     formData.append('video', file);
     try {
-      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
       if (!res.ok) throw new Error('Error al subir video');
       const data = await res.json();
       if (data.videoUrl) {
@@ -761,12 +777,20 @@ const campos = [
   document.getElementById('edit-certificados-input').addEventListener('change', async (e) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
+    const token = localStorage.getItem('agroup_token') || '';
     const formData = new FormData();
+    if (token) {
+      formData.append('authorization', `Bearer ${token}`);
+      formData.append('token', token);
+    }
     for (const file of files) {
       formData.append('certificaciones', file);
     }
     try {
-      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
       if (!res.ok) throw new Error('Error al subir certificado');
       const data = await res.json();
       if (data.certUrls) {

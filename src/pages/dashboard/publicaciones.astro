@@ -569,7 +569,12 @@ import PublicationForm from '../../components/dashboard/PublicationForm.tsx';
 
     if ((photoInput.files && photoInput.files.length > 0) || (videoInput.files && videoInput.files.length > 0)) {
       try {
+        const token = localStorage.getItem('agroup_token') || '';
         const uploadFormData = new FormData();
+        if (token) {
+          uploadFormData.append('authorization', `Bearer ${token}`);
+          uploadFormData.append('token', token);
+        }
         if (photoInput.files) {
           for (const f of Array.from(photoInput.files).slice(0, 5)) {
             uploadFormData.append('photos', f);
@@ -578,7 +583,10 @@ import PublicationForm from '../../components/dashboard/PublicationForm.tsx';
         if (videoInput.files && videoInput.files[0]) {
           uploadFormData.append('video', videoInput.files[0]);
         }
-        const uploadRes = await fetch('/api/upload', { method: 'POST', body: uploadFormData });
+        const uploadRes = await fetch('/api/upload', {
+          method: 'POST',
+          body: uploadFormData,
+        });
         if (uploadRes.ok) {
           const uploadData = await uploadRes.json();
           uploadedPhotoUrls = uploadData.urls || [];

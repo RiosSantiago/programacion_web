@@ -54,21 +54,27 @@ export function generarToken(payload: TokenPayload): string {
  * Compatible con tokens legados Base64 (sin firma) para migración transparente.
  */
 export function verificarToken(token: string): TokenPayload | null {
-  if (!token || !JWT_SECRET) return null;
+  if (!token || !JWT_SECRET) {
+    console.warn(`[auth] verificarToken: token=${token ? 'presente' : 'vacío'}, secret=${JWT_SECRET ? 'definido' : 'VACÍO'}`);
+    return null;
+  }
 
   try {
     const payload = jwt.verify(token, JWT_SECRET) as TokenPayload & {
       iat?: number;
       exp?: number;
     };
-    if (typeof payload.id !== 'number' || !payload.email) return null;
+    if (typeof payload.id !== 'number' || !payload.email) {
+      console.warn(`[auth] verificarToken: payload inválido — id=${typeof payload.id}, email=${!!payload.email}`);
+      return null;
+    }
     return {
       id: payload.id,
       email: payload.email,
       rol: payload.rol || 'comprador',
     };
-  } catch {
-    // Token inválido, firma manipulada o expirado
+  } catch (err: any) {
+    console.warn(`[auth] verificarToken falló: ${err.message}`);
     return null;
   }
 }

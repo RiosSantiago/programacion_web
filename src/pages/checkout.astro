@@ -140,20 +140,20 @@ import BaseLayout from '../layouts/BaseLayout.astro';
                 </svg>
               </div>
 
-              <div class="flex flex-wrap gap-1.5 sm:gap-2 mt-4">
-                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-white border border-[#d1fae5] text-[#065F46]">
+              <div id="metodos-pago" class="flex flex-wrap gap-1.5 sm:gap-2 mt-4" role="radiogroup" aria-label="Método de pago">
+                <button type="button" data-metodo="pse" role="radio" aria-checked="true" class="metodo-chip selected">
                   <img src="/images/pagos/pse.svg" alt="" class="w-3.5 h-3.5 object-contain" onerror="this.style.display='none'" /> PSE
-                </span>
-                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-white border border-[#d1fae5] text-[#065F46]">
+                </button>
+                <button type="button" data-metodo="tarjeta" role="radio" aria-checked="false" class="metodo-chip">
                   <img src="/images/pagos/visa.svg" alt="" class="w-3.5 h-3.5 object-contain" onerror="this.style.display='none'" />
                   <img src="/images/pagos/mastercard.svg" alt="" class="w-3.5 h-3.5 object-contain" onerror="this.style.display='none'" /> Tarjeta
-                </span>
-                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-white border border-[#d1fae5] text-[#065F46]">
+                </button>
+                <button type="button" data-metodo="nequi" role="radio" aria-checked="false" class="metodo-chip">
                   <img src="/images/pagos/nequi.svg" alt="" class="w-3.5 h-3.5 object-contain" onerror="this.style.display='none'" /> Nequi
-                </span>
-                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-white border border-[#d1fae5] text-[#065F46]">
+                </button>
+                <button type="button" data-metodo="daviplata" role="radio" aria-checked="false" class="metodo-chip">
                   <img src="/images/pagos/daviplata.svg" alt="" class="w-3.5 h-3.5 object-contain" onerror="this.style.display='none'" /> Daviplata
-                </span>
+                </button>
                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-white border border-[#d1fae5] text-[#065F46]">
                   <img src="/images/pagos/efectivo.svg" alt="" class="w-3.5 h-3.5 object-contain" onerror="this.style.display='none'" /> Efectivo
                 </span>
@@ -243,6 +243,29 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 </BaseLayout>
 
 <style is:global>
+  .metodo-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    font-size: 0.775rem;
+    font-weight: 600;
+    background: #fff;
+    border: 1.5px solid #d1fae5;
+    color: #065F46;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .metodo-chip:hover { border-color: #0D904F; }
+  .metodo-chip.selected {
+    background: #0D904F;
+    border-color: #0D904F;
+    color: #fff;
+    box-shadow: 0 6px 18px -8px rgba(13, 144, 79, 0.6);
+  }
+  .metodo-chip.selected img { filter: brightness(0) invert(1); }
+
   .reveal {
     opacity: 0;
     transform: translateY(26px);
@@ -485,6 +508,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     animateCOP(totalEl, total);
   }
 
+  document.querySelectorAll('.metodo-chip').forEach((chip) => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.metodo-chip').forEach((c) => {
+        c.classList.remove('selected');
+        c.setAttribute('aria-checked', 'false');
+      });
+      chip.classList.add('selected');
+      chip.setAttribute('aria-checked', 'true');
+    });
+  });
+
   document.getElementById('btn-pagar')?.addEventListener('click', async () => {
     const nombre = (document.getElementById('nombre') as HTMLInputElement)?.value;
     const telefono = (document.getElementById('telefono') as HTMLInputElement)?.value;
@@ -497,7 +531,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     const horario = (document.getElementById('horario') as HTMLSelectElement)?.value;
     const notas = (document.getElementById('notas') as HTMLTextAreaElement)?.value;
 
-    const metodoPago = 'pse';
+    const metodoPago = (document.querySelector('.metodo-chip.selected')?.getAttribute('data-metodo')) || 'pse';
 
     const errorEl = document.getElementById('error-pago');
     if (!nombre || !telefono || !direccion || !municipio || !departamento) {

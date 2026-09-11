@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Transporte de frutas">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#CEE6F5"/>
+      <stop offset="1" stop-color="#7FB4D8"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <circle cx="400" cy="300" r="200" fill="#ffffff" opacity="0.35"/>
+  <!-- contenedor -->
+  <g transform="translate(400,330)">
+    <rect x="-190" y="-120" width="380" height="150" rx="8" fill="#F2EFE4" stroke="#5C431B" stroke-width="6"/>
+    <rect x="0" y="-150" width="-290" height="30" rx="4" fill="#C9A96A"/>
+    <line x1="-150" y1="-120" x2="-150" y2="30" stroke="#D9D2C0" stroke-width="4"/>
+    <line x1="0"   y1="-120" x2="0"   y2="30" stroke="#D9D2C0" stroke-width="4"/>
+    <line x1="150" y1="-120" x2="150" y2="30" stroke="#D9D2C0" stroke-width="4"/>
+  </g>
+  <!-- cabina -->
+  <path d="M200 350 q-8 -46 44 -52 l40 -6 0 58 z" fill="#3E7C57" stroke="#1F4628" stroke-width="5"/>
+  <path d="M244 292 q40 6 44 40 l-44 10 z" fill="#BFE3FF" stroke="#1F4628" stroke-width="5"/>
+  <!-- ruedas -->
+  <circle cx="250" cy="368" r="30" fill="#2B2B2B"/>
+  <circle cx="250" cy="368" r="14" fill="#D9D2C0"/>
+  <circle cx="540" cy="368" r="30" fill="#2B2B2B"/>
+  <circle cx="540" cy="368" r="14" fill="#D9D2C0"/>
+  <!-- suelo -->
+  <line x1="60" y1="400" x2="740" y2="400" stroke="#1F4628" stroke-width="8"/>
+  <text x="50" y="70" font-family="Georgia, serif" font-size="44" font-weight="bold" fill="#1F4628">Transporte</text>
+</svg>

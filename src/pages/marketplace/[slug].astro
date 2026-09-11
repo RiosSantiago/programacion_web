@@ -6,8 +6,6 @@
 // ═══════════════════════════════════════════════════════════════
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PhotoCarousel from '../../components/marketplace/PhotoCarousel';
-import TraceabilityBlock from '../../components/marketplace/TraceabilityBlock';
-import QRTrazabilidad from '../../components/marketplace/QRTrazabilidad';
 import WhatsAppButton from '../../components/marketplace/WhatsAppButton';
 import '../../lib/db';
 import { getProductos, getProductoById } from '../../lib/models/productos.js';
@@ -48,6 +46,13 @@ const categoriaLabels: Record<string, string> = {
 const categoriaLabel = categoriaLabels[catLower] || producto?.categoria || 'Bovino';
 
 const esAgricola = ['agricultura', 'insumos'].includes(catLower);
+
+const rawCerts = producto?.certificaciones || (producto?.ica_pdf ? [producto.ica_pdf] : []);
+const listaCertificados: string[] = (Array.isArray(rawCerts) ? rawCerts : typeof rawCerts === 'string' ? [rawCerts] : [])
+  .map(c => String(c).trim())
+  .filter(c => c.length > 0);
+const tieneCertificados = listaCertificados.length > 0;
+
 const tipsSeguridad = esAgricola ? [
   { titulo: 'Verificación del Producto', texto: 'Solicita fotos o video recientes y verifica la fecha de cosecha o procesamiento y el estado del empaque antes de cerrar la compra.' },
   { titulo: 'Calidad y Trazabilidad', texto: 'Pregunta por certificaciones de origen, registros sanitarios y análisis de calidad del café, cacao o aguacate antes del pago.' },
@@ -121,6 +126,77 @@ const tipsSeguridad = esAgricola ? [
               />
             </div>
           </div>
+
+          <!-- Card Certificados y Documentos Oficiales (Descargables) -->
+          {tieneCertificados && (
+            <div class="bg-white rounded-2xl overflow-hidden shadow-md" style="border: 1.5px solid #C8DCC8;">
+              <div class="flex items-center justify-between px-5 py-3.5" style="background: linear-gradient(90deg, #1A3828, #2D5A3D); border-bottom: 1px solid #1A3828;">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-5 h-5 text-[#C9A84C]">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                  </div>
+                  <span class="text-white text-sm font-bold tracking-wider uppercase">Certificaciones y Documentos</span>
+                </div>
+                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-400/20 text-emerald-200 border border-emerald-400/30">
+                  {listaCertificados.length} {listaCertificados.length === 1 ? 'documento' : 'documentos'}
+                </span>
+              </div>
+              <div class="p-5 space-y-3.5">
+                <p class="text-xs text-[#4A7C5A] font-medium leading-relaxed">
+                  Este producto cuenta con documentos oficiales y certificados sanitarios (ICA, RUV o Registro Genealógico) verificables adjuntados por el vendedor:
+                </p>
+                <div class="space-y-2.5">
+                  {listaCertificados.map((certUrl: string, idx: number) => {
+                    const rawFileName = certUrl.split('/').pop() || `Certificado-${idx + 1}.pdf`;
+                    return (
+                      <div class="flex items-center justify-between p-3.5 rounded-xl bg-[#F4F9F4] border border-[#C8DCC8] hover:border-emerald-500 hover:bg-emerald-50/50 transition-all group shadow-xs">
+                        <div class="flex items-center gap-3 min-w-0 pr-3">
+                          <div class="w-10 h-10 rounded-lg bg-red-100 text-red-700 flex flex-col items-center justify-center shrink-0 shadow-xs border border-red-200">
+                            <span class="text-[10px] font-black uppercase leading-none">PDF</span>
+                            <span class="text-[8px] font-bold text-red-500 mt-0.5">ICA</span>
+                          </div>
+                          <div class="min-w-0">
+                            <p class="text-sm font-bold text-[#1A3828] truncate group-hover:text-emerald-800 transition-colors">
+                              Certificado ICA / Documento Oficial {listaCertificados.length > 1 ? `#${idx + 1}` : ''}
+                            </p>
+                            <p class="text-[11px] text-[#4A7C5A] font-medium truncate">{rawFileName}</p>
+                          </div>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0">
+                          <a
+                            href={certUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold text-emerald-800 bg-white hover:bg-emerald-100 border border-emerald-300 transition-colors"
+                            title="Ver documento en nueva pestaña"
+                          >
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                            <span class="hidden sm:inline">Ver</span>
+                          </a>
+                          <a
+                            href={certUrl}
+                            download
+                            class="btn-download inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-[#1A3828] hover:bg-[#2D5A3D] transition-all shadow-xs active:scale-95"
+                            title="Descargar archivo PDF"
+                          >
+                            <svg class="w-3.5 h-3.5 text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                            </svg>
+                            <span>Descargar</span>
+                          </a>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <!-- ════ DERECHA: Panel de detalles ════ -->
@@ -184,6 +260,16 @@ const tipsSeguridad = esAgricola ? [
               {categoriaLabel}
             </span>
 
+            <!-- Badge ICA Certificado -->
+            {tieneCertificados && (
+              <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-extrabold text-emerald-800 bg-emerald-50 border border-emerald-300 shadow-xs">
+                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                </svg>
+                ✓ ICA Certificado
+              </span>
+            )}
+
             <!-- Destacado -->
             {producto.destacado && (
               <span class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-bold text-[#6B4A0A]" style="background: #FEF3C7; border: 1.5px solid #C9A84C;">
@@ -198,16 +284,6 @@ const tipsSeguridad = esAgricola ? [
             {producto.oferta && tieneDescuento && (
               <span class="inline-flex items-center gap-1 px-3.5 py-2 rounded-lg text-xs font-extrabold text-white" style="background: #C0392B;">
                 -{descuento}% OFF
-              </span>
-            )}
-
-            <!-- Trazabilidad -->
-            {producto.trazabilidad && (
-              <span class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-bold text-[#1A3828]" style="background: #D1EDCF; border: 1px solid #4A7C5A;">
-                <svg class="w-3.5 h-3.5 text-[#2D5A3D]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                Con trazabilidad
               </span>
             )}
           </div>
@@ -379,18 +455,30 @@ const tipsSeguridad = esAgricola ? [
               )}
 
               <!-- Certificaciones -->
-              {producto.certificaciones && producto.certificaciones.length > 0 && (
-                <div class="flex items-center gap-3.5 px-5 py-4 group hover:bg-[#F5FBF5] transition-colors">
-                  <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background: #EAF4EA; border: 1px solid #C8DCC8;">
-                    <svg class="w-5 h-5" fill="none" stroke="#2D5A3D" viewBox="0 0 24 24" stroke-width="1.8">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
+              {tieneCertificados && (
+                <div class="flex items-start sm:items-center justify-between gap-3.5 px-5 py-4 group hover:bg-[#F5FBF5] transition-colors flex-col sm:flex-row">
+                  <div class="flex items-center gap-3.5">
+                    <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background: #EAF4EA; border: 1px solid #C8DCC8;">
+                      <svg class="w-5 h-5" fill="none" stroke="#2D5A3D" viewBox="0 0 24 24" stroke-width="1.8">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                      </svg>
+                    </div>
+                    <span class="text-sm font-bold shrink-0" style="color: #4A7C5A;">Certificados</span>
                   </div>
-                  <span class="text-sm font-bold w-24 shrink-0" style="color: #4A7C5A;">Certificaciones</span>
-                  <div class="flex flex-wrap gap-2 ml-auto">
-                    {producto.certificaciones.map((certUrl: string) => (
-                      <a href={certUrl} target="_blank" rel="noopener noreferrer" class="font-bold text-sm text-emerald-700 hover:text-emerald-600 underline truncate max-w-[180px]">
-                        Ver certificado
+                  <div class="flex flex-wrap gap-2 sm:ml-auto w-full sm:w-auto">
+                    {listaCertificados.map((certUrl: string, idx: number) => (
+                      <a
+                        href={certUrl}
+                        download
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="btn-download inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 transition-all hover:shadow-xs"
+                        title="Descargar Certificado ICA (PDF)"
+                      >
+                        <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                        </svg>
+                        <span>📄 Descargar Certificado {listaCertificados.length > 1 ? `#${idx + 1}` : 'ICA'}</span>
                       </a>
                     ))}
                   </div>
@@ -633,43 +721,6 @@ const tipsSeguridad = esAgricola ? [
 
           </div>
         </div>
-      </div>
-    )}
-
-    <!-- ══ Trazabilidad ══ -->
-    {producto.trazabilidad && (
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 space-y-6">
-        <TraceabilityBlock client:visible data={{
-          pesoActual: producto.peso ?? undefined,
-          ultimaVacuna: producto.salud || 'Aftosa',
-          fechaNacimiento: producto.fecha_nacimiento || '2024-01',
-          verificacion: producto.trazabilidad ? 'verificado' : 'basico',
-          categoria: producto.categoria,
-          historialPeso: [
-            { fecha: 'Ene 26', peso: Math.round((producto.peso || 400) * 0.75) },
-            { fecha: 'Feb 26', peso: Math.round((producto.peso || 400) * 0.82) },
-            { fecha: 'Mar 26', peso: Math.round((producto.peso || 400) * 0.88) },
-            { fecha: 'Abr 26', peso: Math.round((producto.peso || 400) * 0.94) },
-            { fecha: 'May 26', peso: producto.peso || 445 },
-          ],
-          vacunas: [
-            { fecha: '2026-01-15', nombre: 'Aftosa', tipo: 'Obligatoria' },
-            { fecha: '2026-02-20', nombre: 'Brucelosis', tipo: 'Obligatoria' },
-            { fecha: '2026-03-10', nombre: 'Carbunco', tipo: 'Recomendada' },
-          ],
-          genealogia: (producto.categoria === 'bovinos' || producto.categoria === 'equinos') ? {
-            padre: producto.raza ? `Toro ${producto.raza}` : 'Toro Angus',
-            padreRaza: producto.raza || 'Angus Negro',
-            madre: producto.raza ? `Vaca ${producto.raza}` : 'Vaca Angus',
-            madreRaza: producto.raza || 'Angus Negro',
-            abueloPaterno: 'Campeón Nacional',
-            abuelaPaterna: 'Vaca Premium',
-            abueloMaterno: 'Reproductor Élite',
-            abuelaMaterna: 'Vaca Lechera Record',
-          } : undefined,
-          id: producto.id,
-        }} />
-        <QRTrazabilidad client:load productoId={producto.id} nombre={producto.nombre} />
       </div>
     )}
 

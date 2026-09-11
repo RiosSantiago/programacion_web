@@ -102,7 +102,8 @@ function transformarProducto(row: any, imagenesTabulares?: string[]): Producto {
   try {
     const imagenes: string[] = (imagenesTabulares && imagenesTabulares.length > 0) ? imagenesTabulares : [];
     const categoria = normalizarSlugCategoria(row.categoria) || 'bovinos';
-    const { ica_pdf, ...rest } = row;
+    const certs = parseCertificaciones(row.certificaciones || row.ica_pdf);
+    const { ica_pdf, certificaciones: _certs, ...rest } = row;
     return {
       ...rest,
       categoria,
@@ -116,31 +117,49 @@ function transformarProducto(row: any, imagenesTabulares?: string[]): Producto {
       precioAnterior:  row.precio_anterior ?? row.precioAnterior ?? null,
       vendedorRating:  row.vendedor_rating  ?? row.vendedorRating  ?? 4.5,
       vendedor_id:     row.vendedor_id      ?? null,
-      certificaciones: parseCertificaciones(ica_pdf),
+      certificaciones: certs,
+      ica_pdf: certs[0] || (typeof ica_pdf === 'string' ? ica_pdf : ''),
     };
   } catch {
+    const certs = parseCertificaciones(row?.certificaciones || row?.ica_pdf);
     return {
       ...row,
-      categoria: normalizarSlugCategoria(row.categoria) || 'bovinos',
+      categoria: normalizarSlugCategoria(row?.categoria) || 'bovinos',
       destacado: false, oferta: false, trazabilidad: false, envio: false,
       imagenes: [],
-      imagen: getPlaceholderImagen(normalizarSlugCategoria(row.categoria) || 'bovinos'),
+      imagen: getPlaceholderImagen(normalizarSlugCategoria(row?.categoria) || 'bovinos'),
       video: '',
-      precioAnterior: row.precio_anterior ?? null,
-      vendedorRating: row.vendedor_rating  ?? 4.5,
-      vendedor_id:    row.vendedor_id       ?? null,
-      certificaciones: [],
+      precioAnterior: row?.precio_anterior ?? null,
+      vendedorRating: row?.vendedor_rating  ?? 4.5,
+      vendedor_id:    row?.vendedor_id       ?? null,
+      certificaciones: certs,
+      ica_pdf: certs[0] || (typeof row?.ica_pdf === 'string' ? row.ica_pdf : ''),
     };
   }
 }
 
-function parseCertificaciones(val: unknown): string[] {
+export function parseCertificaciones(val: unknown): string[] {
   if (!val) return [];
-  if (Array.isArray(val)) return val;
+  if (Array.isArray(val)) {
+    return val.map(v => String(v).trim()).filter(v => v.length > 0);
+  }
   try {
     const parsed = JSON.parse(String(val));
-    return Array.isArray(parsed) ? parsed : [];
+    if (Array.isArray(parsed)) {
+      return parsed.map(v => String(v).trim()).filter(v => v.length > 0);
+    }
+    if (typeof parsed === 'string' && parsed.trim().length > 0) {
+      return [parsed.trim()];
+    }
+    return [];
   } catch {
+    const str = String(val).trim();
+    if (str.length > 0 && str !== '[]' && str !== '""' && str !== "''" && str !== '{}') {
+      if (str.includes(',')) {
+        return str.split(',').map(s => s.trim().replace(/^["'\[\]]+|["'\[\]]+$/g, '')).filter(Boolean);
+      }
+      return [str.replace(/^["'\[\]]+|["'\[\]]+$/g, '')];
+    }
     return [];
   }
 }
@@ -181,7 +200,7 @@ const PRODUCTO_COLS = `
   p.vendedor_id, p.vendedor_rating, p.estado, p.salud, p.envio,
   p.destacado, p.oferta, p.trazabilidad, p.tipo_precio, p.sexo,
   p.fecha_nacimiento, p.descripcion, p.video, p.finca, p.vereda,
-  p.referencia_ubicacion, p.ica_pdf, p.transporte, p.created_at
+  p.referencia_ubicacion, p.ica_pdf, p.certificaciones, p.transporte, p.created_at
 `;
 
 export async function getProductos(): Promise<Producto[]> {

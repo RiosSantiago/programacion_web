@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { queryRun, withTransaction } from '../../../lib/db';
 import { crearPaymentLink, WOMPI_CHECKOUT_URL } from '../../../lib/wompi';
-import { getRequestUser } from '../../../lib/rbac';
+import { getRequestUser, unauthorized } from '../../../lib/rbac';
 import { ApiError } from '../../../lib/errors';
 
 function generarOrdenId(): string {
@@ -16,7 +16,8 @@ function generarOrdenId(): string {
 export const POST: APIRoute = async ({ request }) => {
   try {
     const user = getRequestUser(request);
-    let usuarioId: number | null = user?.id ?? null;
+    if (!user) return unauthorized();
+    const usuarioId = user.id;
 
     const { items, total, metodoPago, nombre, telefono, direccion, notas } = await request.json();
 
@@ -43,6 +44,9 @@ export const POST: APIRoute = async ({ request }) => {
 
     const ordenId = generarOrdenId();
 
+    const METODOS_ONLINE = ['pse', 'tarjeta', 'nequi', 'daviplata'];
+    const metodoFinal = METODOS_ONLINE.includes(metodoPago) ? metodoPago : 'pse';
+
     // 1. Crear pedido, detalles y reservar stock en una transacción atómica
     const { pedidoId } = await withTransaction(async (tx) => {
       // Validar stock disponible
@@ -64,7 +68,7 @@ export const POST: APIRoute = async ({ request }) => {
       const { lastInsertRowid: newPedidoId } = await tx.queryRun(
         `INSERT INTO pedidos (orden_id, usuario_id, total, metodo_pago, nombre_comprador, telefono_comprador, direccion, notas, estado)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pendiente')`,
-        [ordenId, usuarioId, total, metodoPago || 'pse', nombre, telefono, direccion, notas || '']
+        [ordenId, usuarioId, total, metodoFinal, nombre, telefono, direccion, notas || '']
       );
 
       for (const item of items) {
@@ -90,7 +94,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     // 2. Crear link de pago en Wompi
     const origin = new URL(request.url).origin;
-    const redirectUrl = `${origin}/pedido-exito?orden=${ordenId}&metodo=${metodoPago || 'pse'}`;
+    const redirectUrl = `${origin}/pedido-exito?orden=${ordenId}&metodo=${metodoFinal}`;
     const amountCents = Math.round(Number(total) * 100);
 
     let wompiData;

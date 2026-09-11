@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Predio o finca">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#DCF0E8"/>
+      <stop offset="1" stop-color="#8FCBB0"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <circle cx="400" cy="300" r="200" fill="#ffffff" opacity="0.35"/>
+  <circle cx="620" cy="120" r="46" fill="#FFD86B" stroke="#D9A400" stroke-width="4"/>
+  <!-- cerro y pasto -->
+  <path d="M0 420 q200 -140 400 -30 q200 110 400 -30 l0 240 l-800 0 z" fill="#4C9C6B"/>
+  <rect x="0" y="470" width="800" height="130" fill="#3E7C57"/>
+  <!-- casa -->
+  <g transform="translate(330,300)">
+    <rect x="-70" y="40" width="140" height="100" rx="4" fill="#F6E7C1" stroke="#7A5C2E" stroke-width="5"/>
+    <rect x="20" y="80" width="40" height="60" fill="#7A5C2E"/>
+    <rect x="-46" y="66" width="34" height="34" fill="#BFE3FF" stroke="#7A5C2E" stroke-width="4"/>
+    <path d="M-90 40 L0 -70 L90 40 z" fill="#C94F3F" stroke="#7A5C2E" stroke-width="5" stroke-linejoin="round"/>
+  </g>
+  <!-- árbol -->
+  <path d="M620 470 l0 -90" stroke="#6B4A24" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="620" cy="330" r="64" fill="#2E7D4F"/>
+  <circle cx="578" cy="360" r="40" fill="#37935D"/>
+  <circle cx="662" cy="360" r="40" fill="#37935D"/>
+  <!-- corral -->
+  <line x1="120" y1="470" x2="180" y2="470" stroke="#7A5C2E" stroke-width="8"/>
+  <line x1="120" y1="470" x2="120" y2="420" stroke="#7A5C2E" stroke-width="8"/>
+  <line x1="180" y1="470" x2="180" y2="420" stroke="#7A5C2E" stroke-width="8"/>
+  <line x1="120" y1="420" x2="180" y2="420" stroke="#7A5C2E" stroke-width="8"/>
+  <text x="50" y="70" font-family="Georgia, serif" font-size="44" font-weight="bold" fill="#1F4628">Predio y ubicación</text>
+</svg>

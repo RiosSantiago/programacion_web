@@ -2,6 +2,27 @@ import type { APIRoute } from 'astro';
 import { queryGet, queryRun } from '../../../lib/db';
 import { generarToken, verificarPassword, hashPassword, getTokenFromRequest } from '../../../lib/auth';
 
+export const GET: APIRoute = async ({ request }) => {
+  try {
+    const tokenPayload = getTokenFromRequest(request);
+    if (!tokenPayload) {
+      return new Response(JSON.stringify({ error: 'No autorizado' }), { status: 401 });
+    }
+
+    const usuario = await queryGet<any>('SELECT id, nombre, email, rol, celular, hacienda, ciudad, departamento, direccion, created_at FROM usuarios WHERE id = $1', [tokenPayload.id]);
+    if (!usuario) {
+      return new Response(JSON.stringify({ error: 'Usuario no encontrado' }), { status: 404 });
+    }
+
+    return new Response(JSON.stringify(usuario), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({ error: 'Error interno del servidor' }), { status: 500 });
+  }
+};
+
 export const PUT: APIRoute = async ({ request }) => {
   try {
     const tokenPayload = getTokenFromRequest(request);

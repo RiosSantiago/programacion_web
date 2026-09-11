@@ -181,15 +181,14 @@ function actualizarCarritoUI() {
   });
 
   const subtotal = getCartTotal();
-  const transporte = items.length > 0 ? 150000 : 0;
-  const total = subtotal + transporte;
+  const total = subtotal;
 
   const subtotalEl = document.getElementById('cart-subtotal');
   const transporteEl = document.getElementById('cart-transporte');
   const totalEl = document.getElementById('cart-total');
 
   if (subtotalEl) subtotalEl.textContent = formatearCOP(subtotal);
-  if (transporteEl) transporteEl.textContent = formatearCOP(transporte);
+  if (transporteEl) transporteEl.textContent = 'Gratis';
   if (totalEl) totalEl.textContent = formatearCOP(total);
 }
 

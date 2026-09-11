@@ -18,6 +18,9 @@ RUN npm ci
 # Código fuente (node_modules, .env, dist, etc. excluidos vía .dockerignore)
 COPY . .
 
+# Directorio para archivos subidos en runtime (fotos, videos, certificados PDF)
+RUN mkdir -p public/uploads
+
 # Build server standalone (same artifact as producción) — informe 3.1
 RUN npm run build
 

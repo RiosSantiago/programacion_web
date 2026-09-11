@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { queryAll } from '../../../lib/db';
-import { getImagenesMap } from '../../../lib/models/productos';
+import { getImagenesMap, parseCertificaciones } from '../../../lib/models/productos';
 import { getAuthContext, unauthorized, forbidden } from '../../../lib/rbac';
 
 export const GET: APIRoute = async ({ request }) => {
@@ -19,7 +19,7 @@ export const GET: APIRoute = async ({ request }) => {
               p.vendedor_id, p.vendedor_rating, p.estado, p.salud, p.envio,
               p.destacado, p.oferta, p.trazabilidad, p.tipo_precio, p.sexo,
               p.fecha_nacimiento, p.descripcion, p.video, p.finca, p.vereda,
-              p.referencia_ubicacion, p.ica_pdf, p.created_at,
+              p.referencia_ubicacion, p.ica_pdf, p.certificaciones, p.created_at,
               u.nombre AS vendedor,
               COALESCE(c.slug, p.categoria) AS categoria,
               c.nombre AS categoria_nombre
@@ -37,14 +37,17 @@ export const GET: APIRoute = async ({ request }) => {
 
     const productos = rows.map((row: any) => {
       const imagenes = imgMap[row.id] || (typeof row.imagenes === 'string' ? JSON.parse(row.imagenes) : []);
+      const certs = parseCertificaciones(row.certificaciones || row.ica_pdf);
       return {
         ...row,
         imagenes,
-        imagen:       imagenes[0] || '/images/ganado.svg',
-        destacado:    Boolean(row.destacado),
-        oferta:       Boolean(row.oferta),
-        trazabilidad: Boolean(row.trazabilidad),
-        envio:        Boolean(row.envio),
+        imagen:          imagenes[0] || '/images/ganado.svg',
+        destacado:       Boolean(row.destacado),
+        oferta:          Boolean(row.oferta),
+        trazabilidad:    Boolean(row.trazabilidad),
+        envio:           Boolean(row.envio),
+        certificaciones: certs,
+        ica_pdf:         certs[0] || (typeof row.ica_pdf === 'string' ? row.ica_pdf : ''),
       };
     });
 

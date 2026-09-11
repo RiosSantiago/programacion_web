@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { queryAll, queryGet, queryRun, withTransaction } from '../../../lib/db';
 import { getTokenFromRequest } from '../../../lib/auth';
+import { parseCertificaciones } from '../../../lib/models/productos';
 
 async function getUserRole(userId: number): Promise<string | null> {
   const row = await queryGet<{ rol: string }>('SELECT rol FROM usuarios WHERE id = ?', [userId]);
@@ -22,7 +23,7 @@ export const GET: APIRoute = async ({ params }) => {
               p.vendedor_id, p.vendedor_rating, p.estado, p.salud, p.envio,
               p.destacado, p.oferta, p.trazabilidad, p.tipo_precio, p.sexo,
               p.fecha_nacimiento, p.descripcion, p.video, p.finca, p.vereda,
-              p.referencia_ubicacion, p.ica_pdf, p.transporte, p.created_at,
+              p.referencia_ubicacion, p.ica_pdf, p.certificaciones, p.transporte, p.created_at,
               u.nombre AS vendedor,
               COALESCE(c.slug, p.categoria) AS categoria,
               c.nombre AS categoria_nombre
@@ -36,9 +37,16 @@ export const GET: APIRoute = async ({ params }) => {
 
     const imgRows = await queryAll<{ url: string }>('SELECT url FROM imagenes_producto WHERE producto_id = ? ORDER BY orden ASC', [id]);
     const imagenes: string[] = Array.isArray(imgRows) ? imgRows.map(i => i.url) : [];
+    const certs = parseCertificaciones(product.certificaciones || product.ica_pdf);
 
     return new Response(JSON.stringify({
-      producto: { ...product, imagenes, imagen: imagenes[0] || '/images/ganado.svg' },
+      producto: { 
+        ...product, 
+        certificaciones: certs,
+        ica_pdf: certs[0] || (typeof product.ica_pdf === 'string' ? product.ica_pdf : ''),
+        imagenes, 
+        imagen: imagenes[0] || '/images/ganado.svg' 
+      },
     }), { status: 200, headers: { 'Content-Type': 'application/json' } });
   } catch (error) {
     console.error('Error al obtener producto:', error);
@@ -61,7 +69,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
       p.vendedor_id, p.vendedor_rating, p.estado, p.salud, p.envio,
       p.destacado, p.oferta, p.trazabilidad, p.tipo_precio, p.sexo,
       p.fecha_nacimiento, p.descripcion, p.video, p.finca, p.vereda,
-      p.referencia_ubicacion, p.ica_pdf, p.transporte, p.created_at,
+      p.referencia_ubicacion, p.ica_pdf, p.certificaciones, p.transporte, p.created_at,
       u.nombre AS vendedor,
       COALESCE(c.slug, p.categoria) AS categoria,
       c.nombre AS categoria_nombre

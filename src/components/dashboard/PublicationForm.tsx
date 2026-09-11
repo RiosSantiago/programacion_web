@@ -267,19 +267,50 @@ export default function PublicationForm() {
         if (video) uploadFormData.append('video', video);
         certificaciones.forEach((cert) => uploadFormData.append('certificaciones', cert));
 
+        const token =
+          localStorage?.getItem?.('agroup_token') ||
+          window?.localStorage?.getItem('agroup_token');
+
+        console.log('[AUTH DEBUG] Token type:', typeof token);
+        console.log('[AUTH DEBUG] Token length:', token?.length);
+        console.log('[AUTH DEBUG] Token value (first 50 chars):', token?.substring(0, 50));
+        console.log('[AUTH DEBUG] Token is empty string?', token === '');
+        console.log('[AUTH DEBUG] Token is null?', token === null);
+        console.log('[AUTH DEBUG] Token is undefined?', token === undefined);
+
+        if (!token) {
+          console.error('[AUTH DEBUG] Token NOT FOUND en localStorage');
+          console.error('[AUTH DEBUG] All localStorage keys:', Object.keys(localStorage || {}));
+          setError('Error de autenticación: token perdido');
+          setLoading(false);
+          return;
+        }
+
+        // Agregar el token AL FormData, no a los headers
+        uploadFormData.append('authorization', `Bearer ${token}`);
+
+        console.log('[AUTH DEBUG] Proceeding with token in FormData, about to fetch');
+
         const uploadRes = await fetch('/api/upload', {
           method: 'POST',
           body: uploadFormData,
         });
+        console.log('[AUTH DEBUG] Fetch done, status:', uploadRes.status);
 
-        if (uploadRes.ok) {
-          const uploadData = await uploadRes.json();
-          uploadedPhotoUrls = uploadData.urls || [];
-          uploadedVideoUrl = uploadData.videoUrl || '';
-          uploadedCertUrls = uploadData.certUrls || [];
+        if (!uploadRes.ok) {
+          const uploadError = await uploadRes.json().catch(() => ({}));
+          setError(uploadError.error || 'Error al subir archivo. Verifica el formato y el tamaño.');
+          setLoading(false);
+          return; // no continúes con el resto del formulario
         }
+
+        const uploadData = await uploadRes.json();
+        uploadedPhotoUrls = uploadData.urls || [];
+        uploadedVideoUrl = uploadData.videoUrl || '';
+        uploadedCertUrls = uploadData.certUrls || [];
       } catch (uploadErr) {
         console.log('Error uploading files:', uploadErr);
+        setError('Error al subir archivo. Intenta de nuevo.');
       }
     }
 
@@ -296,6 +327,7 @@ export default function PublicationForm() {
 
     try {
       const token = localStorage.getItem('agroup_token');
+      console.log('[AUTH DEBUG] publicar token:', token ? 'presente' : 'NULL');
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
